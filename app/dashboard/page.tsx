@@ -7,7 +7,7 @@ import { LogOut, PlayCircle, BookOpen, Lock, CheckCircle, ChevronRight, Eye } fr
 import { getSession, clearSession, PLAN_LABELS, type UserSession } from "@/lib/auth";
 
 const meditacionesContent = [
-  { id: 1, title: "Meditación 1: Silenciando el alma", duration: "28 min", unlocked: true, vimeoId: null },
+  { id: 1, title: "El Secreto de la Meditación 1", duration: "28 min", unlocked: true, vimeoId: "1204206028" },
   { id: 2, title: "Meditación 2: La voz interior del profeta", duration: "35 min", unlocked: true, vimeoId: null },
   { id: 3, title: "Meditación 3: Alineando mente y espíritu", duration: "42 min", unlocked: true, vimeoId: null },
   { id: 4, title: "Meditación 4: Visiones y percepción profética", duration: "31 min", unlocked: true, vimeoId: null },
