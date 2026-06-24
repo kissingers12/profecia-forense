@@ -10,7 +10,7 @@ const links = [
   { label: "Programas", href: "#programas" },
   { label: "Eventos", href: "#eventos" },
   { label: "Invitaciones", href: "#testimonios" },
-  { label: "Ofrendas y Diezmos", href: "#donaciones" },
+  { label: "Ofrendas", href: "#donaciones" },
   { label: "Contacto", href: "#contacto" },
 ];
 
@@ -44,9 +44,9 @@ export default function Navbar() {
               className="object-cover w-full h-full"
             />
           </div>
-          <span className="text-lg font-bold tracking-wider text-white hidden sm:block">
-            Profecía <span className="text-[#c9a84c]">Forense</span>{" "}
-            <span className="text-sm font-normal text-[#8a7a6a]">por Kissingers Araque</span>
+          <span className="font-bold tracking-wider text-white hidden sm:block whitespace-nowrap">
+            <span className="text-base">Profecía <span className="text-[#c9a84c]">Forense</span></span>
+            <span className="text-xs font-normal text-[#8a7a6a] ml-1">por Kissingers Araque</span>
           </span>
         </a>
 
