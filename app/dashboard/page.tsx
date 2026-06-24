@@ -20,13 +20,13 @@ type Group = {
 };
 
 const meditacionesContent: Lesson[] = [
-  { id: 1, title: "El Secreto de la Meditación 1", duration: "28 min", unlocked: true, vimeoId: "1204206028" },
-  { id: 2, title: "El Secreto de la Meditación 2", duration: "35 min", unlocked: true, vimeoId: "1204206979" },
-  { id: 3, title: "El Secreto de la Meditación 3", duration: "42 min", unlocked: true, vimeoId: "1204224003" },
-  { id: 4, title: "El Secreto de la Meditación 4", duration: "31 min", unlocked: true, vimeoId: "1204242854" },
-  { id: 5, title: "La Llave de la Ciencia", duration: "38 min", unlocked: true, vimeoId: "1204243775" },
-  { id: 6, title: "La Meditación de los profetas para salir del cuerpo", duration: "45 min", unlocked: true, vimeoId: "1204243894" },
-  { id: 7, title: "4 horas instrumental para meditar", duration: "4h 00min", unlocked: true, vimeoId: "1204255913" },
+  { id: 1, title: "El Secreto de la Meditación 1", duration: "", unlocked: true, vimeoId: "1204206028" },
+  { id: 2, title: "El Secreto de la Meditación 2", duration: "", unlocked: true, vimeoId: "1204206979" },
+  { id: 3, title: "El Secreto de la Meditación 3", duration: "", unlocked: true, vimeoId: "1204224003" },
+  { id: 4, title: "El Secreto de la Meditación 4", duration: "", unlocked: true, vimeoId: "1204242854" },
+  { id: 5, title: "La Llave de la Ciencia", duration: "", unlocked: true, vimeoId: "1204243775" },
+  { id: 6, title: "La Meditación de los profetas para salir del cuerpo", duration: "", unlocked: true, vimeoId: "1204243894" },
+  { id: 7, title: "4 horas instrumental para meditar", duration: "", unlocked: true, vimeoId: "1204255913" },
   { id: 8, title: "Próximamente nueva enseñanza", duration: "", unlocked: false, vimeoId: null },
 ];
 
@@ -34,13 +34,13 @@ const escuelaGroups: Group[] = [
   {
     groupTitle: "Los Secretos de la Meditación",
     lessons: [
-      { id: 1, title: "El Secreto de la Meditación 1", duration: "28 min", unlocked: true, vimeoId: "1204206028" },
-      { id: 2, title: "El Secreto de la Meditación 2", duration: "35 min", unlocked: true, vimeoId: "1204206979" },
-      { id: 3, title: "El Secreto de la Meditación 3", duration: "42 min", unlocked: true, vimeoId: "1204224003" },
-      { id: 4, title: "El Secreto de la Meditación 4", duration: "31 min", unlocked: true, vimeoId: "1204242854" },
-      { id: 5, title: "La Llave de la Ciencia", duration: "38 min", unlocked: true, vimeoId: "1204243775" },
-      { id: 6, title: "La Meditación de los profetas para salir del cuerpo", duration: "45 min", unlocked: true, vimeoId: "1204243894" },
-      { id: 7, title: "4 horas instrumental para meditar", duration: "4h 00min", unlocked: true, vimeoId: "1204255913" },
+      { id: 1, title: "El Secreto de la Meditación 1", duration: "", unlocked: true, vimeoId: "1204206028" },
+      { id: 2, title: "El Secreto de la Meditación 2", duration: "", unlocked: true, vimeoId: "1204206979" },
+      { id: 3, title: "El Secreto de la Meditación 3", duration: "", unlocked: true, vimeoId: "1204224003" },
+      { id: 4, title: "El Secreto de la Meditación 4", duration: "", unlocked: true, vimeoId: "1204242854" },
+      { id: 5, title: "La Llave de la Ciencia", duration: "", unlocked: true, vimeoId: "1204243775" },
+      { id: 6, title: "La Meditación de los profetas para salir del cuerpo", duration: "", unlocked: true, vimeoId: "1204243894" },
+      { id: 7, title: "4 horas instrumental para meditar", duration: "", unlocked: true, vimeoId: "1204255913" },
     ],
   },
   {
