@@ -15,7 +15,7 @@ export default function Footer() {
                 <Image src="/logo.jpg" alt="100x100Cristianos" width={40} height={40} className="object-cover w-full h-full" />
               </div>
               <span className="text-white font-bold tracking-wider">
-                Profecía <span className="text-[#c9a84c]">Forense</span>
+                100x100 <span className="text-[#c9a84c]">Cristianos</span>
               </span>
             </div>
             <p className="text-[#6a5a4a] text-sm leading-relaxed">
@@ -59,7 +59,7 @@ export default function Footer() {
                 ["Nosotros", "#nosotros"],
                 ["Programas", "#programas"],
                 ["Eventos", "#eventos"],
-                ["Testimonios", "#testimonios"],
+                ["Invitaciones", "#testimonios"],
                 ["Contacto", "#contacto"],
               ].map(([label, href]) => (
                 <li key={href}>
