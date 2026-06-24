@@ -8,7 +8,7 @@ import { getSession, clearSession, PLAN_LABELS, type UserSession } from "@/lib/a
 
 const meditacionesContent = [
   { id: 1, title: "El Secreto de la Meditación 1", duration: "28 min", unlocked: true, vimeoId: "1204206028" },
-  { id: 2, title: "Meditación 2: La voz interior del profeta", duration: "35 min", unlocked: true, vimeoId: null },
+  { id: 2, title: "El Secreto de la Meditación 2", duration: "35 min", unlocked: true, vimeoId: "1204206979" },
   { id: 3, title: "Meditación 3: Alineando mente y espíritu", duration: "42 min", unlocked: true, vimeoId: null },
   { id: 4, title: "Meditación 4: Visiones y percepción profética", duration: "31 min", unlocked: true, vimeoId: null },
   { id: 5, title: "Meditación 5: Discernimiento de voces", duration: "38 min", unlocked: true, vimeoId: null },
