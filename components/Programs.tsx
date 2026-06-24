@@ -197,8 +197,8 @@ export default function Programs() {
                   <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
                 </a>
                 <p className="text-center text-xs text-[#6a5a4a] mt-2">
-                  Por ahora solo disponible pago con criptomonedas.{" "}
-                  <span className="text-[#c9a84c]/70">Próximamente todos los métodos de pago.</span>
+                  Elige tu criptomoneda favorita al pagar —{" "}
+                  <span className="text-[#c9a84c]/70">Bitcoin, USDT, ETH y más de 100 opciones.</span>
                 </p>
                 <a
                   href="/login"

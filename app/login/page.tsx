@@ -219,8 +219,8 @@ function LoginContent() {
                 Proceder al pago — ${price}
               </a>
               <p className="text-center text-xs text-[#6a5a4a]">
-                Por ahora solo disponible pago con criptomonedas.{" "}
-                <span className="text-[#c9a84c]/70">Próximamente todos los métodos de pago.</span>
+                Elige tu criptomoneda favorita —{" "}
+                <span className="text-[#c9a84c]/70">Bitcoin, USDT, ETH y más de 100 opciones.</span>
               </p>
               <p className="text-[#6a5a4a] text-xs">
                 Después del pago, tu acceso se activará automáticamente en minutos.{" "}
