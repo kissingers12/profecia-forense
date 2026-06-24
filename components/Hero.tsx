@@ -38,7 +38,7 @@ export default function Hero() {
     <section id="inicio" className="relative overflow-hidden">
 
       {/* ── PART 1: Full-viewport image (seen first) ── */}
-      <div className="relative h-screen w-full overflow-hidden">
+      <div className="relative h-[65vh] sm:h-screen w-full overflow-hidden">
         {/* Image with parallax */}
         <div ref={imageRef} className="absolute inset-0 scale-110 will-change-transform">
           <Image
