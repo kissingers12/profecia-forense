@@ -14,6 +14,7 @@ const meditacionesContent = [
   { id: 5, title: "La Llave de la Ciencia", duration: "38 min", unlocked: true, vimeoId: "1204243775" },
   { id: 6, title: "La Meditación de los profetas para salir del cuerpo", duration: "45 min", unlocked: true, vimeoId: "1204243894" },
   { id: 7, title: "4 horas instrumental para meditar", duration: "4h 00min", unlocked: true, vimeoId: "1204255913" },
+  { id: 8, title: "Próximamente nueva enseñanza", duration: "", unlocked: false, vimeoId: null },
 ];
 
 const escuelaContent = [
