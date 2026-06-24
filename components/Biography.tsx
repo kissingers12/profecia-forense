@@ -1,7 +1,7 @@
 const milestones = [
   {
     age: "8 años",
-    text: "Entregué mi vida a Jesucristo como mi Señor y Salvador. Pocos días después, en medio de la noche, fui despertado por una voz poderosa, como un trueno, que llamaba mi nombre. Corrí hacia mi familia buscando explicación, pero ellos insistían en que nadie me había llamado. Sin embargo, mientras más intentaba ignorarla, más fuerte se hacía aquella voz que resonaba en mi interior.",
+    text: "Entregué mi vida a Jesucristo. Pocos días después, en medio de la noche, fui despertado por una voz poderosa, como un trueno, que llamaba mi nombre. Corrí hacia mi familia buscando explicación, pero ellos insistían en que nadie me había llamado. Sin embargo, mientras más intentaba ignorarla, más fuerte se hacía aquella voz que resonaba en mi interior.",
   },
   {
     age: "El llamado",
