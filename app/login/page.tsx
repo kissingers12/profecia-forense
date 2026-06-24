@@ -145,10 +145,14 @@ function LoginContent() {
               <button type="submit" disabled={loading} className="btn-gold w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 mt-2">
                 {loading ? <span className="w-4 h-4 border-2 border-[#050510]/40 border-t-[#050510] rounded-full animate-spin" /> : <><LogIn size={17} />Ingresar</>}
               </button>
-              <p className="text-center text-xs text-[#6a5a4a] mt-2">
-                ¿No tienes cuenta?{" "}
-                <button type="button" onClick={() => setTab("register")} className="text-[#c9a84c] underline">Regístrate aquí</button>
-              </p>
+              <div className="flex items-center justify-between mt-2">
+                <a href="/reset-password" className="text-xs text-[#6a5a4a] hover:text-[#c9a84c] transition-colors">
+                  ¿Olvidaste tu contraseña?
+                </a>
+                <button type="button" onClick={() => setTab("register")} className="text-xs text-[#c9a84c] underline">
+                  Regístrate aquí
+                </button>
+              </div>
             </form>
           )}
 
