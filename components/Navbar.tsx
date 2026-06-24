@@ -38,14 +38,14 @@ export default function Navbar() {
           <div className="w-10 h-10 rounded-full overflow-hidden border border-[#c9a84c]/40 group-hover:border-[#c9a84c] transition-colors">
             <Image
               src="/logo.jpg"
-              alt="Profecía Forense"
+              alt="100x100Cristianos"
               width={40}
               height={40}
               className="object-cover w-full h-full"
             />
           </div>
           <span className="font-bold tracking-wider text-white hidden sm:block whitespace-nowrap">
-            <span className="text-base">Profecía <span className="text-[#c9a84c]">Forense</span></span>
+            <span className="text-base">100x100 <span className="text-[#c9a84c]">Cristianos</span></span>
             <span className="text-xs font-normal text-[#8a7a6a] ml-1">por Kissingers Araque</span>
           </span>
         </a>

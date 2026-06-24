@@ -6,7 +6,7 @@ const events = [
   {
     id: 1,
     category: "Masterclass",
-    title: "Masterclass Profecía Forense",
+    title: "Masterclass 100x100Cristianos",
     description:
       "Una sesión intensiva de alto impacto donde aprenderás los principios fundamentales de la profecía forense: cómo leer el espíritu de las situaciones, identificar patrones proféticos y operar con autoridad espiritual.",
     date: "Octubre 2026",

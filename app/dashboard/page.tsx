@@ -152,10 +152,10 @@ export default function Dashboard() {
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
           <a href="/" className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full overflow-hidden border border-[#c9a84c]/40">
-              <Image src="/logo.jpg" alt="Profecía Forense" width={32} height={32} className="object-cover" />
+              <Image src="/logo.jpg" alt="100x100Cristianos" width={32} height={32} className="object-cover" />
             </div>
             <span className="text-white font-bold text-sm hidden sm:block">
-              Profecía <span className="text-[#c9a84c]">Forense</span>
+              100x100 <span className="text-[#c9a84c]">Cristianos</span>
             </span>
           </a>
           <div className="flex items-center gap-4">

@@ -5,8 +5,8 @@ import { ChevronDown } from "lucide-react";
 
 const faqs = [
   {
-    q: "¿Qué es Profecía Forense?",
-    a: "Profecía Forense es una metodología de formación espiritual desarrollada por Kissingers Araque que combina principios bíblicos, entrenamiento mental y activación espiritual para desarrollar el don profético con madurez, precisión y responsabilidad. El término 'forense' hace referencia a la capacidad de examinar, discernir y articular la voz de Dios con exactitud.",
+    q: "¿Qué es 100x100Cristianos?",
+    a: "100x100Cristianos es una metodología de formación espiritual desarrollada por Kissingers Araque que combina principios bíblicos, entrenamiento mental y activación espiritual para desarrollar el don profético con madurez, precisión y responsabilidad. El término 'forense' hace referencia a la capacidad de examinar, discernir y articular la voz de Dios con exactitud.",
   },
   {
     q: "¿Para quién es esta plataforma?",
@@ -14,11 +14,11 @@ const faqs = [
   },
   {
     q: "¿Necesito experiencia previa?",
-    a: "No. Tenemos programas para todos los niveles. Las Meditaciones para Profecía Forense son ideales para quienes comienzan, mientras que la Escuela Avanzada de Profecía está diseñada para quienes ya tienen una base y desean ir más profundo. Lo más importante es tener hambre espiritual y disposición para aprender.",
+    a: "No. Tenemos programas para todos los niveles. Las Meditaciones para 100x100Cristianos son ideales para quienes comienzan, mientras que la Escuela Avanzada de Profecía está diseñada para quienes ya tienen una base y desean ir más profundo. Lo más importante es tener hambre espiritual y disposición para aprender.",
   },
   {
     q: "¿Qué programas ofrecen?",
-    a: "Ofrecemos: Meditaciones para Profecía Forense (acceso 24/7), Escuela Avanzada de Profecía (programa de 12 semanas), Masterclasses en vivo, Mentorías intensivas individuales y grupales, y eventos especiales como conferencias y talleres temáticos. Todos diseñados para acompañarte en cada etapa de tu desarrollo profético.",
+    a: "Ofrecemos: Meditaciones para 100x100Cristianos (acceso 24/7), Escuela Avanzada de Profecía (programa de 12 semanas), Masterclasses en vivo, Mentorías intensivas individuales y grupales, y eventos especiales como conferencias y talleres temáticos. Todos diseñados para acompañarte en cada etapa de tu desarrollo profético.",
   },
   {
     q: "¿Cómo puedo inscribirme?",

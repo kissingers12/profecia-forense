@@ -9,7 +9,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Profecía Forense | Kissingers Araque",
+  title: "100x100Cristianos | Kissingers Araque",
   description:
     "Plataforma de formación espiritual diseñada para activar, entrenar y equipar líderes, videntes e intercesores en el lenguaje profético de Dios.",
   keywords: "profecia, forense, kissingers araque, formacion espiritual, ministerio, profeta",

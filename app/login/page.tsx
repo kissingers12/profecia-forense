@@ -83,10 +83,10 @@ function LoginContent() {
         {/* Logo */}
         <div className="flex flex-col items-center mb-8">
           <div className="w-16 h-16 rounded-full overflow-hidden border-2 border-[#c9a84c]/50 mb-4">
-            <Image src="/logo.jpg" alt="Profecía Forense" width={64} height={64} className="object-cover" />
+            <Image src="/logo.jpg" alt="100x100Cristianos" width={64} height={64} className="object-cover" />
           </div>
           <h1 className="text-2xl font-bold text-white">
-            Profecía <span className="text-[#c9a84c]">Forense</span>
+            100x100 <span className="text-[#c9a84c]">Cristianos</span>
           </h1>
           <p className="text-[#8a7a6a] text-sm mt-1">Tu formación espiritual te espera</p>
         </div>

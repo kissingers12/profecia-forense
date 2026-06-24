@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
     });
 
     await transporter.sendMail({
-      from: `"Profecía Forense" <${process.env.EMAIL_USER}>`,
+      from: `"100x100Cristianos" <${process.env.EMAIL_USER}>`,
       to: "100x100cristianos@gmail.com",
       replyTo: email,
       subject: `Nuevo mensaje — ${programa || "Sin programa"} | ${nombre}`,

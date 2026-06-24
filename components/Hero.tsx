@@ -43,7 +43,7 @@ export default function Hero() {
         <div ref={imageRef} className="absolute inset-0 scale-110 will-change-transform">
           <Image
             src="/hero-bg.jpg"
-            alt="Profecía Forense"
+            alt="100x100Cristianos"
             fill
             priority
             quality={95}

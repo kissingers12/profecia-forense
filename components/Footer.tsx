@@ -12,7 +12,7 @@ export default function Footer() {
           <div>
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-full overflow-hidden border border-[#c9a84c]/40">
-                <Image src="/logo.jpg" alt="Profecía Forense" width={40} height={40} className="object-cover w-full h-full" />
+                <Image src="/logo.jpg" alt="100x100Cristianos" width={40} height={40} className="object-cover w-full h-full" />
               </div>
               <span className="text-white font-bold tracking-wider">
                 Profecía <span className="text-[#c9a84c]">Forense</span>
@@ -100,7 +100,7 @@ export default function Footer() {
 
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-[#4a3a2a] text-xs">
           <p>
-            © {year} Profecía Forense · Kissingers Araque. Todos los derechos reservados.
+            © {year} 100x100Cristianos · Kissingers Araque. Todos los derechos reservados.
           </p>
           <p>Diseñado con propósito y excelencia.</p>
         </div>
