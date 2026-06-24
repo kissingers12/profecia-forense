@@ -10,7 +10,7 @@ const meditacionesContent = [
   { id: 1, title: "El Secreto de la Meditación 1", duration: "28 min", unlocked: true, vimeoId: "1204206028" },
   { id: 2, title: "El Secreto de la Meditación 2", duration: "35 min", unlocked: true, vimeoId: "1204206979" },
   { id: 3, title: "El Secreto de la Meditación 3", duration: "42 min", unlocked: true, vimeoId: "1204224003" },
-  { id: 4, title: "Meditación 4: Visiones y percepción profética", duration: "31 min", unlocked: true, vimeoId: null },
+  { id: 4, title: "El Secreto de la Meditación 4", duration: "31 min", unlocked: true, vimeoId: "1204242854" },
   { id: 5, title: "Meditación 5: Discernimiento de voces", duration: "38 min", unlocked: true, vimeoId: null },
   { id: 6, title: "Meditación 6: Activación del don profético", duration: "45 min", unlocked: true, vimeoId: null },
   { id: 7, title: "4 horas instrumental para meditar", duration: "4h 00min", unlocked: true, vimeoId: "1204255913" },
