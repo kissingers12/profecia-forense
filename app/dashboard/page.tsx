@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { LogOut, PlayCircle, BookOpen, Lock, CheckCircle, ChevronRight, Eye, KeyRound } from "lucide-react";
-import { getSession, clearSession, PLAN_LABELS, type UserSession } from "@/lib/auth";
+import { getSession, clearSession, saveSession, PLAN_LABELS, type UserSession } from "@/lib/auth";
 
 type Lesson = {
   id: number;
@@ -79,9 +79,24 @@ export default function Dashboard() {
     const s = getSession();
     if (!s) {
       router.push("/login");
-    } else {
-      setSession(s);
+      return;
     }
+    setSession(s);
+    // Re-validate from Supabase to get fresh activated status
+    fetch("/api/auth/me", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: s.email }),
+    })
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.user) {
+          const updated = { ...s, activated: data.user.activated };
+          saveSession(updated);
+          setSession(updated);
+        }
+      })
+      .catch(() => {});
   }, [router]);
 
   const handleLogout = () => {
