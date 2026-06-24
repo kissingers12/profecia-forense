@@ -67,7 +67,9 @@ export default function Donations() {
               </p>
             </div>
             <a
-              href="#"
+              href="https://nowpayments.io/donation?api_key=bf32c23b-4d1b-41b9-a4ed-105514b4eab9"
+              target="_blank"
+              rel="noreferrer noopener"
               className="btn-gold w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2"
             >
               <Bitcoin size={16} />
