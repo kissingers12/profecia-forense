@@ -15,6 +15,7 @@ function LoginContent() {
   const router = useRouter();
   const params = useSearchParams();
   const defaultTab = params.get("tab") === "register" ? "register" : "login";
+  const defaultPlan = params.get("plan") ?? "";
 
   const [tab, setTab] = useState<"login" | "register">(defaultTab as "login" | "register");
   const [showPwd, setShowPwd] = useState(false);
@@ -22,7 +23,7 @@ function LoginContent() {
   const [loading, setLoading] = useState(false);
 
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
-  const [regForm, setRegForm] = useState({ name: "", email: "", password: "", confirm: "", plan: "" });
+  const [regForm, setRegForm] = useState({ name: "", email: "", password: "", confirm: "", plan: defaultPlan });
   const [registered, setRegistered] = useState(false);
   const [paymentUrl, setPaymentUrl] = useState("");
   const [price, setPrice] = useState(0);

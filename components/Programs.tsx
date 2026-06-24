@@ -190,7 +190,7 @@ export default function Programs() {
 
                 {/* CTA */}
                 <a
-                  href={p.paymentUrl}
+                  href={`/login?tab=register&plan=${p.id === 1 ? "meditaciones" : "escuela"}`}
                   className="btn-gold w-full py-3.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 mt-auto group"
                 >
                   Inscribirme · ${p.price}
