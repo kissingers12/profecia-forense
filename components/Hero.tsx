@@ -115,7 +115,11 @@ export default function Hero() {
             de Dios que está en ti. Tu espíritu no necesita abrir los ojos. Dios
             no te dio un espíritu ciego.
             <br /><br />
-            Tuvo que ir alineando su alma con lo que su espíritu ya era.
+            Por eso dice la Biblia que Jesús crecía en sabiduría y estatura.
+            Jesús en el espíritu era Dios, pero su alma no lo sabía todavía.
+            Tuvo que ir aprendiendo. Tuvo que ir alineando su alma con lo que
+            su espíritu ya era.
+            <br /><br />
             Entonces{" "}
             <span className="text-[#c9a84c] not-italic font-semibold">
               tu alma debe convertirse en profeta
