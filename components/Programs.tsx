@@ -38,7 +38,7 @@ const programs = [
       "Un programa intensivo diseñado para formar y equipar profetas, llevándolos desde los fundamentos del ministerio profético hasta niveles avanzados de discernimiento, revelación y práctica ministerial.",
       "Recibirás acceso de por vida a más de 25 enseñanzas prácticas cargadas de secretos diseñados para activar la profecía, junto con mentoría y activaciones enfocadas en desarrollar tu sensibilidad espiritual, fortalecer tu discernimiento y ayudarte a crecer en el ejercicio responsable del don profético.",
     ],
-    accessLabel: "Acceso a enseñanzas avanzadas sobre temas que rara vez se enseñan de manera completa, compartiendo principios, experiencias y herramientas prácticas para el desarrollo profético.",
+    accessLabel: "Al inscribirte en la Escuela Avanzada tendrás acceso completo a todo el contenido publicado en Meditación Profética, más enseñanzas avanzadas sobre temas que rara vez se enseñan de manera completa, compartiendo principios, experiencias y herramientas prácticas para el desarrollo profético.",
     learnsLabel: "Temas de formación:",
     learns: [
       "Desbloqueando los ojos espirituales.",
