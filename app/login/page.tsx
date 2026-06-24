@@ -203,6 +203,10 @@ function LoginContent() {
               >
                 Proceder al pago — ${selectedPlan?.price}
               </a>
+              <p className="text-center text-xs text-[#6a5a4a]">
+                Por ahora solo disponible pago con criptomonedas.{" "}
+                <span className="text-[#c9a84c]/70">Próximamente todos los métodos de pago.</span>
+              </p>
               <p className="text-[#6a5a4a] text-xs">
                 Después de pagar recibirás acceso inmediato.{" "}
                 <button onClick={() => { setTab("login"); setRegistered(false); }} className="text-[#c9a84c] underline">
