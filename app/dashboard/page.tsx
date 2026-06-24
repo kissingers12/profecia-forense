@@ -7,12 +7,13 @@ import { LogOut, PlayCircle, BookOpen, Lock, CheckCircle, ChevronRight, Eye } fr
 import { getSession, clearSession, PLAN_LABELS, type UserSession } from "@/lib/auth";
 
 const meditacionesContent = [
-  { id: 1, title: "Meditación 1: Silenciando el alma", duration: "28 min", unlocked: true },
-  { id: 2, title: "Meditación 2: La voz interior del profeta", duration: "35 min", unlocked: true },
-  { id: 3, title: "Meditación 3: Alineando mente y espíritu", duration: "42 min", unlocked: true },
-  { id: 4, title: "Meditación 4: Visiones y percepción profética", duration: "31 min", unlocked: true },
-  { id: 5, title: "Meditación 5: Discernimiento de voces", duration: "38 min", unlocked: true },
-  { id: 6, title: "Meditación 6: Activación del don profético", duration: "45 min", unlocked: true },
+  { id: 1, title: "Meditación 1: Silenciando el alma", duration: "28 min", unlocked: true, vimeoId: null },
+  { id: 2, title: "Meditación 2: La voz interior del profeta", duration: "35 min", unlocked: true, vimeoId: null },
+  { id: 3, title: "Meditación 3: Alineando mente y espíritu", duration: "42 min", unlocked: true, vimeoId: null },
+  { id: 4, title: "Meditación 4: Visiones y percepción profética", duration: "31 min", unlocked: true, vimeoId: null },
+  { id: 5, title: "Meditación 5: Discernimiento de voces", duration: "38 min", unlocked: true, vimeoId: null },
+  { id: 6, title: "Meditación 6: Activación del don profético", duration: "45 min", unlocked: true, vimeoId: null },
+  { id: 7, title: "4 horas instrumental para meditar", duration: "4h 00min", unlocked: true, vimeoId: "1204255913" },
 ];
 
 const escuelaContent = [
@@ -125,6 +126,34 @@ export default function Dashboard() {
             {activeLesson ? "Continuar" : "Comenzar"}
           </button>
         </div>
+
+        {/* Video player */}
+        {activeLesson && (() => {
+          const lesson = content.find((l) => l.id === activeLesson);
+          return lesson?.vimeoId ? (
+            <div className="mb-10">
+              <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                <PlayCircle size={20} className="text-[#c9a84c]" />
+                {lesson.title}
+              </h2>
+              <div className="rounded-2xl overflow-hidden border border-[#c9a84c]/20" style={{ padding: "56.25% 0 0 0", position: "relative" }}>
+                <iframe
+                  src={`https://player.vimeo.com/video/${lesson.vimeoId}?badge=0&autopause=0&player_id=0&app_id=58479`}
+                  frameBorder="0"
+                  allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media"
+                  style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}
+                  title={lesson.title}
+                />
+              </div>
+              <script src="https://player.vimeo.com/api/player.js" async />
+            </div>
+          ) : (
+            <div className="mb-10 card-dark rounded-2xl p-8 text-center border border-[#c9a84c]/20">
+              <PlayCircle size={40} className="text-[#c9a84c]/40 mx-auto mb-3" />
+              <p className="text-[#8a7a6a] text-sm">Video próximamente disponible</p>
+            </div>
+          );
+        })()}
 
         {/* Content list */}
         <h2 className="text-xl font-bold text-white mb-5 flex items-center gap-2">
