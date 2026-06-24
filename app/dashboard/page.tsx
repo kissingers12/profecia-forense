@@ -12,7 +12,7 @@ const meditacionesContent = [
   { id: 3, title: "El Secreto de la Meditación 3", duration: "42 min", unlocked: true, vimeoId: "1204224003" },
   { id: 4, title: "El Secreto de la Meditación 4", duration: "31 min", unlocked: true, vimeoId: "1204242854" },
   { id: 5, title: "La Llave de la Ciencia", duration: "38 min", unlocked: true, vimeoId: "1204243775" },
-  { id: 6, title: "Meditación 6: Activación del don profético", duration: "45 min", unlocked: true, vimeoId: null },
+  { id: 6, title: "La Meditación de los profetas para salir del cuerpo", duration: "45 min", unlocked: true, vimeoId: "1204243894" },
   { id: 7, title: "4 horas instrumental para meditar", duration: "4h 00min", unlocked: true, vimeoId: "1204255913" },
 ];
 
