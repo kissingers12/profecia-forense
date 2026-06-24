@@ -13,17 +13,29 @@ export default function Donations() {
         {/* Header */}
         <div className="text-center mb-14">
           <span className="inline-block text-[#c9a84c] text-xs font-bold tracking-[0.3em] uppercase mb-4">
-            Apoya el ministerio
+            Ofrendas y Diezmos
           </span>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-5 leading-tight">
             Tu donación{" "}
             <span className="text-[#c9a84c]">impulsa el reino</span>
           </h2>
-          <p className="max-w-2xl mx-auto text-[#b8a888] text-base lg:text-lg">
-            Cada aporte nos permite seguir formando profetas, produciendo
-            enseñanzas y llevando la Palabra a más naciones. Gracias por
-            sembrar en esta visión.
-          </p>
+          <blockquote className="max-w-2xl mx-auto text-[#c9a84c] text-base italic mb-6">
+            "El que es enseñado en la Palabra, haga partícipe de toda cosa buena al que lo instruye." — Gálatas 6:6
+          </blockquote>
+          <div className="max-w-2xl mx-auto space-y-4 text-[#b8a888] text-base lg:text-lg text-left">
+            <p>
+              Cada ofrenda y cada diezmo es una expresión de honra a Dios y una participación activa en la extensión de Su Reino.
+            </p>
+            <p>
+              La honra abre los cielos. Cuando tus fuerzas no alcancen, tu semilla hablará por ti delante de Dios. Así como las ofrendas de Cornelio subieron como memorial delante del Señor y hablaron más fuerte que sus propias palabras, y como las obras de Dorcas hablaron en el momento de su necesidad, tu generosidad también se convierte en un testimonio que Dios ve, recuerda y recompensa.
+            </p>
+            <p>
+              Tu ofrenda no es solo un recurso; es una semilla profética sembrada en tierra fértil. Cada aporte lleva el mensaje de Cristo más lejos, alcanza más vidas y deja una herencia eterna en el Reino de Dios.
+            </p>
+            <p className="text-white font-medium">
+              Gracias por sembrar con fe, por honrar la obra del Señor y por ser parte de esta visión. Lo que hoy depositas en obediencia y amor, mañana dará fruto para la gloria de Dios.
+            </p>
+          </div>
           <div className="divider-gold max-w-xs mx-auto mt-8" />
         </div>
 
