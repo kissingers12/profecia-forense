@@ -1,22 +1,10 @@
-// Simple client-side auth with localStorage
-// In production replace with a real backend (Supabase, Clerk, etc.)
-
 export type UserSession = {
   email: string;
   name: string;
   plan: "meditaciones" | "escuela" | null;
   accessCode: string;
+  activated: boolean;
 };
-
-// Demo access codes — in production these come from your payment provider webhook
-const VALID_CODES: Record<string, Omit<UserSession, "email" | "name">> = {
-  "MED-2025-DEMO": { plan: "meditaciones", accessCode: "MED-2025-DEMO" },
-  "ESC-2025-DEMO": { plan: "escuela", accessCode: "ESC-2025-DEMO" },
-};
-
-export function validateAccessCode(code: string): Omit<UserSession, "email" | "name"> | null {
-  return VALID_CODES[code.toUpperCase()] ?? null;
-}
 
 export function saveSession(session: UserSession) {
   if (typeof window === "undefined") return;
@@ -39,6 +27,6 @@ export function clearSession() {
 }
 
 export const PLAN_LABELS: Record<string, string> = {
-  meditaciones: "Meditaciones para Profecía Forense",
+  meditaciones: "Meditación Profética",
   escuela: "Escuela Avanzada de Profecía",
 };

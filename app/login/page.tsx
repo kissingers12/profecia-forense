@@ -45,7 +45,7 @@ function LoginContent() {
     const accounts = JSON.parse(localStorage.getItem("pf_accounts") || "{}");
     const account = accounts[loginForm.email];
     if (account && account.password === loginForm.password) {
-      saveSession({ email: loginForm.email, name: account.name, plan: account.plan, accessCode: "" });
+      saveSession({ email: loginForm.email, name: account.name, plan: account.plan, accessCode: "", activated: account.activated === true });
       router.push("/dashboard");
     } else {
       setError("Correo o contraseña incorrectos.");
@@ -62,7 +62,7 @@ function LoginContent() {
     await new Promise((r) => setTimeout(r, 600));
     const accounts = JSON.parse(localStorage.getItem("pf_accounts") || "{}");
     if (accounts[regForm.email]) { setError("Ya existe una cuenta con ese correo."); setLoading(false); return; }
-    accounts[regForm.email] = { name: regForm.name, password: regForm.password, plan: regForm.plan };
+    accounts[regForm.email] = { name: regForm.name, password: regForm.password, plan: regForm.plan, activated: false };
     localStorage.setItem("pf_accounts", JSON.stringify(accounts));
     setRegistered(true);
     setLoading(false);

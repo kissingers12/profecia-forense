@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { LogOut, PlayCircle, BookOpen, Lock, CheckCircle, ChevronRight, Eye } from "lucide-react";
+import { LogOut, PlayCircle, BookOpen, Lock, CheckCircle, ChevronRight, Eye, KeyRound } from "lucide-react";
 import { getSession, clearSession, PLAN_LABELS, type UserSession } from "@/lib/auth";
 
 type Lesson = {
@@ -71,6 +71,9 @@ export default function Dashboard() {
   const router = useRouter();
   const [session, setSession] = useState<UserSession | null>(null);
   const [activeLesson, setActiveLesson] = useState<number | null>(null);
+  const [activationCode, setActivationCode] = useState("");
+  const [activationError, setActivationError] = useState("");
+  const [activationLoading, setActivationLoading] = useState(false);
 
   useEffect(() => {
     const s = getSession();
@@ -86,10 +89,90 @@ export default function Dashboard() {
     router.push("/");
   };
 
+  const handleActivation = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setActivationLoading(true);
+    setActivationError("");
+    try {
+      const res = await fetch("/api/activate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: activationCode, plan: session?.plan }),
+      });
+      if (res.ok) {
+        const accounts = JSON.parse(localStorage.getItem("pf_accounts") || "{}");
+        if (session?.email && accounts[session.email]) {
+          accounts[session.email].activated = true;
+          localStorage.setItem("pf_accounts", JSON.stringify(accounts));
+        }
+        const updated = { ...session!, activated: true };
+        saveSession(updated);
+        setSession(updated);
+      } else {
+        setActivationError("Código incorrecto. Verifica e intenta de nuevo.");
+      }
+    } catch {
+      setActivationError("Error de conexión. Intenta de nuevo.");
+    }
+    setActivationLoading(false);
+  };
+
   if (!session) {
     return (
       <div className="min-h-screen gradient-hero flex items-center justify-center">
         <span className="w-8 h-8 border-2 border-[#c9a84c]/40 border-t-[#c9a84c] rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (!session.activated) {
+    return (
+      <div className="min-h-screen bg-[#050510] flex flex-col items-center justify-center px-4">
+        <div className="w-full max-w-md">
+          <div className="flex flex-col items-center mb-8">
+            <div className="w-16 h-16 rounded-full bg-[#c9a84c]/10 border border-[#c9a84c]/30 flex items-center justify-center mb-4">
+              <KeyRound size={28} className="text-[#c9a84c]" />
+            </div>
+            <h1 className="text-2xl font-bold text-white mb-2">Activa tu acceso</h1>
+            <p className="text-[#8a7a6a] text-sm text-center max-w-xs">
+              Después de realizar tu pago, recibirás un código de activación por WhatsApp o email. Ingrésalo aquí para desbloquear tu contenido.
+            </p>
+          </div>
+          <form onSubmit={handleActivation} className="card-dark rounded-2xl p-8 space-y-5">
+            <div>
+              <label className="block text-xs font-semibold text-[#c9a84c] uppercase tracking-widest mb-2">
+                Código de activación
+              </label>
+              <input
+                type="text"
+                value={activationCode}
+                onChange={(e) => setActivationCode(e.target.value)}
+                required
+                placeholder="Ej: MED-7K2X9P"
+                className="w-full bg-white/5 border border-[#c9a84c]/20 rounded-xl px-4 py-3 text-white placeholder-[#4a3a2a] text-sm focus:outline-none focus:border-[#c9a84c]/60 uppercase tracking-widest"
+              />
+            </div>
+            {activationError && <p className="text-red-400 text-xs">{activationError}</p>}
+            <button
+              type="submit"
+              disabled={activationLoading}
+              className="btn-gold w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2"
+            >
+              {activationLoading
+                ? <span className="w-4 h-4 border-2 border-[#050510]/40 border-t-[#050510] rounded-full animate-spin" />
+                : <><KeyRound size={16} />Activar acceso</>}
+            </button>
+            <p className="text-center text-xs text-[#6a5a4a]">
+              ¿Aún no has pagado?{" "}
+              <a href="/#programas" className="text-[#c9a84c] underline">Ver programas</a>
+            </p>
+          </form>
+          <div className="text-center mt-6">
+            <button onClick={handleLogout} className="text-[#6a5a4a] text-xs hover:text-[#c9a84c]">
+              Cerrar sesión
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
