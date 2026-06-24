@@ -3,9 +3,11 @@
 import { useState } from "react";
 import { Send, CheckCircle } from "lucide-react";
 
-const programs = [
-  "Meditación Profética",
-  "Escuela Avanzada de Profecía",
+const motivos = [
+  "Oración",
+  "Pregunta sobre la formación profética",
+  "Inscribirme en un programa",
+  "Otro",
 ];
 
 export default function Contact() {
@@ -133,7 +135,7 @@ export default function Contact() {
               </div>
               <div>
                 <label className="block text-xs font-semibold text-[#c9a84c] uppercase tracking-widest mb-2">
-                  Programa de interés
+                  Motivo de contacto
                 </label>
                 <select
                   name="programa"
@@ -142,9 +144,9 @@ export default function Contact() {
                   className="w-full bg-[#0a0a20] border border-[#c9a84c]/20 rounded-xl px-4 py-3 text-[#c8b89a] text-sm focus:outline-none focus:border-[#c9a84c]/60 transition-colors"
                 >
                   <option value="">Seleccionar...</option>
-                  {programs.map((p) => (
-                    <option key={p} value={p}>
-                      {p}
+                  {motivos.map((m) => (
+                    <option key={m} value={m}>
+                      {m}
                     </option>
                   ))}
                 </select>

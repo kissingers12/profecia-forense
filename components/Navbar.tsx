@@ -67,13 +67,13 @@ export default function Navbar() {
         {/* CTA buttons */}
         <div className="hidden lg:flex items-center gap-3">
           <a
-            href="/login"
+            href="/login?tab=login"
             className="btn-outline-gold px-5 py-2 rounded-full text-sm font-bold tracking-wide"
           >
             Ingresar
           </a>
           <a
-            href="#contacto"
+            href="/login?tab=register"
             className="btn-gold px-5 py-2 rounded-full text-sm font-bold tracking-wide"
           >
             Comenzar ahora
