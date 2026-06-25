@@ -59,6 +59,15 @@ const escuelaGroups: Group[] = [
     lessons: [
       { id: 201, title: "LA LLAVE DE LA CIENCIA: ESTO ACTIVA LO PROFÉTICO", duration: "", unlocked: true, vimeoId: "1204243775" },
       { id: 202, title: "La Meditación de los profetas para salir del cuerpo", duration: "", unlocked: true, vimeoId: "1204243894" },
+      { id: 203, title: "Actos Proféticos 1", duration: "", unlocked: true, vimeoId: "1204621088" },
+      { id: 204, title: "Actos Proféticos 2", duration: "", unlocked: true, vimeoId: "1204621216" },
+      { id: 205, title: "Acto profético 3", duration: "", unlocked: true, vimeoId: "1204621410" },
+      { id: 206, title: "Angeles, Fantasmas y sombras", duration: "", unlocked: true, vimeoId: "1204621581" },
+      { id: 207, title: "El secreto de la prosperidad", duration: "", unlocked: true, vimeoId: "1204620987" },
+      { id: 208, title: "(Parte 1) esto me hizo millonario", duration: "", unlocked: true, vimeoId: "1204621966" },
+      { id: 209, title: "(Parte 2) esto me hizo millonario", duration: "", unlocked: true, vimeoId: "1204621894" },
+      { id: 210, title: "Si lo crees ya eres profeta", duration: "", unlocked: true, vimeoId: "1204621749" },
+      { id: 211, title: "Próximamente", duration: "", unlocked: false, vimeoId: null },
     ],
   },
 ];
