@@ -32,7 +32,20 @@ const meditacionesContent: Lesson[] = [
 
 const escuelaGroups: Group[] = [
   {
-    groupTitle: "Los Secretos de la Meditación",
+    groupTitle: "Nivel Básico",
+    lessons: [
+      { id: 101, title: "Escuela de profetas #1 Desbloqueando los ojos espirituales", duration: "", unlocked: true, vimeoId: "1204614170" },
+      { id: 102, title: "Escuela de Profetas #2 Como recibir Espíritu de Profecía", duration: "", unlocked: true, vimeoId: "1204614262" },
+      { id: 103, title: "Escuela de profeta #3 primeros pasos profetizando...Pasa de espectador a profeta", duration: "", unlocked: true, vimeoId: "1204614337" },
+      { id: 104, title: "Escuela de Profeta #4 la honra y el llamo a profetizar", duration: "", unlocked: true, vimeoId: "1204614447" },
+      { id: 105, title: "Escuela de profeta #5 Profecía por interpretación (parte 1)", duration: "", unlocked: true, vimeoId: "1204615096" },
+      { id: 106, title: "Escuela de profetas #6 Profecía al tocar una persona", duration: "", unlocked: true, vimeoId: "1204615280" },
+      { id: 107, title: "Escuela de profetas #7 Como ver letras en el espíritu y nombres", duration: "", unlocked: true, vimeoId: "1204615509" },
+      { id: 108, title: "Escuela de Profetas #8 abrir los ojos y tener visiones", duration: "", unlocked: true, vimeoId: "1204615620" },
+    ],
+  },
+  {
+    groupTitle: "Nivel Intermedio",
     lessons: [
       { id: 1, title: "El Secreto de la Meditación 1", duration: "", unlocked: true, vimeoId: "1204206028" },
       { id: 2, title: "El Secreto de la Meditación 2", duration: "", unlocked: true, vimeoId: "1204206979" },
@@ -41,16 +54,6 @@ const escuelaGroups: Group[] = [
       { id: 5, title: "La Llave de la Ciencia", duration: "", unlocked: true, vimeoId: "1204243775" },
       { id: 6, title: "La Meditación de los profetas para salir del cuerpo", duration: "", unlocked: true, vimeoId: "1204243894" },
       { id: 7, title: "4 horas instrumental para meditar", duration: "", unlocked: true, vimeoId: "1204255913" },
-    ],
-  },
-  {
-    groupTitle: "Próximamente",
-    lessons: [
-      { id: 101, title: "Próximamente nueva enseñanza", duration: "", unlocked: false, vimeoId: null },
-      { id: 102, title: "Próximamente nueva enseñanza", duration: "", unlocked: false, vimeoId: null },
-      { id: 103, title: "Próximamente nueva enseñanza", duration: "", unlocked: false, vimeoId: null },
-      { id: 104, title: "Próximamente nueva enseñanza", duration: "", unlocked: false, vimeoId: null },
-      { id: 105, title: "Próximamente nueva enseñanza", duration: "", unlocked: false, vimeoId: null },
     ],
   },
   {
