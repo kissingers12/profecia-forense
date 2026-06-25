@@ -51,19 +51,14 @@ const escuelaGroups: Group[] = [
       { id: 2, title: "El Secreto de la Meditación 2", duration: "", unlocked: true, vimeoId: "1204206979" },
       { id: 3, title: "El Secreto de la Meditación 3", duration: "", unlocked: true, vimeoId: "1204224003" },
       { id: 4, title: "El Secreto de la Meditación 4", duration: "", unlocked: true, vimeoId: "1204242854" },
-      { id: 5, title: "La Llave de la Ciencia", duration: "", unlocked: true, vimeoId: "1204243775" },
-      { id: 6, title: "La Meditación de los profetas para salir del cuerpo", duration: "", unlocked: true, vimeoId: "1204243894" },
-      { id: 7, title: "4 horas instrumental para meditar", duration: "", unlocked: true, vimeoId: "1204255913" },
+      { id: 5, title: "4 horas instrumental para meditar", duration: "", unlocked: true, vimeoId: "1204255913" },
     ],
   },
   {
-    groupTitle: "Próximamente",
+    groupTitle: "Nivel Avanzado",
     lessons: [
-      { id: 201, title: "Próximamente nueva enseñanza", duration: "", unlocked: false, vimeoId: null },
-      { id: 202, title: "Próximamente nueva enseñanza", duration: "", unlocked: false, vimeoId: null },
-      { id: 203, title: "Próximamente nueva enseñanza", duration: "", unlocked: false, vimeoId: null },
-      { id: 204, title: "Próximamente nueva enseñanza", duration: "", unlocked: false, vimeoId: null },
-      { id: 205, title: "Próximamente nueva enseñanza", duration: "", unlocked: false, vimeoId: null },
+      { id: 201, title: "LA LLAVE DE LA CIENCIA: ESTO ACTIVA LO PROFÉTICO", duration: "", unlocked: true, vimeoId: "1204243775" },
+      { id: 202, title: "La Meditación de los profetas para salir del cuerpo", duration: "", unlocked: true, vimeoId: "1204243894" },
     ],
   },
 ];
