@@ -85,6 +85,8 @@ export default function Dashboard() {
   const [supportMessage, setSupportMessage] = useState("");
   const [supportLoading, setSupportLoading] = useState(false);
   const [supportSent, setSupportSent] = useState(false);
+  const [paymentUrl, setPaymentUrl] = useState("");
+  const [paymentLoading, setPaymentLoading] = useState(false);
 
   useEffect(() => {
     const s = getSession();
@@ -113,6 +115,24 @@ export default function Dashboard() {
   const handleLogout = () => {
     clearSession();
     router.push("/");
+  };
+
+  const handleGetPayment = async () => {
+    setPaymentLoading(true);
+    try {
+      const res = await fetch("/api/payment/renew", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: session?.email }),
+      });
+      const data = await res.json();
+      if (data.paymentUrl) {
+        setPaymentUrl(data.paymentUrl);
+      }
+    } catch {
+      // silently ignore, user can retry
+    }
+    setPaymentLoading(false);
   };
 
   const handleSupport = async (e: React.FormEvent) => {
@@ -258,44 +278,67 @@ export default function Dashboard() {
               Después de realizar tu pago, recibirás un código de activación por WhatsApp o email. Ingrésalo aquí para desbloquear tu contenido.
             </p>
           </div>
-          <form onSubmit={handleActivation} className="card-dark rounded-2xl p-8 space-y-5">
-            <div>
-              <label className="block text-xs font-semibold text-[#c9a84c] uppercase tracking-widest mb-2">
-                Código de activación
-              </label>
-              <input
-                type="text"
-                value={activationCode}
-                onChange={(e) => setActivationCode(e.target.value)}
-                required
-                placeholder="Ej: MED-7K2X9P"
-                className="w-full bg-white/5 border border-[#c9a84c]/20 rounded-xl px-4 py-3 text-white placeholder-[#4a3a2a] text-sm focus:outline-none focus:border-[#c9a84c]/60 uppercase tracking-widest"
-              />
-            </div>
-            {activationError && <p className="text-red-400 text-xs">{activationError}</p>}
-            <button
-              type="submit"
-              disabled={activationLoading}
-              className="btn-gold w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2"
-            >
-              {activationLoading
-                ? <span className="w-4 h-4 border-2 border-[#050510]/40 border-t-[#050510] rounded-full animate-spin" />
-                : <><KeyRound size={16} />Activar acceso</>}
-            </button>
-            <p className="text-center text-xs text-[#6a5a4a]">
-              ¿Aún no has pagado?{" "}
-              <a href="/#programas" className="text-[#c9a84c] underline">Ver programas</a>
-            </p>
-            <div className="border-t border-white/5 pt-4">
+          <div className="card-dark rounded-2xl p-8 space-y-5">
+            {/* Opción 1: Ya pagué, tengo código */}
+            <form onSubmit={handleActivation} className="space-y-4">
+              <p className="text-xs font-semibold text-[#c9a84c] uppercase tracking-widest">Ya pagué — tengo mi código</p>
+              <div>
+                <input
+                  type="text"
+                  value={activationCode}
+                  onChange={(e) => setActivationCode(e.target.value)}
+                  required
+                  placeholder="Ej: MED-7K2X9P"
+                  className="w-full bg-white/5 border border-[#c9a84c]/20 rounded-xl px-4 py-3 text-white placeholder-[#4a3a2a] text-sm focus:outline-none focus:border-[#c9a84c]/60 uppercase tracking-widest"
+                />
+              </div>
+              {activationError && <p className="text-red-400 text-xs">{activationError}</p>}
+              <button
+                type="submit"
+                disabled={activationLoading}
+                className="btn-gold w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2"
+              >
+                {activationLoading
+                  ? <span className="w-4 h-4 border-2 border-[#050510]/40 border-t-[#050510] rounded-full animate-spin" />
+                  : <><KeyRound size={16} />Activar acceso</>}
+              </button>
+            </form>
+
+            <div className="border-t border-white/5 pt-4 space-y-3">
+              {/* Opción 2: Aún no he pagado */}
+              <p className="text-xs font-semibold text-[#c9a84c] uppercase tracking-widest">Aún no he pagado</p>
+              {paymentUrl ? (
+                <a
+                  href={paymentUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 text-sm bg-white/5 border border-[#c9a84c]/40 text-[#c9a84c] hover:bg-[#c9a84c]/10 transition-all"
+                >
+                  Ir a completar mi pago →
+                </a>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleGetPayment}
+                  disabled={paymentLoading}
+                  className="w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 text-sm bg-white/5 border border-[#c9a84c]/20 text-[#c9a84c] hover:border-[#c9a84c]/50 transition-all"
+                >
+                  {paymentLoading
+                    ? <span className="w-4 h-4 border-2 border-[#c9a84c]/40 border-t-[#c9a84c] rounded-full animate-spin" />
+                    : "Quiero pagar ahora"}
+                </button>
+              )}
+
+              {/* Opción 3: Pagué pero no funciona */}
               <button
                 type="button"
                 onClick={() => setShowSupport(true)}
-                className="w-full text-center text-sm text-[#c9a84c] font-semibold hover:text-[#e8c76a] transition-colors py-1"
+                className="w-full text-center text-sm text-[#8a7a6a] hover:text-[#c9a84c] transition-colors py-1"
               >
                 ¿Ya pagaste y tienes problemas con el código?
               </button>
             </div>
-          </form>
+          </div>
           <div className="text-center mt-6">
             <button onClick={handleLogout} className="text-[#6a5a4a] text-xs hover:text-[#c9a84c]">
               Cerrar sesión
