@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { LogOut, PlayCircle, BookOpen, Lock, CheckCircle, ChevronRight, Eye, KeyRound } from "lucide-react";
+import { LogOut, PlayCircle, BookOpen, Lock, CheckCircle, ChevronRight, Eye, KeyRound, MessageCircle, Video } from "lucide-react";
 import { getSession, clearSession, saveSession, PLAN_LABELS, type UserSession } from "@/lib/auth";
 
 type Lesson = {
@@ -543,6 +543,68 @@ export default function Dashboard() {
             {meditacionesContent.map((lesson, i) => (
               <LessonButton key={lesson.id} lesson={lesson} index={i} />
             ))}
+          </div>
+        )}
+
+        {/* Community access for escuela users */}
+        {session.plan === "escuela" && (
+          <div className="mt-10 space-y-4">
+            <h2 className="text-xl font-bold text-white flex items-center gap-2">
+              <MessageCircle size={20} className="text-[#c9a84c]" />
+              Tu comunidad y clases en vivo
+            </h2>
+
+            {/* WhatsApp group */}
+            <div className="card-dark rounded-2xl p-6 flex flex-col sm:flex-row sm:items-center gap-5">
+              <div className="w-12 h-12 rounded-xl bg-green-500/10 border border-green-500/20 flex items-center justify-center shrink-0">
+                <MessageCircle size={22} className="text-green-400" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-white font-bold mb-1">Grupo de WhatsApp — Escuela Avanzada</h3>
+                <p className="text-[#8a7a6a] text-sm">Acceso exclusivo al grupo grupal con Kissingers y todos los estudiantes activos.</p>
+              </div>
+              {process.env.NEXT_PUBLIC_WHATSAPP_GROUP_URL ? (
+                <a
+                  href={process.env.NEXT_PUBLIC_WHATSAPP_GROUP_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="shrink-0 bg-green-500/10 border border-green-500/30 text-green-400 hover:bg-green-500/20 transition-all px-5 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2"
+                >
+                  <MessageCircle size={16} />
+                  Unirme al grupo
+                </a>
+              ) : (
+                <span className="shrink-0 text-xs text-[#6a5a4a] bg-white/5 border border-white/10 px-4 py-2 rounded-full">
+                  Próximamente
+                </span>
+              )}
+            </div>
+
+            {/* Zoom classes */}
+            <div className="card-dark rounded-2xl p-6 flex flex-col sm:flex-row sm:items-center gap-5">
+              <div className="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shrink-0">
+                <Video size={22} className="text-blue-400" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-white font-bold mb-1">Clases en vivo por Zoom</h3>
+                <p className="text-[#8a7a6a] text-sm">Sesiones grupales en vivo con Kissingers. El enlace se comparte en el grupo de WhatsApp antes de cada clase.</p>
+              </div>
+              {process.env.NEXT_PUBLIC_ZOOM_URL ? (
+                <a
+                  href={process.env.NEXT_PUBLIC_ZOOM_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="shrink-0 bg-blue-500/10 border border-blue-500/30 text-blue-400 hover:bg-blue-500/20 transition-all px-5 py-2.5 rounded-xl font-bold text-sm flex items-center gap-2"
+                >
+                  <Video size={16} />
+                  Unirme a la clase
+                </a>
+              ) : (
+                <span className="shrink-0 text-xs text-[#6a5a4a] bg-white/5 border border-white/10 px-4 py-2 rounded-full">
+                  Próximamente
+                </span>
+              )}
+            </div>
           </div>
         )}
 
