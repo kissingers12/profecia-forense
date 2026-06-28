@@ -16,12 +16,12 @@ function verifySignature(body: string, signature: string, secret: string): boole
 export async function POST(req: NextRequest) {
   const rawBody = await req.text();
   const ipnSecret = process.env.NOWPAYMENTS_IPN_SECRET;
+  const signature = req.headers.get("x-nowpayments-sig") ?? "";
 
-  if (ipnSecret) {
-    const signature = req.headers.get("x-nowpayments-sig") ?? "";
-    if (!verifySignature(rawBody, signature, ipnSecret)) {
-      return Response.json({ error: "Invalid signature." }, { status: 401 });
-    }
+  // Reject all requests without a valid signature.
+  // If the secret is not configured, block everything to prevent fake activations.
+  if (!ipnSecret || !verifySignature(rawBody, signature, ipnSecret)) {
+    return Response.json({ error: "Invalid signature." }, { status: 401 });
   }
 
   let payload: Record<string, unknown>;
