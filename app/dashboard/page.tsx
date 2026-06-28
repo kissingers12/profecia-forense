@@ -300,7 +300,7 @@ export default function Dashboard() {
             </div>
             <h1 className="text-2xl font-bold text-white mb-2">Activa tu acceso</h1>
             <p className="text-[#8a7a6a] text-sm text-center max-w-xs">
-              Después de realizar tu pago, recibirás un código de activación por WhatsApp o email. Ingrésalo aquí para desbloquear tu contenido.
+              Después de realizar tu pago, recibirás un código de activación por email. Ingrésalo aquí para desbloquear tu contenido.
             </p>
           </div>
           <div className="card-dark rounded-2xl p-8 space-y-5">
