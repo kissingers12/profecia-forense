@@ -27,15 +27,15 @@ export default function Contact() {
     setLoading(true);
     setError("");
     try {
-      const res = await fetch(process.env.NEXT_PUBLIC_FORMSPREE_URL ?? "", {
+      const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name: form.nombre,
+          nombre: form.nombre,
           email: form.email,
-          phone: form.telefono,
-          program: form.programa,
-          message: form.mensaje,
+          telefono: form.telefono,
+          programa: form.programa,
+          mensaje: form.mensaje,
         }),
       });
       if (res.ok) {
