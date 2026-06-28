@@ -105,9 +105,16 @@ export default function Navbar() {
                 </a>
               </li>
             ))}
-            <li className="pt-2">
+            <li className="pt-2 flex flex-col gap-2">
               <a
-                href="#contacto"
+                href="/login?tab=login"
+                onClick={() => setMenuOpen(false)}
+                className="btn-outline-gold px-5 py-2 rounded-full text-sm font-bold tracking-wide inline-block text-center w-full"
+              >
+                Ingresar
+              </a>
+              <a
+                href="/login?tab=register"
                 onClick={() => setMenuOpen(false)}
                 className="btn-gold px-5 py-2 rounded-full text-sm font-bold tracking-wide inline-block text-center w-full"
               >
