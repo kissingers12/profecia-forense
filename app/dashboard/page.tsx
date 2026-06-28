@@ -225,13 +225,21 @@ export default function Dashboard() {
                 <div className="text-center space-y-4">
                   <h3 className="text-white font-bold text-lg">No pudimos enviar el mensaje</h3>
                   <p className="text-[#8a7a6a] text-sm">
-                    Hubo un problema técnico. Escríbenos directamente con tu email <span className="text-[#c9a84c]">{session.email}</span> y te activamos en minutos:
+                    Hubo un problema técnico. Contáctanos directamente con tu email <span className="text-[#c9a84c]">{session.email}</span> y te activamos en minutos:
                   </p>
                   <a
-                    href={`mailto:100x100cristianos@gmail.com?subject=Problema%20con%20acceso&body=Mi%20email%20de%20registro%20es%3A%20${encodeURIComponent(session.email)}`}
-                    className="btn-gold w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2"
+                    href={`https://wa.me/376379559?text=${encodeURIComponent(`Hola, pagué y no puedo acceder. Mi email de registro es: ${session.email}`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 bg-green-600 hover:bg-green-500 text-white transition-colors"
                   >
-                    Enviar email →
+                    Escribir por WhatsApp →
+                  </a>
+                  <a
+                    href={`mailto:100x100cristianos@gmail.com?subject=Problema%20con%20acceso&body=Mi%20email%20de%20registro%20es%3A%20${encodeURIComponent(session.email)}`}
+                    className="w-full py-3 rounded-xl font-semibold flex items-center justify-center gap-2 text-sm bg-white/5 border border-white/10 text-[#8a7a6a] hover:text-white transition-colors"
+                  >
+                    Enviar email
                   </a>
                   <button
                     onClick={() => { setSupportFailed(false); }}
