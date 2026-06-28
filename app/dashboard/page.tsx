@@ -119,7 +119,7 @@ export default function Dashboard() {
       const res = await fetch("/api/activate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code: activationCode, plan: session?.plan }),
+        body: JSON.stringify({ code: activationCode, plan: session?.plan, email: session?.email }),
       });
       if (res.ok) {
         const accounts = JSON.parse(localStorage.getItem("pf_accounts") || "{}");
