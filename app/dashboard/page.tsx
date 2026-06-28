@@ -81,6 +81,10 @@ export default function Dashboard() {
   const [activationCode, setActivationCode] = useState("");
   const [activationError, setActivationError] = useState("");
   const [activationLoading, setActivationLoading] = useState(false);
+  const [showSupport, setShowSupport] = useState(false);
+  const [supportMessage, setSupportMessage] = useState("");
+  const [supportLoading, setSupportLoading] = useState(false);
+  const [supportSent, setSupportSent] = useState(false);
 
   useEffect(() => {
     const s = getSession();
@@ -111,6 +115,27 @@ export default function Dashboard() {
     router.push("/");
   };
 
+  const handleSupport = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSupportLoading(true);
+    try {
+      await fetch("/api/support", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: session?.name,
+          email: session?.email,
+          plan: session?.plan,
+          message: supportMessage,
+        }),
+      });
+      setSupportSent(true);
+    } catch {
+      setSupportSent(true);
+    }
+    setSupportLoading(false);
+  };
+
   const handleActivation = async (e: React.FormEvent) => {
     e.preventDefault();
     setActivationLoading(true);
@@ -119,7 +144,7 @@ export default function Dashboard() {
       const res = await fetch("/api/activate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code: activationCode, plan: session?.plan }),
+        body: JSON.stringify({ code: activationCode, plan: session?.plan, email: session?.email }),
       });
       if (res.ok) {
         const accounts = JSON.parse(localStorage.getItem("pf_accounts") || "{}");
@@ -150,6 +175,79 @@ export default function Dashboard() {
   if (!session.activated) {
     return (
       <div className="min-h-screen bg-[#050510] flex flex-col items-center justify-center px-4">
+        {/* Support modal */}
+        {showSupport && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/70 backdrop-blur-sm">
+            <div className="w-full max-w-md card-dark rounded-2xl p-8">
+              {supportSent ? (
+                <div className="text-center space-y-4">
+                  <div className="w-14 h-14 rounded-full bg-[#c9a84c]/10 border border-[#c9a84c]/30 flex items-center justify-center mx-auto">
+                    <CheckCircle size={28} className="text-[#c9a84c]" />
+                  </div>
+                  <h3 className="text-white font-bold text-lg">Mensaje enviado</h3>
+                  <p className="text-[#8a7a6a] text-sm">
+                    Recibimos tu solicitud. Te contactaremos a <span className="text-[#c9a84c]">{session.email}</span> en las próximas horas para verificar tu pago y darte acceso.
+                  </p>
+                  <button
+                    onClick={() => { setShowSupport(false); setSupportSent(false); setSupportMessage(""); }}
+                    className="btn-gold w-full py-3 rounded-xl font-bold mt-2"
+                  >
+                    Cerrar
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <h3 className="text-white font-bold text-lg mb-1">¿Problemas con tu acceso?</h3>
+                  <p className="text-[#8a7a6a] text-sm mb-6">
+                    Si ya realizaste tu pago y no puedes ingresar, escríbenos. Verificaremos tu pago y te activaremos manualmente.
+                  </p>
+                  <form onSubmit={handleSupport} className="space-y-4">
+                    <div>
+                      <label className="block text-xs font-semibold text-[#c9a84c] uppercase tracking-widest mb-2">
+                        Tu email de pago
+                      </label>
+                      <input
+                        type="text"
+                        value={session.email}
+                        readOnly
+                        className="w-full bg-white/5 border border-[#c9a84c]/20 rounded-xl px-4 py-3 text-[#c9a84c] text-sm cursor-default"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold text-[#c9a84c] uppercase tracking-widest mb-2">
+                        Cuéntanos qué pasó <span className="text-[#4a3a2a] normal-case font-normal">(opcional)</span>
+                      </label>
+                      <textarea
+                        value={supportMessage}
+                        onChange={(e) => setSupportMessage(e.target.value)}
+                        placeholder="Ej: Pagué ayer con Bitcoin y aún no tengo acceso..."
+                        rows={3}
+                        className="w-full bg-white/5 border border-[#c9a84c]/20 rounded-xl px-4 py-3 text-white placeholder-[#4a3a2a] text-sm focus:outline-none focus:border-[#c9a84c]/60 resize-none"
+                      />
+                    </div>
+                    <button
+                      type="submit"
+                      disabled={supportLoading}
+                      className="btn-gold w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2"
+                    >
+                      {supportLoading
+                        ? <span className="w-4 h-4 border-2 border-[#050510]/40 border-t-[#050510] rounded-full animate-spin" />
+                        : "Enviar solicitud de ayuda"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setShowSupport(false)}
+                      className="w-full text-center text-xs text-[#6a5a4a] hover:text-[#c9a84c] transition-colors"
+                    >
+                      Cancelar
+                    </button>
+                  </form>
+                </>
+              )}
+            </div>
+          </div>
+        )}
+
         <div className="w-full max-w-md">
           <div className="flex flex-col items-center mb-8">
             <div className="w-16 h-16 rounded-full bg-[#c9a84c]/10 border border-[#c9a84c]/30 flex items-center justify-center mb-4">
@@ -188,6 +286,15 @@ export default function Dashboard() {
               ¿Aún no has pagado?{" "}
               <a href="/#programas" className="text-[#c9a84c] underline">Ver programas</a>
             </p>
+            <div className="border-t border-white/5 pt-4">
+              <button
+                type="button"
+                onClick={() => setShowSupport(true)}
+                className="w-full text-center text-sm text-[#c9a84c] font-semibold hover:text-[#e8c76a] transition-colors py-1"
+              >
+                ¿Ya pagaste y tienes problemas con el código?
+              </button>
+            </div>
           </form>
           <div className="text-center mt-6">
             <button onClick={handleLogout} className="text-[#6a5a4a] text-xs hover:text-[#c9a84c]">

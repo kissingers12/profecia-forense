@@ -1,9 +1,10 @@
 import { NextRequest } from "next/server";
+import { supabaseAdmin } from "@/lib/supabase";
 
 export async function POST(req: NextRequest) {
-  const { code, plan } = await req.json();
+  const { code, plan, email } = await req.json();
 
-  if (!code || !plan) {
+  if (!code || !plan || !email) {
     return Response.json({ valid: false, message: "Datos incompletos." }, { status: 400 });
   }
 
@@ -16,6 +17,11 @@ export async function POST(req: NextRequest) {
   if (!inputCode || !validCodes.includes(inputCode)) {
     return Response.json({ valid: false, message: "Código incorrecto o ya utilizado." }, { status: 400 });
   }
+
+  await supabaseAdmin
+    .from("users")
+    .update({ activated: true })
+    .eq("email", email.toLowerCase());
 
   return Response.json({ valid: true });
 }
