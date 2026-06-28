@@ -85,6 +85,7 @@ export default function Dashboard() {
   const [supportMessage, setSupportMessage] = useState("");
   const [supportLoading, setSupportLoading] = useState(false);
   const [supportSent, setSupportSent] = useState(false);
+  const [supportFailed, setSupportFailed] = useState(false);
   const [paymentUrl, setPaymentUrl] = useState("");
   const [paymentLoading, setPaymentLoading] = useState(false);
 
@@ -138,8 +139,9 @@ export default function Dashboard() {
   const handleSupport = async (e: React.FormEvent) => {
     e.preventDefault();
     setSupportLoading(true);
+    setSupportFailed(false);
     try {
-      await fetch("/api/support", {
+      const res = await fetch("/api/support", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -149,9 +151,13 @@ export default function Dashboard() {
           message: supportMessage,
         }),
       });
-      setSupportSent(true);
+      if (res.ok) {
+        setSupportSent(true);
+      } else {
+        setSupportFailed(true);
+      }
     } catch {
-      setSupportSent(true);
+      setSupportFailed(true);
     }
     setSupportLoading(false);
   };
@@ -213,6 +219,25 @@ export default function Dashboard() {
                     className="btn-gold w-full py-3 rounded-xl font-bold mt-2"
                   >
                     Cerrar
+                  </button>
+                </div>
+              ) : supportFailed ? (
+                <div className="text-center space-y-4">
+                  <h3 className="text-white font-bold text-lg">No pudimos enviar el mensaje</h3>
+                  <p className="text-[#8a7a6a] text-sm">
+                    Hubo un problema técnico. Escríbenos directamente con tu email <span className="text-[#c9a84c]">{session.email}</span> y te activamos en minutos:
+                  </p>
+                  <a
+                    href={`mailto:100x100cristianos@gmail.com?subject=Problema%20con%20acceso&body=Mi%20email%20de%20registro%20es%3A%20${encodeURIComponent(session.email)}`}
+                    className="btn-gold w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2"
+                  >
+                    Enviar email →
+                  </a>
+                  <button
+                    onClick={() => { setSupportFailed(false); }}
+                    className="w-full text-center text-xs text-[#6a5a4a] hover:text-[#c9a84c] transition-colors"
+                  >
+                    Intentar de nuevo
                   </button>
                 </div>
               ) : (
