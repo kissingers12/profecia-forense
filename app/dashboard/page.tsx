@@ -282,16 +282,17 @@ export default function Dashboard() {
                 ? <span className="w-4 h-4 border-2 border-[#050510]/40 border-t-[#050510] rounded-full animate-spin" />
                 : <><KeyRound size={16} />Activar acceso</>}
             </button>
-            <div className="flex items-center justify-between pt-1">
-              <a href="/#programas" className="text-xs text-[#6a5a4a] hover:text-[#c9a84c] transition-colors">
-                ¿Aún no has pagado?
-              </a>
+            <p className="text-center text-xs text-[#6a5a4a]">
+              ¿Aún no has pagado?{" "}
+              <a href="/#programas" className="text-[#c9a84c] underline">Ver programas</a>
+            </p>
+            <div className="border-t border-white/5 pt-4">
               <button
                 type="button"
                 onClick={() => setShowSupport(true)}
-                className="text-xs text-[#c9a84c] underline hover:text-[#e8c76a] transition-colors"
+                className="w-full text-center text-sm text-[#c9a84c] font-semibold hover:text-[#e8c76a] transition-colors py-1"
               >
-                ¿Problemas con el código?
+                ¿Ya pagaste y tienes problemas con el código?
               </button>
             </div>
           </form>
