@@ -7,30 +7,27 @@ export default function Book() {
   return (
     <section id="libro" className="relative min-h-screen flex items-center overflow-hidden">
       <style>{`
-        @keyframes bookFloat {
-          0%   { transform: translateY(0px) rotate(-1.5deg); }
-          25%  { transform: translateY(-12px) rotate(0.5deg); }
-          50%  { transform: translateY(-20px) rotate(1.5deg); }
-          75%  { transform: translateY(-10px) rotate(-0.5deg); }
-          100% { transform: translateY(0px) rotate(-1.5deg); }
+        @keyframes bookBreath {
+          0%, 100% { transform: scale(1); }
+          50%       { transform: scale(1.04); }
         }
         @keyframes glowPulse {
           0%, 100% { opacity: 0.15; transform: scale(1); }
-          50%       { opacity: 0.35; transform: scale(1.15); }
+          50%       { opacity: 0.4; transform: scale(1.2); }
         }
         @keyframes waveRing {
-          0%   { transform: scale(0.8); opacity: 0.5; }
-          100% { transform: scale(2.2); opacity: 0; }
+          0%   { transform: scale(0.8); opacity: 0.6; }
+          100% { transform: scale(2.4); opacity: 0; }
         }
         @keyframes fadeUp {
           from { opacity: 0; transform: translateY(30px); }
           to   { opacity: 1; transform: translateY(0); }
         }
-        .book-float  { animation: bookFloat 5s ease-in-out infinite; }
-        .glow-pulse  { animation: glowPulse 4s ease-in-out infinite; }
-        .wave-ring-1 { animation: waveRing 3s ease-out infinite; }
-        .wave-ring-2 { animation: waveRing 3s ease-out infinite 1s; }
-        .wave-ring-3 { animation: waveRing 3s ease-out infinite 2s; }
+        .book-float  { animation: bookBreath 6s ease-in-out infinite; }
+        .glow-pulse  { animation: glowPulse 6s ease-in-out infinite; }
+        .wave-ring-1 { animation: waveRing 4s ease-out infinite; }
+        .wave-ring-2 { animation: waveRing 4s ease-out infinite 1.3s; }
+        .wave-ring-3 { animation: waveRing 4s ease-out infinite 2.6s; }
         .fade-up-1   { animation: fadeUp 0.8s ease-out 0.1s both; }
         .fade-up-2   { animation: fadeUp 0.8s ease-out 0.3s both; }
         .fade-up-3   { animation: fadeUp 0.8s ease-out 0.5s both; }
