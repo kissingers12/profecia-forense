@@ -18,9 +18,9 @@ export default function Home() {
     <>
       <Navbar />
       <main>
+        <Book />
         <Hero />
         <Programs />
-        <Book />
         <About />
         <Events />
         <Founder />
