@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { ShieldCheck, Clock } from "lucide-react";
 
+
 const contents = [
   "Los dos tipos de profetas que existen en la Biblia — y cómo saber cuál eres tú",
   "El mecanismo exacto que activa lo profético, condiciones que puedes replicar intencionalmente",
@@ -47,19 +48,12 @@ export default function Book() {
               <div className="relative rounded-2xl overflow-hidden w-64 sm:w-72 shadow-2xl">
                 <Image
                   src="/portada-libro.png"
-                  alt="Escuela de Profetas - El manual de un Profeta por Kissingers Araque"
+                  alt="El Manual para Oír a Dios por Kissingers Araque"
                   width={288}
                   height={432}
                   className="w-full h-auto rounded-2xl"
                   priority
                 />
-                {/* Preventa badge sobre la imagen */}
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-[85%] bg-black/70 backdrop-blur-sm border border-[#c9a84c]/50 rounded-xl px-4 py-2.5">
-                  <p className="text-[#c9a84c] text-xs font-bold tracking-widest uppercase flex items-center justify-center gap-2">
-                    <Clock size={12} />
-                    Próximamente · Preventa
-                  </p>
-                </div>
               </div>
             </div>
           </div>
