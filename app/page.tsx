@@ -25,11 +25,11 @@ export default function Home() {
         <Events />
         <Founder />
         <Biography />
+        <Donations />
         <Testimonials />
         <CTA />
         <Contact />
         <FAQ />
-        <Donations />
       </main>
       <Footer />
     </>
