@@ -39,15 +39,11 @@ export default function Founder() {
 
           {/* Text side */}
           <div>
-            <span className="inline-block text-[#c9a84c] text-xs font-bold tracking-[0.3em] uppercase mb-4">
-              El Fundador
-            </span>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight mb-6">
               <span className="text-[#c9a84c]">Kissingers Araque</span>
             </h2>
             <p className="text-[#b8a888] text-base lg:text-lg leading-relaxed mb-5">
-              Es empresario, conferencista internacional y
-              fundador de GRECA. Reconocido por su labor en la formación de
+              Es profeta, escritor y empresario. Reconocido por su labor en la formación de
               líderes y el desarrollo de dones espirituales, ha dedicado años a
               capacitar personas en liderazgo, crecimiento personal y
               entrenamiento profético.
