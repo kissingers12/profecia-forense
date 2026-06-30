@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { Clock } from "lucide-react";
+import { Clock, Smartphone, Package } from "lucide-react";
 
 
 export default function Book() {
@@ -66,37 +66,87 @@ export default function Book() {
               La ignorancia. Y estás a punto de curarte de ella.
             </p>
 
-            {/* Price block */}
-            <div className="card-dark rounded-2xl p-6 border border-[#c9a84c]/20">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <p className="text-[#8a7a6a] text-xs uppercase tracking-widest mb-1">Precio</p>
-                  <div className="flex items-center gap-3">
-                    <span className="text-3xl font-bold text-white">Próximamente</span>
+            {/* Two purchase options */}
+            <div className="grid sm:grid-cols-2 gap-4">
+
+              {/* Opción 1: Digital */}
+              <div className="card-dark rounded-2xl p-5 border border-[#c9a84c]/30 flex flex-col gap-3">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-[#c9a84c]/10 border border-[#c9a84c]/20 flex items-center justify-center">
+                    <Smartphone size={15} className="text-[#c9a84c]" />
                   </div>
-                  <p className="text-[#c9a84c] text-xs mt-1 flex items-center gap-1.5">
-                    <Clock size={11} />
-                    Regístrate para recibir el precio de preventa
+                  <div>
+                    <p className="text-white text-xs font-bold">Edición Digital</p>
+                    <p className="text-[#8a7a6a] text-[10px]">PDF · ePub · App</p>
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex items-center gap-2 mb-0.5">
+                    <span className="line-through text-[#6a5a4a] text-sm">$47</span>
+                    <span className="bg-green-500/15 border border-green-500/30 text-green-400 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                      -42% PREVENTA
+                    </span>
+                  </div>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-2xl font-bold text-white">$27</span>
+                    <span className="text-[#8a7a6a] text-xs">USD</span>
+                  </div>
+                </div>
+
+                <div className="bg-[#c9a84c]/10 border border-[#c9a84c]/20 rounded-lg px-3 py-2">
+                  <p className="text-[#c9a84c] text-[10px] font-bold flex items-center gap-1.5">
+                    <Clock size={10} />
+                    Sale el 16 de julio · Preventa abierta
                   </p>
                 </div>
-                <div className="bg-[#c9a84c]/10 border border-[#c9a84c]/30 rounded-xl px-4 py-2 text-center">
-                  <p className="text-[#c9a84c] text-xs font-bold tracking-widest uppercase">Preventa</p>
-                  <p className="text-white text-xs mt-0.5">Precio especial</p>
-                </div>
+
+                <button
+                  disabled
+                  className="w-full py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 bg-[#c9a84c]/20 text-[#c9a84c]/60 border border-[#c9a84c]/20 cursor-not-allowed mt-auto"
+                >
+                  <Clock size={13} />
+                  Disponible el 16 de julio
+                </button>
               </div>
 
-              {/* CTA */}
-              <button
-                disabled
-                className="w-full py-3.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 bg-[#c9a84c]/20 text-[#c9a84c]/60 border border-[#c9a84c]/20 cursor-not-allowed"
-              >
-                <Clock size={16} />
-                Disponible próximamente
-              </button>
-              <p className="text-center text-xs text-[#6a5a4a] mt-3">
-                Sigue nuestras redes para ser el primero en enterarte
-              </p>
+              {/* Opción 2: Físico Amazon */}
+              <div className="card-dark rounded-2xl p-5 border border-white/10 flex flex-col gap-3 opacity-70">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center">
+                    <Package size={15} className="text-[#8a7a6a]" />
+                  </div>
+                  <div>
+                    <p className="text-white text-xs font-bold">Tapa Dura · Físico</p>
+                    <p className="text-[#8a7a6a] text-[10px]">Impreso · Envío a tu puerta</p>
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-[#8a7a6a] text-xs mb-1">Precio por confirmar</p>
+                  <p className="text-white text-sm font-bold">Próximamente en Amazon</p>
+                </div>
+
+                <div className="bg-white/5 border border-white/10 rounded-lg px-3 py-2">
+                  <p className="text-[#8a7a6a] text-[10px] font-bold flex items-center gap-1.5">
+                    <Clock size={10} />
+                    Disponible próximamente
+                  </p>
+                </div>
+
+                <button
+                  disabled
+                  className="w-full py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 bg-white/5 text-[#6a5a4a] border border-white/10 cursor-not-allowed mt-auto"
+                >
+                  Próximamente en Amazon
+                </button>
+              </div>
+
             </div>
+
+            <p className="text-center text-xs text-[#6a5a4a]">
+              Sigue nuestras redes para ser el primero en enterarte del lanzamiento
+            </p>
           </div>
         </div>
       </div>
