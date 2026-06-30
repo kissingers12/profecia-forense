@@ -1,6 +1,7 @@
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
 import Programs from "@/components/Programs";
+import Book from "@/components/Book";
 import About from "@/components/About";
 import Events from "@/components/Events";
 import Founder from "@/components/Founder";
@@ -19,6 +20,7 @@ export default function Home() {
       <main>
         <Hero />
         <Programs />
+        <Book />
         <About />
         <Events />
         <Founder />
