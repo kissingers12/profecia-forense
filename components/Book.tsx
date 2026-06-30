@@ -61,11 +61,12 @@ export default function Book() {
           {/* Right: Text content */}
           <div className="flex flex-col gap-6">
             <p className="text-[#b8a888] text-base leading-relaxed">
-              Durante años pagué cientos y miles de dólares en escuelas de profetas buscando lo que nadie me enseñaba:{" "}
-              <strong className="text-white">el cómo</strong>. No el qué. No el por qué. El{" "}
-              <em>cómo</em>. Cómo fluir. Cómo activar el don. Cómo abrir los ojos espirituales
-              con intención y no por accidente. Cuando Dios me lo reveló, le prometí que no me lo
-              guardaría. <strong className="text-[#c9a84c]">Este libro es esa promesa cumplida.</strong>
+              Este libro contiene revelaciones reservadas para los que buscan con hambre genuina los misterios de Dios.
+              No todo el mundo está listo para lo que encontrará en estas páginas. Si usted es de los que todo lo llama
+              pecado, de los que todo lo etiqueta como brujería antes de leer, este libro no es para usted. Pero si
+              tiene hambre real, si en su interior algo le dice que hay más, mucho más de lo que le han enseñado —
+              siga leyendo.{" "}
+              <strong className="text-[#c9a84c]">Lo que está a punto de descubrir lo va a cambiar para siempre.</strong>
             </p>
 
             {/* What you'll find */}
