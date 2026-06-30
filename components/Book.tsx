@@ -1,6 +1,7 @@
 "use client";
 
-import { BookOpen, ShieldCheck, Clock, Star } from "lucide-react";
+import Image from "next/image";
+import { ShieldCheck, Clock } from "lucide-react";
 
 const contents = [
   "Los dos tipos de profetas que existen en la Biblia — y cómo saber cuál eres tú",
@@ -43,44 +44,21 @@ export default function Book() {
               <div className="absolute inset-0 blur-3xl bg-[#c9a84c]/20 rounded-3xl scale-110" />
 
               {/* Book card */}
-              <div className="relative card-dark rounded-2xl overflow-hidden w-64 sm:w-72 shadow-2xl border border-[#c9a84c]/30">
-                {/* Top gradient bar */}
-                <div className="h-1.5 w-full bg-gradient-to-r from-[#c9a84c] via-[#f0d080] to-[#c9a84c]" />
-
-                {/* Cover content */}
-                <div className="p-8 flex flex-col items-center text-center gap-5">
-                  <div className="w-16 h-16 rounded-2xl bg-[#c9a84c]/10 border border-[#c9a84c]/30 flex items-center justify-center">
-                    <BookOpen size={32} className="text-[#c9a84c]" />
-                  </div>
-
-                  <div>
-                    <p className="text-[#c9a84c] text-xs font-bold tracking-[0.25em] uppercase mb-2">
-                      Kissingers Araque
-                    </p>
-                    <h3 className="text-white font-bold text-xl leading-snug mb-1">
-                      Escuela de Profetas
-                    </h3>
-                    <p className="text-[#b8a888] text-xs leading-relaxed">
-                      Secretos del Reino para Activar lo Profético
-                    </p>
-                  </div>
-
-                  <div className="divider-gold w-full" />
-
-                  {/* Stars */}
-                  <div className="flex items-center gap-1">
-                    {[...Array(5)].map((_, i) => (
-                      <Star key={i} size={14} className="text-[#c9a84c] fill-[#c9a84c]" />
-                    ))}
-                  </div>
-
-                  {/* Preventa badge */}
-                  <div className="w-full bg-[#c9a84c]/10 border border-[#c9a84c]/30 rounded-xl px-4 py-3">
-                    <p className="text-[#c9a84c] text-xs font-bold tracking-widest uppercase flex items-center justify-center gap-2">
-                      <Clock size={12} />
-                      Próximamente · Preventa
-                    </p>
-                  </div>
+              <div className="relative rounded-2xl overflow-hidden w-64 sm:w-72 shadow-2xl">
+                <Image
+                  src="/portada-libro.png"
+                  alt="Escuela de Profetas - El manual de un Profeta por Kissingers Araque"
+                  width={288}
+                  height={432}
+                  className="w-full h-auto rounded-2xl"
+                  priority
+                />
+                {/* Preventa badge sobre la imagen */}
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 w-[85%] bg-black/70 backdrop-blur-sm border border-[#c9a84c]/50 rounded-xl px-4 py-2.5">
+                  <p className="text-[#c9a84c] text-xs font-bold tracking-widest uppercase flex items-center justify-center gap-2">
+                    <Clock size={12} />
+                    Próximamente · Preventa
+                  </p>
                 </div>
               </div>
             </div>
