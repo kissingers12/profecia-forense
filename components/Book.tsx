@@ -21,7 +21,7 @@ export default function Book() {
         {/* Header */}
         <div className="text-center mb-16">
           <span className="inline-block text-[#c9a84c] text-xs font-bold tracking-[0.3em] uppercase mb-4">
-            Escuela de Profetas
+            El manual de un Profeta
           </span>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-5 leading-tight">
             El libro que{" "}
