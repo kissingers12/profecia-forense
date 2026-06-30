@@ -70,8 +70,8 @@ export default function Book() {
               <p className="text-[#b8a888] text-base leading-relaxed">
                 Este libro contiene revelaciones reservadas para los que buscan con hambre genuina
                 los misterios de Dios. Si tiene hambre real, si en su interior algo le dice que hay
-                más, mucho más de lo que le han enseñado — siga leyendo.{" "}
-                <strong className="text-[#c9a84c]">Lo que está a punto de descubrir lo va a cambiar para siempre.</strong>
+                más, mucho más de lo que le han enseñado, entonces{" "}
+                <strong className="text-[#c9a84c]">lo que está a punto de descubrir en este libro lo va a cambiar todo para siempre.</strong>
               </p>
             </div>
 
