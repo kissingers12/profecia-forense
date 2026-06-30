@@ -18,8 +18,8 @@ export default function Home() {
     <>
       <Navbar />
       <main>
-        <Book />
         <Hero />
+        <Book />
         <Programs />
         <About />
         <Events />
