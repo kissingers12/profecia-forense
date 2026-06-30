@@ -1,17 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { ShieldCheck, Clock } from "lucide-react";
+import { Clock } from "lucide-react";
 
-
-const contents = [
-  "Los dos tipos de profetas que existen en la Biblia — y cómo saber cuál eres tú",
-  "El mecanismo exacto que activa lo profético, condiciones que puedes replicar intencionalmente",
-  "Los secretos que los grandes hombres de Dios guardan en silencio — y por qué decidí no guardarlos",
-  "Cómo la meditación profética de David, Elías y Ezequiel puede activarse en tu vida hoy",
-  "Principios probados: enfermedades sanadas, embarazos imposibles, finanzas transformadas",
-  "Todo con respaldo bíblico y experiencia personal comprobada — nada es solo teoría",
-];
 
 export default function Book() {
   return (
@@ -68,21 +59,6 @@ export default function Book() {
               siga leyendo.{" "}
               <strong className="text-[#c9a84c]">Lo que está a punto de descubrir lo va a cambiar para siempre.</strong>
             </p>
-
-            {/* What you'll find */}
-            <div>
-              <p className="text-white text-xs font-bold uppercase tracking-widest mb-4">
-                Lo que encontrarás:
-              </p>
-              <ul className="space-y-3">
-                {contents.map((item, i) => (
-                  <li key={i} className="flex items-start gap-3 text-sm text-[#c8b89a]">
-                    <ShieldCheck size={15} className="text-[#c9a84c] shrink-0 mt-0.5" />
-                    <span className="leading-relaxed">{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
 
             {/* Closing quote */}
             <p className="text-[#c9a84c] text-sm leading-relaxed italic border-l-2 border-[#c9a84c]/40 pl-4">
