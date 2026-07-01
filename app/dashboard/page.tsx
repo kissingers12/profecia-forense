@@ -88,6 +88,8 @@ export default function Dashboard() {
   const [supportFailed, setSupportFailed] = useState(false);
   const [paymentUrl, setPaymentUrl] = useState("");
   const [paymentLoading, setPaymentLoading] = useState(false);
+  const [upgradeLoading, setUpgradeLoading] = useState(false);
+  const [upgradeError, setUpgradeError] = useState("");
 
   useEffect(() => {
     const s = getSession();
@@ -134,6 +136,30 @@ export default function Dashboard() {
       // silently ignore, user can retry
     }
     setPaymentLoading(false);
+  };
+
+  const handleUpgradePlan = async () => {
+    setUpgradeLoading(true);
+    setUpgradeError("");
+    try {
+      const res = await fetch("/api/auth/change-plan", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: session?.email, newPlan: "escuela" }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setUpgradeError(data.error ?? "Error al cambiar el plan.");
+      } else {
+        const updated = { ...session!, plan: "escuela" };
+        saveSession(updated);
+        setSession(updated);
+        setPaymentUrl(data.paymentUrl);
+      }
+    } catch {
+      setUpgradeError("Error de conexión. Intenta de nuevo.");
+    }
+    setUpgradeLoading(false);
   };
 
   const handleSupport = async (e: React.FormEvent) => {
@@ -352,6 +378,32 @@ export default function Dashboard() {
                 ¿Pagaste y la verificación no funciona?
               </button>
             </div>
+
+            {/* Opción 4: Cambiar a Escuela Avanzada (solo si está en plan meditaciones) */}
+            {session.plan === "meditaciones" && (
+              <div className="border-t border-white/5 pt-4 space-y-3">
+                <p className="text-xs font-semibold text-[#c9a84c] uppercase tracking-widest">
+                  ¿Quieres el Nivel Avanzado?
+                </p>
+                <p className="text-[#8a7a6a] text-xs leading-relaxed">
+                  Actualmente tienes seleccionado el plan de Meditación ($333). Si prefieres el programa completo de la Escuela Avanzada, puedes cambiar aquí.
+                </p>
+                {upgradeError && <p className="text-red-400 text-xs">{upgradeError}</p>}
+                <button
+                  type="button"
+                  onClick={handleUpgradePlan}
+                  disabled={upgradeLoading}
+                  className="w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 text-sm border border-[#c9a84c]/60 text-[#c9a84c] bg-[#c9a84c]/5 hover:bg-[#c9a84c]/15 transition-all"
+                >
+                  {upgradeLoading
+                    ? <span className="w-4 h-4 border-2 border-[#c9a84c]/40 border-t-[#c9a84c] rounded-full animate-spin" />
+                    : "Cambiar a Escuela Avanzada — $777"}
+                </button>
+                <p className="text-[#6a5a4a] text-[10px] text-center">
+                  Esto actualizará tu plan. Tu cuenta anterior de meditación quedará cancelada.
+                </p>
+              </div>
+            )}
           </div>
           <div className="text-center mt-6">
             <button onClick={handleLogout} className="text-[#6a5a4a] text-xs hover:text-[#c9a84c]">
