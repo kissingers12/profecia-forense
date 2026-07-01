@@ -423,48 +423,71 @@ export default function Dashboard() {
   const activeLesson_obj = flatContent.find((l) => l.id === activeLesson);
 
   function LessonButton({ lesson, index }: { lesson: Lesson; index: number }) {
+    const isActive = activeLesson === lesson.id;
     return (
-      <button
-        onClick={() => lesson.unlocked && setActiveLesson(lesson.id)}
-        className={`w-full card-dark rounded-xl p-5 flex items-center gap-4 text-left transition-all duration-200 group ${
-          activeLesson === lesson.id
-            ? "border-[#c9a84c]/50 bg-[#c9a84c]/5"
-            : lesson.unlocked
-            ? "hover:border-[#c9a84c]/30 cursor-pointer"
-            : "opacity-60 cursor-default"
-        }`}
-      >
-        <div
-          className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-sm font-bold transition-colors ${
-            activeLesson && lesson.id < activeLesson && lesson.unlocked
-              ? "bg-[#c9a84c] text-[#050510]"
-              : activeLesson === lesson.id
-              ? "bg-[#c9a84c]/20 border border-[#c9a84c] text-[#c9a84c]"
-              : "bg-white/5 text-[#6a5a4a]"
+      <>
+        <button
+          onClick={() => lesson.unlocked && setActiveLesson(isActive ? null : lesson.id)}
+          className={`w-full card-dark rounded-xl p-5 flex items-center gap-4 text-left transition-all duration-200 group ${
+            isActive
+              ? "border-[#c9a84c]/50 bg-[#c9a84c]/5"
+              : lesson.unlocked
+              ? "hover:border-[#c9a84c]/30 cursor-pointer"
+              : "opacity-60 cursor-default"
           }`}
         >
-          {activeLesson && lesson.id < activeLesson && lesson.unlocked ? (
-            <CheckCircle size={16} />
-          ) : (
-            <span>{String(index + 1).padStart(2, "0")}</span>
-          )}
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className={`font-semibold text-sm truncate ${activeLesson === lesson.id ? "text-[#c9a84c]" : "text-white"}`}>
-            {lesson.title}
-          </p>
-          {lesson.duration && <p className="text-[#6a5a4a] text-xs mt-0.5">{lesson.duration}</p>}
-        </div>
-        {lesson.unlocked ? (
-          <div className="flex items-center gap-2 shrink-0">
-            {activeLesson === lesson.id && <span className="w-2 h-2 rounded-full bg-[#c9a84c] animate-pulse" />}
-            <Eye size={16} className="text-[#c9a84c] opacity-0 group-hover:opacity-100 transition-opacity" />
-            <ChevronRight size={16} className="text-[#6a5a4a]" />
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-sm font-bold transition-colors ${
+            activeLesson && lesson.id < activeLesson && lesson.unlocked
+              ? "bg-[#c9a84c] text-[#050510]"
+              : isActive
+              ? "bg-[#c9a84c]/20 border border-[#c9a84c] text-[#c9a84c]"
+              : "bg-white/5 text-[#6a5a4a]"
+          }`}>
+            {activeLesson && lesson.id < activeLesson && lesson.unlocked ? (
+              <CheckCircle size={16} />
+            ) : isActive ? (
+              <PlayCircle size={16} />
+            ) : (
+              <span>{String(index + 1).padStart(2, "0")}</span>
+            )}
           </div>
-        ) : (
-          <Lock size={16} className="text-[#4a3a2a] shrink-0" />
+          <div className="flex-1 min-w-0">
+            <p className={`font-semibold text-sm truncate ${isActive ? "text-[#c9a84c]" : "text-white"}`}>
+              {lesson.title}
+            </p>
+            {lesson.duration && <p className="text-[#6a5a4a] text-xs mt-0.5">{lesson.duration}</p>}
+          </div>
+          {lesson.unlocked ? (
+            <div className="flex items-center gap-2 shrink-0">
+              {isActive && <span className="w-2 h-2 rounded-full bg-[#c9a84c] animate-pulse" />}
+              <Video size={15} className={`text-[#c9a84c] transition-opacity ${isActive ? "opacity-100" : "opacity-40 group-hover:opacity-100"}`} />
+              <ChevronRight size={16} className={`text-[#6a5a4a] transition-transform duration-200 ${isActive ? "rotate-90" : ""}`} />
+            </div>
+          ) : (
+            <Lock size={16} className="text-[#4a3a2a] shrink-0" />
+          )}
+        </button>
+
+        {/* Reproductor inline — aparece justo debajo de la lección seleccionada */}
+        {isActive && (
+          lesson.vimeoId ? (
+            <div className="rounded-2xl overflow-hidden border border-[#c9a84c]/25 mt-2" style={{ padding: "56.25% 0 0 0", position: "relative" }}>
+              <iframe
+                src={`https://player.vimeo.com/video/${lesson.vimeoId}?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1`}
+                frameBorder="0"
+                allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media"
+                style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}
+                title={lesson.title}
+              />
+            </div>
+          ) : (
+            <div className="card-dark rounded-2xl p-6 text-center border border-[#c9a84c]/20 mt-2">
+              <PlayCircle size={36} className="text-[#c9a84c]/40 mx-auto mb-2" />
+              <p className="text-[#8a7a6a] text-sm">Video próximamente disponible</p>
+            </div>
+          )
         )}
-      </button>
+      </>
     );
   }
 
@@ -583,33 +606,6 @@ export default function Dashboard() {
             {activeLesson ? "Continuar" : "Comenzar"}
           </button>
         </div>
-
-        {/* Video player */}
-        {activeLesson && (
-          activeLesson_obj?.vimeoId ? (
-            <div className="mb-10">
-              <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                <PlayCircle size={20} className="text-[#c9a84c]" />
-                {activeLesson_obj.title}
-              </h2>
-              <div className="rounded-2xl overflow-hidden border border-[#c9a84c]/20" style={{ padding: "56.25% 0 0 0", position: "relative" }}>
-                <iframe
-                  src={`https://player.vimeo.com/video/${activeLesson_obj.vimeoId}?badge=0&autopause=0&player_id=0&app_id=58479`}
-                  frameBorder="0"
-                  allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media"
-                  style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}
-                  title={activeLesson_obj.title}
-                />
-              </div>
-              <script src="https://player.vimeo.com/api/player.js" async />
-            </div>
-          ) : (
-            <div className="mb-10 card-dark rounded-2xl p-8 text-center border border-[#c9a84c]/20">
-              <PlayCircle size={40} className="text-[#c9a84c]/40 mx-auto mb-3" />
-              <p className="text-[#8a7a6a] text-sm">Video próximamente disponible</p>
-            </div>
-          )
-        )}
 
         {/* Libro digital — solo usuarios Escuela Avanzada */}
         {isEscuela && (() => {
