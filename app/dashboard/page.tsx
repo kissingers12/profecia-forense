@@ -151,7 +151,7 @@ export default function Dashboard() {
       if (!res.ok) {
         setUpgradeError(data.error ?? "Error al cambiar el plan.");
       } else {
-        const updated = { ...session!, plan: "escuela" };
+        const updated = { ...session!, plan: "escuela" as const };
         saveSession(updated);
         setSession(updated);
         setPaymentUrl(data.paymentUrl);
