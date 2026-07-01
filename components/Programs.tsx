@@ -1,6 +1,6 @@
 "use client";
 
-import { BookOpen, Eye, ArrowRight, Tag, ShieldCheck } from "lucide-react";
+import { BookOpen, Eye, ArrowRight, Tag, ShieldCheck, Gift } from "lucide-react";
 
 const programs = [
   {
@@ -26,6 +26,7 @@ const programs = [
     originalPrice: 444,
     price: 333,
     discount: 25,
+    gift: null,
     paymentUrl: "https://nowpayments.io/payment/?iid=6358579774&paymentId=4532704630",
     accent: "#8b5cf6",
   },
@@ -55,6 +56,10 @@ const programs = [
       "Activaciones prácticas y ejercicios supervisados.",
       "Preguntas y respuestas en grupo de WhatsApp con el pastor Kissingers.",
     ],
+    gift: {
+      title: "El Manual para Escuchar a Dios",
+      description: "Un libro donde están resumidas las 30 enseñanzas proféticas de la escuela — dado como regalo para que puedas tener toda la Escuela de Profeta en un libro.",
+    },
     closing: "Una formación diseñada para acelerar tu crecimiento espiritual, desarrollar tu discernimiento y ayudarte a caminar con mayor claridad, madurez y precisión en el llamado profético.",
     duration: "Acceso de por vida",
     level: "Todos los niveles",
@@ -125,6 +130,22 @@ export default function Programs() {
                     </p>
                   ))}
                 </div>
+
+                {/* Regalo: Libro */}
+                {p.gift && (
+                  <div className="mb-5 rounded-xl border border-[#c9a84c]/50 bg-[#c9a84c]/8 p-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <div className="w-7 h-7 rounded-lg bg-[#c9a84c]/20 flex items-center justify-center shrink-0">
+                        <Gift size={14} className="text-[#c9a84c]" />
+                      </div>
+                      <span className="text-[#c9a84c] text-[10px] font-bold tracking-widest uppercase">
+                        Regalo incluido
+                      </span>
+                    </div>
+                    <p className="text-white font-bold text-sm mb-1">{p.gift.title}</p>
+                    <p className="text-[#b8a888] text-xs leading-relaxed">{p.gift.description}</p>
+                  </div>
+                )}
 
                 {/* Lo que recibirás (opcional) */}
                 {p.accessLabel && (
