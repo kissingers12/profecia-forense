@@ -519,6 +519,51 @@ export default function Dashboard() {
                   {group.groupTitle}
                   <span className="flex-1 h-px bg-[#c9a84c]/20" />
                 </h3>
+
+                {/* Anuncio primera clase en vivo — solo en Nivel Avanzado */}
+                {group.groupTitle === "Nivel Avanzado" && (
+                  <div className="mb-5 rounded-2xl border border-[#c9a84c]/40 bg-[#c9a84c]/5 p-6">
+                    <div className="flex items-start gap-3 mb-4">
+                      <div className="w-10 h-10 rounded-xl bg-[#c9a84c]/15 border border-[#c9a84c]/30 flex items-center justify-center shrink-0">
+                        <Video size={18} className="text-[#c9a84c]" />
+                      </div>
+                      <div>
+                        <span className="inline-block bg-[#c9a84c]/20 border border-[#c9a84c]/40 text-[#c9a84c] text-[10px] font-bold tracking-widest uppercase px-2 py-0.5 rounded-full mb-1">
+                          Primera clase · Grupo reducido · Agosto 2026
+                        </span>
+                        <h4 className="text-white font-bold text-base leading-snug">
+                          Profecía Forense: Precisión y Detalles Específicos
+                        </h4>
+                      </div>
+                    </div>
+                    <p className="text-[#b8a888] text-sm leading-relaxed mb-4">
+                      La precisión en lo profético no es un accidente; es el resultado de una mente disciplinada y un espíritu refinado.
+                      Para pasar del estímulo general a la Profecía Forense —donde ves nombres, fechas y detalles específicos "ocultos"—
+                      debes dominar el procesamiento interno de la señal.
+                    </p>
+                    <p className="text-[#c9a84c] text-xs font-bold uppercase tracking-widest mb-3">Temas a tratar:</p>
+                    <ul className="space-y-2.5 text-sm text-[#c8b89a]">
+                      {[
+                        "Cada profeta tiene una \"frecuencia de recepción\" única. La precisión forense comienza con una auditoría de cómo Dios te habla específicamente.",
+                        "Descifrando el \"Flash\": aprendiendo a distinguir entre un pensamiento pasajero y una visión divina en \"fotograma inmóvil\".",
+                        "Identificación sensorial: ¿La revelación viene como una imagen mental (interna), una visión abierta (externa) o un \"saber\" (gnosis)?",
+                        "El método de la \"congelación\" de la primera imagen que recibes para observar con más detalle — allí es donde se esconden los detalles forenses.",
+                      ].map((item, i) => (
+                        <li key={i} className="flex items-start gap-2.5">
+                          <span className="text-[#c9a84c] font-bold shrink-0">{i + 1}.</span>
+                          <span className="leading-relaxed">{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="mt-4 pt-4 border-t border-[#c9a84c]/15">
+                      <p className="text-[#8a7a6a] text-xs flex items-center gap-1.5">
+                        <span className="w-2 h-2 rounded-full bg-[#c9a84c] animate-pulse shrink-0" />
+                        El enlace de la clase se compartirá en el grupo de WhatsApp antes de la sesión.
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 <div className="space-y-3">
                   {group.lessons.map((lesson, i) => (
                     <LessonButton key={lesson.id} lesson={lesson} index={i} />
