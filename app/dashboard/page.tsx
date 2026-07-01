@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { LogOut, PlayCircle, BookOpen, Lock, CheckCircle, ChevronRight, Eye, KeyRound, MessageCircle, Video } from "lucide-react";
+import { LogOut, PlayCircle, BookOpen, Lock, CheckCircle, ChevronRight, Eye, KeyRound, MessageCircle, Video, Download, Gift } from "lucide-react";
 import { getSession, clearSession, saveSession, PLAN_LABELS, type UserSession } from "@/lib/auth";
 
 type Lesson = {
@@ -610,6 +610,68 @@ export default function Dashboard() {
             </div>
           )
         )}
+
+        {/* Libro digital — solo usuarios Escuela Avanzada */}
+        {isEscuela && (() => {
+          const launched = new Date() >= new Date("2026-07-16T00:00:00");
+          const bookUrl = process.env.NEXT_PUBLIC_BOOK_URL ?? "";
+          return (
+            <div className="mb-10 rounded-2xl border border-[#c9a84c]/40 bg-[#c9a84c]/5 overflow-hidden">
+              <div className="flex items-center gap-2 px-6 pt-5 pb-0">
+                <Gift size={15} className="text-[#c9a84c]" />
+                <span className="text-[#c9a84c] text-[10px] font-bold tracking-widest uppercase">
+                  Regalo incluido en tu plan
+                </span>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-6 p-6">
+                {/* Portada */}
+                <div className="shrink-0 w-28 sm:w-32 mx-auto sm:mx-0">
+                  <div className="rounded-xl overflow-hidden border border-[#c9a84c]/30 shadow-lg">
+                    <Image
+                      src="/portada-libro.png"
+                      alt="El Manual para Escuchar a Dios"
+                      width={128}
+                      height={180}
+                      className="w-full object-cover"
+                    />
+                  </div>
+                </div>
+                {/* Info */}
+                <div className="flex flex-col justify-between flex-1">
+                  <div>
+                    <h3 className="text-white font-extrabold text-lg leading-snug mb-1">
+                      El Manual para Escuchar a Dios
+                    </h3>
+                    <p className="text-[#b8a888] text-sm leading-relaxed mb-4">
+                      Las 30 enseñanzas proféticas de la Escuela resumidas en un libro. Tu guía completa para desarrollar el don profético, dada como regalo exclusivo para los estudiantes de la Escuela Avanzada.
+                    </p>
+                  </div>
+                  {launched && bookUrl ? (
+                    <a
+                      href={bookUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 btn-gold px-6 py-3 rounded-xl font-bold text-sm w-fit"
+                    >
+                      <Download size={16} />
+                      Descargar libro digital
+                    </a>
+                  ) : (
+                    <div className="flex items-center gap-3">
+                      <div className="inline-flex items-center gap-2 bg-white/5 border border-[#c9a84c]/30 text-[#c9a84c] px-5 py-2.5 rounded-xl text-sm font-bold opacity-70 cursor-not-allowed select-none">
+                        <Download size={15} />
+                        Descargar libro digital
+                      </div>
+                      <span className="text-[#c9a84c] text-xs font-bold bg-[#c9a84c]/10 border border-[#c9a84c]/30 px-3 py-1.5 rounded-full">
+                        Disponible 16 de julio
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        })()}
 
         {/* Content list */}
         <h2 className="text-xl font-bold text-white mb-5 flex items-center gap-2">
