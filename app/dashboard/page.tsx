@@ -107,7 +107,7 @@ export default function Dashboard() {
       .then((r) => r.json())
       .then((data) => {
         if (data.user) {
-          const updated = { ...s, activated: data.user.activated };
+          const updated = { ...s, activated: data.user.activated, plan: data.user.plan };
           saveSession(updated);
           setSession(updated);
         }
@@ -202,6 +202,8 @@ export default function Dashboard() {
         const updated = { ...session!, activated: true };
         saveSession(updated);
         setSession(updated);
+      } else if (!res.ok && data.error) {
+        setActivationError("Error del servidor. Intenta de nuevo en unos minutos o usa el soporte.");
       } else {
         setActivationError(data.message ?? "No encontramos un pago confirmado. Si acabas de pagar, espera unos minutos e intenta de nuevo.");
       }
