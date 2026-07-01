@@ -13,6 +13,7 @@ const programs = [
       "A través de sesiones guiadas, aprenderás a silenciar el ruido externo, enfocar tu mente en la presencia de Dios y desarrollar hábitos que favorezcan una mayor claridad espiritual.",
     ],
     accessLabel: null,
+    accessItems: null,
     learnsLabel: "Lo que aprenderás:",
     learns: [
       "Los 4 secretos de la meditación profética y cómo aplicarlos correctamente.",
@@ -39,7 +40,14 @@ const programs = [
       "Un programa intensivo diseñado para formar y equipar profetas, llevándolos desde los fundamentos del ministerio profético hasta niveles avanzados de discernimiento, revelación y práctica ministerial.",
       "Recibirás acceso de por vida a más de 25 enseñanzas prácticas cargadas de secretos diseñados para activar la profecía, junto con mentoría y activaciones enfocadas en desarrollar tu sensibilidad espiritual, fortalecer tu discernimiento y ayudarte a crecer en el ejercicio responsable del don profético.",
     ],
-    accessLabel: "Al inscribirte en la Escuela Avanzada tendrás acceso completo a todo el contenido publicado en Meditación Profética, más enseñanzas avanzadas sobre temas que rara vez se enseñan de manera completa, compartiendo principios, experiencias y herramientas prácticas para el desarrollo profético.",
+    accessLabel: "Al inscribirte en la Escuela Avanzada tendrás acceso completo a:",
+    accessItems: [
+      { bold: "Todo el contenido de Meditación Profética", detail: "acceso completo a todas las enseñanzas publicadas en esa sección." },
+      { bold: "El libro: El Manual para Escuchar a Dios", detail: "las 30 enseñanzas proféticas resumidas en un libro, incluido como regalo exclusivo." },
+      { bold: "Videos exclusivos de YouTube para miembros", detail: "enseñanzas que solo se han compartido en privado con miembros. Si ya los viste en YouTube, aquí los tienes organizados — y además recibirás mentoría exclusiva y acceso a todas las próximas enseñanzas." },
+      { bold: "Mentoría en grupo reducido", detail: "sesiones donde podrás recibir orientación directa y resolver dudas en un ambiente íntimo." },
+      { bold: "Clases en vivo por Zoom", detail: "acceso a clases en tiempo real y a las grabaciones de cada sesión." },
+    ],
     learnsLabel: "Temas de formación:",
     learns: [
       "Desbloqueando los ojos espirituales.",
@@ -150,10 +158,23 @@ export default function Programs() {
                 {/* Lo que recibirás (opcional) */}
                 {p.accessLabel && (
                   <div className="mb-4">
-                    <p className="text-white text-xs font-bold uppercase tracking-widest mb-2">
+                    <p className="text-white text-xs font-bold uppercase tracking-widest mb-3">
                       Lo que recibirás
                     </p>
-                    <p className="text-[#b8a888] text-sm leading-relaxed">{p.accessLabel}</p>
+                    <p className="text-[#b8a888] text-sm leading-relaxed mb-3">{p.accessLabel}</p>
+                    {"accessItems" in p && p.accessItems && (
+                      <ul className="space-y-3">
+                        {(p.accessItems as { bold: string; detail: string }[]).map((item, i) => (
+                          <li key={i} className="flex items-start gap-2.5 text-sm">
+                            <ShieldCheck size={15} className="text-[#c9a84c] shrink-0 mt-0.5" />
+                            <span className="text-[#c8b89a] leading-relaxed">
+                              <span className="text-white font-semibold">{item.bold}</span>
+                              {" — "}{item.detail}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
                 )}
 
