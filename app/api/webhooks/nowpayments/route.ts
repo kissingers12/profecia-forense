@@ -8,8 +8,17 @@ const PRICE_TO_PLAN: Record<number, string> = {
   777: "escuela",
 };
 
-function verifySignature(body: string, signature: string, secret: string): boolean {
-  const hmac = crypto.createHmac("sha512", secret).update(body).digest("hex");
+function verifySignature(rawBody: string, signature: string, secret: string): boolean {
+  try {
+    // NOWPayments signs the alphabetically sorted JSON, not the raw body
+    const parsed = JSON.parse(rawBody);
+    const sortedKeys = Object.keys(parsed).sort();
+    const sortedBody = JSON.stringify(parsed, sortedKeys);
+    const hmac = crypto.createHmac("sha512", secret).update(sortedBody).digest("hex");
+    if (hmac === signature) return true;
+  } catch {}
+  // Fallback: try raw body as-is
+  const hmac = crypto.createHmac("sha512", secret).update(rawBody).digest("hex");
   return hmac === signature;
 }
 

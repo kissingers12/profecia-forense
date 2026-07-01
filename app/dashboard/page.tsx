@@ -162,27 +162,22 @@ export default function Dashboard() {
     setSupportLoading(false);
   };
 
-  const handleActivation = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleActivation = async () => {
     setActivationLoading(true);
     setActivationError("");
     try {
-      const res = await fetch("/api/activate", {
+      const res = await fetch("/api/payment/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code: activationCode, plan: session?.plan, email: session?.email }),
+        body: JSON.stringify({ email: session?.email }),
       });
-      if (res.ok) {
-        const accounts = JSON.parse(localStorage.getItem("pf_accounts") || "{}");
-        if (session?.email && accounts[session.email]) {
-          accounts[session.email].activated = true;
-          localStorage.setItem("pf_accounts", JSON.stringify(accounts));
-        }
+      const data = await res.json();
+      if (data.activated) {
         const updated = { ...session!, activated: true };
         saveSession(updated);
         setSession(updated);
       } else {
-        setActivationError("Código incorrecto. Verifica e intenta de nuevo.");
+        setActivationError(data.message ?? "No encontramos un pago confirmado. Si acabas de pagar, espera unos minutos e intenta de nuevo.");
       }
     } catch {
       setActivationError("Error de conexión. Intenta de nuevo.");
@@ -300,34 +295,28 @@ export default function Dashboard() {
             </div>
             <h1 className="text-2xl font-bold text-white mb-2">Activa tu acceso</h1>
             <p className="text-[#8a7a6a] text-sm text-center max-w-xs">
-              Después de realizar tu pago, recibirás un código de activación por email. Ingrésalo aquí para desbloquear tu contenido.
+              Si ya realizaste tu pago, presiona el botón para verificarlo automáticamente y desbloquear tu contenido.
             </p>
           </div>
           <div className="card-dark rounded-2xl p-8 space-y-5">
-            {/* Opción 1: Ya pagué, tengo código */}
-            <form onSubmit={handleActivation} className="space-y-4">
-              <p className="text-xs font-semibold text-[#c9a84c] uppercase tracking-widest">Ya pagué — tengo mi código</p>
-              <div>
-                <input
-                  type="text"
-                  value={activationCode}
-                  onChange={(e) => setActivationCode(e.target.value)}
-                  required
-                  placeholder="Ej: MED-7K2X9P"
-                  className="w-full bg-white/5 border border-[#c9a84c]/20 rounded-xl px-4 py-3 text-white placeholder-[#4a3a2a] text-sm focus:outline-none focus:border-[#c9a84c]/60 uppercase tracking-widest"
-                />
-              </div>
+            {/* Opción 1: Ya pagué */}
+            <div className="space-y-3">
+              <p className="text-xs font-semibold text-[#c9a84c] uppercase tracking-widest">Ya realicé mi pago</p>
               {activationError && <p className="text-red-400 text-xs">{activationError}</p>}
               <button
-                type="submit"
+                type="button"
+                onClick={handleActivation}
                 disabled={activationLoading}
                 className="btn-gold w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2"
               >
                 {activationLoading
                   ? <span className="w-4 h-4 border-2 border-[#050510]/40 border-t-[#050510] rounded-full animate-spin" />
-                  : <><KeyRound size={16} />Activar acceso</>}
+                  : <><CheckCircle size={16} />Verificar mi pago</>}
               </button>
-            </form>
+              <p className="text-[#6a5a4a] text-xs text-center">
+                El sistema verificará tu pago automáticamente
+              </p>
+            </div>
 
             <div className="border-t border-white/5 pt-4 space-y-3">
               {/* Opción 2: Aún no he pagado */}
@@ -360,7 +349,7 @@ export default function Dashboard() {
                 onClick={() => setShowSupport(true)}
                 className="w-full text-center text-sm text-[#8a7a6a] hover:text-[#c9a84c] transition-colors py-1"
               >
-                ¿Ya pagaste y tienes problemas con el código?
+                ¿Pagaste y la verificación no funciona?
               </button>
             </div>
           </div>
