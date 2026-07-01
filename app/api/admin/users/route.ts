@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
 
   const { data: users, error } = await supabaseAdmin
     .from("users")
-    .select("id, email, name, plan, activated, created_at")
+    .select("id, email, name, plan, activated, whatsapp, created_at")
     .order("created_at", { ascending: false });
 
   if (error) {

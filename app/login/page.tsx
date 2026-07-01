@@ -23,7 +23,7 @@ function LoginContent() {
   const [loading, setLoading] = useState(false);
 
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
-  const [regForm, setRegForm] = useState({ name: "", email: "", password: "", confirm: "", plan: defaultPlan });
+  const [regForm, setRegForm] = useState({ name: "", email: "", password: "", confirm: "", plan: defaultPlan, countryCode: "+1", phone: "" });
   const [registered, setRegistered] = useState(false);
   const [paymentUrl, setPaymentUrl] = useState("");
   const [price, setPrice] = useState(0);
@@ -64,12 +64,13 @@ function LoginContent() {
     if (regForm.password !== regForm.confirm) { setError("Las contraseñas no coinciden."); return; }
     if (regForm.password.length < 6) { setError("La contraseña debe tener al menos 6 caracteres."); return; }
     if (!regForm.plan) { setError("Selecciona un programa."); return; }
+    const whatsapp = regForm.phone ? `${regForm.countryCode}${regForm.phone.replace(/\s/g, "")}` : "";
     setLoading(true);
     try {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: regForm.email, name: regForm.name, password: regForm.password, plan: regForm.plan }),
+        body: JSON.stringify({ email: regForm.email, name: regForm.name, password: regForm.password, plan: regForm.plan, whatsapp }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -190,6 +191,42 @@ function LoginContent() {
                   ))}
                 </select>
               </div>
+
+              {regForm.plan === "escuela" && (
+                <div>
+                  <label className="block text-xs font-semibold text-[#c9a84c] uppercase tracking-widest mb-2">
+                    WhatsApp <span className="text-red-400">*</span>
+                  </label>
+                  <div className="flex gap-2">
+                    <select
+                      value={regForm.countryCode}
+                      onChange={(e) => setRegForm({ ...regForm, countryCode: e.target.value })}
+                      className="bg-[#0a0a20] border border-[#c9a84c]/20 rounded-xl px-3 py-3 text-[#c8b89a] text-sm focus:outline-none focus:border-[#c9a84c]/60 w-28 shrink-0"
+                    >
+                      {[
+                        ["+1","🇺🇸 +1"],["+52","🇲🇽 +52"],["+ 57","🇨🇴 +57"],
+                        ["+58","🇻🇪 +58"],["+51","🇵🇪 +51"],["+54","🇦🇷 +54"],
+                        ["+34","🇪🇸 +34"],["+56","🇨🇱 +56"],["+593","🇪🇨 +593"],
+                        ["+507","🇵🇦 +507"],["+503","🇸🇻 +503"],["+502","🇬🇹 +502"],
+                        ["+504","🇭🇳 +504"],["+505","🇳🇮 +505"],["+506","🇨🇷 +506"],
+                        ["+1-809","🇩🇴 +1-809"],["+44","🇬🇧 +44"],["+49","🇩🇪 +49"],
+                      ].map(([val, label]) => (
+                        <option key={val} value={val}>{label}</option>
+                      ))}
+                    </select>
+                    <input
+                      type="tel"
+                      value={regForm.phone}
+                      onChange={(e) => setRegForm({ ...regForm, phone: e.target.value })}
+                      required={regForm.plan === "escuela"}
+                      placeholder="Número sin código"
+                      className="flex-1 bg-white/5 border border-[#c9a84c]/20 rounded-xl px-4 py-3 text-white placeholder-[#4a3a2a] text-sm focus:outline-none focus:border-[#c9a84c]/60"
+                    />
+                  </div>
+                  <p className="text-[#6a5a4a] text-xs mt-1.5">Te añadiremos al grupo de WhatsApp de la Escuela Avanzada</p>
+                </div>
+              )}
+
               {error && <p className="text-red-400 text-xs">{error}</p>}
               <button type="submit" disabled={loading} className="btn-gold w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 mt-2">
                 {loading ? <span className="w-4 h-4 border-2 border-[#050510]/40 border-t-[#050510] rounded-full animate-spin" /> : <><UserPlus size={17} />Crear cuenta y pagar</>}

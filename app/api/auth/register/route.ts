@@ -43,10 +43,14 @@ async function createNowPaymentsInvoice(email: string, plan: string): Promise<st
 }
 
 export async function POST(req: NextRequest) {
-  const { email, name, password, plan } = await req.json();
+  const { email, name, password, plan, whatsapp } = await req.json();
 
   if (!email || !name || !password || !plan) {
     return Response.json({ error: "Todos los campos son requeridos." }, { status: 400 });
+  }
+
+  if (plan === "escuela" && !whatsapp) {
+    return Response.json({ error: "El número de WhatsApp es obligatorio para este programa." }, { status: 400 });
   }
 
   if (!PLAN_PRICES[plan]) {
@@ -73,6 +77,7 @@ export async function POST(req: NextRequest) {
       password_hash: passwordHash,
       plan,
       activated: false,
+      ...(whatsapp ? { whatsapp } : {}),
     })
     .select("id, email, name, plan")
     .single();
