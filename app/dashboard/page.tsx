@@ -457,14 +457,23 @@ export default function Dashboard() {
         {/* Anuncio primera clase en vivo — solo Escuela Avanzada */}
         {isEscuela && (
           <div className="mb-8 rounded-2xl border border-[#c9a84c]/40 bg-[#c9a84c]/5 p-6">
+            <div className="flex items-center gap-2 mb-3">
+              <span className="w-2 h-2 rounded-full bg-[#c9a84c] animate-pulse shrink-0" />
+              <span className="text-[#c9a84c] text-[10px] font-bold tracking-widest uppercase">
+                Primera clase · Grupo reducido · Agosto 2026
+              </span>
+            </div>
+            <h2 className="text-white font-extrabold text-2xl sm:text-3xl leading-tight mb-1">
+              Primera Clase Avanzada
+            </h2>
+            <p className="text-[#c9a84c]/80 text-sm font-semibold mb-5">
+              Recomendado solo para personas que ya vieron todos los videos
+            </p>
             <div className="flex items-start gap-3 mb-4">
               <div className="w-10 h-10 rounded-xl bg-[#c9a84c]/15 border border-[#c9a84c]/30 flex items-center justify-center shrink-0">
                 <Video size={18} className="text-[#c9a84c]" />
               </div>
               <div>
-                <span className="inline-block bg-[#c9a84c]/20 border border-[#c9a84c]/40 text-[#c9a84c] text-[10px] font-bold tracking-widest uppercase px-2 py-0.5 rounded-full mb-1">
-                  Primera clase · Grupo reducido · Agosto 2026
-                </span>
                 <h4 className="text-white font-bold text-base leading-snug">
                   Profecía Forense: Precisión y Detalles Específicos
                 </h4>
