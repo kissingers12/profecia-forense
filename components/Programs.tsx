@@ -36,7 +36,7 @@ const programs = [
     title: "Escuela Avanzada de Profecía",
     paragraphs: [
       "Un programa intensivo diseñado para formar y equipar profetas, llevándolos desde los fundamentos del ministerio profético hasta niveles avanzados de discernimiento, revelación y práctica ministerial.",
-      "Recibirás acceso de por vida a más de 25 enseñanzas prácticas cargadas de secretos diseñados para activar la profecía, junto con mentoría y activaciones enfocadas en desarrollar tu sensibilidad espiritual, fortalecer tu discernimiento y ayudarte a crecer en el ejercicio responsable del don profético.",
+      "Recibirás acceso 24/7 a más de 25 enseñanzas prácticas cargadas de secretos diseñados para activar la profecía, junto con mentoría y activaciones enfocadas en desarrollar tu sensibilidad espiritual, fortalecer tu discernimiento y ayudarte a crecer en el ejercicio responsable del don profético.",
     ],
     accessLabel: "Al inscribirte en la Escuela Avanzada tendrás acceso completo a todo el contenido publicado en Meditación Profética, más enseñanzas avanzadas sobre temas que rara vez se enseñan de manera completa, compartiendo principios, experiencias y herramientas prácticas para el desarrollo profético.",
     learnsLabel: "Temas de formación:",
@@ -56,7 +56,7 @@ const programs = [
       "Preguntas y respuestas en grupo de WhatsApp con el pastor Kissingers.",
     ],
     closing: "Una formación diseñada para acelerar tu crecimiento espiritual, desarrollar tu discernimiento y ayudarte a caminar con mayor claridad, madurez y precisión en el llamado profético.",
-    duration: "Acceso de por vida",
+    duration: "Acceso 24/7",
     level: "Todos los niveles",
     originalPrice: 1200,
     price: 777,
@@ -185,7 +185,7 @@ export default function Programs() {
                     <span className="text-3xl font-bold text-white">${p.price}</span>
                     <span className="text-[#8a7a6a] text-sm">USD</span>
                   </div>
-                  <span className="text-[#6a5a4a] text-xs">Pago único · Acceso de por vida</span>
+                  <span className="text-[#6a5a4a] text-xs">Pago único · Acceso 24/7</span>
                 </div>
 
                 {/* CTA */}

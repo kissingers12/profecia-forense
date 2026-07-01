@@ -212,7 +212,7 @@ function LoginContent() {
               <div className="card-dark rounded-xl p-5 text-left">
                 <p className="text-[#8a7a6a] text-xs mb-1">Total a pagar</p>
                 <p className="text-3xl font-bold text-white">${price} <span className="text-sm text-[#8a7a6a]">USD</span></p>
-                <p className="text-[#6a5a4a] text-xs mt-1">Pago único · Acceso de por vida</p>
+                <p className="text-[#6a5a4a] text-xs mt-1">Pago único · Acceso 24/7</p>
               </div>
               <a
                 href={paymentUrl}
