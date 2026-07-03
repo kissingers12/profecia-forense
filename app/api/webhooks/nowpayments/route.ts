@@ -2,24 +2,34 @@ import { NextRequest } from "next/server";
 import crypto from "crypto";
 import { supabaseAdmin } from "@/lib/supabase";
 
-// Price → plan mapping
 const PRICE_TO_PLAN: Record<number, string> = {
   333: "meditaciones",
   777: "escuela",
 };
 
+// Accept payment if it's within 2% of the expected price (covers rounding/fees)
+const PARTIAL_TOLERANCE = 0.02;
+
 function verifySignature(rawBody: string, signature: string, secret: string): boolean {
   try {
-    // NOWPayments signs the alphabetically sorted JSON, not the raw body
     const parsed = JSON.parse(rawBody);
     const sortedKeys = Object.keys(parsed).sort();
     const sortedBody = JSON.stringify(parsed, sortedKeys);
     const hmac = crypto.createHmac("sha512", secret).update(sortedBody).digest("hex");
     if (hmac === signature) return true;
   } catch {}
-  // Fallback: try raw body as-is
   const hmac = crypto.createHmac("sha512", secret).update(rawBody).digest("hex");
   return hmac === signature;
+}
+
+function findPlanByAmount(priceAmount: number): string | null {
+  for (const [price, plan] of Object.entries(PRICE_TO_PLAN)) {
+    const expected = Number(price);
+    if (priceAmount >= expected * (1 - PARTIAL_TOLERANCE)) {
+      return plan;
+    }
+  }
+  return null;
 }
 
 export async function POST(req: NextRequest) {
@@ -27,11 +37,19 @@ export async function POST(req: NextRequest) {
   const ipnSecret = process.env.NOWPAYMENTS_IPN_SECRET;
   const signature = req.headers.get("x-nowpayments-sig") ?? "";
 
-  // Reject all requests without a valid signature.
-  // If the secret is not configured, block everything to prevent fake activations.
-  if (!ipnSecret || !verifySignature(rawBody, signature, ipnSecret)) {
+  console.log("[webhook] Received IPN call");
+
+  if (!ipnSecret) {
+    console.error("[webhook] NOWPAYMENTS_IPN_SECRET not configured in env vars");
+    return Response.json({ error: "Server misconfigured." }, { status: 500 });
+  }
+
+  if (!verifySignature(rawBody, signature, ipnSecret)) {
+    console.error("[webhook] Signature verification FAILED. Signature:", signature?.slice(0, 20) + "...");
     return Response.json({ error: "Invalid signature." }, { status: 401 });
   }
+
+  console.log("[webhook] Signature OK");
 
   let payload: Record<string, unknown>;
   try {
@@ -41,27 +59,49 @@ export async function POST(req: NextRequest) {
   }
 
   const status = payload.payment_status as string;
-  if (status !== "finished" && status !== "confirmed") {
+  const orderId = (payload.order_id as string | undefined) ?? "";
+  const priceAmount = Number(payload.price_amount);
+  const actuallyPaid = Number(payload.actually_paid ?? 0);
+
+  console.log(`[webhook] status=${status} order_id=${orderId} price_amount=${priceAmount} actually_paid=${actuallyPaid}`);
+
+  // Accept finished, confirmed, and partially_paid within tolerance
+  const isFinished = status === "finished" || status === "confirmed";
+  const isPartialOk =
+    status === "partially_paid" &&
+    actuallyPaid > 0 &&
+    actuallyPaid >= priceAmount * (1 - PARTIAL_TOLERANCE);
+
+  if (!isFinished && !isPartialOk) {
+    console.log(`[webhook] Skipping status=${status}`);
     return Response.json({ ok: true, skipped: true });
   }
 
-  // Try to identify the user by order_id (email) first
-  const orderId = payload.order_id as string | undefined;
-  const priceAmount = Number(payload.price_amount);
-  const plan = PRICE_TO_PLAN[priceAmount];
-
+  // Try to activate by email (order_id)
   if (orderId && orderId.includes("@")) {
-    // order_id is the user's email
-    await supabaseAdmin
+    console.log(`[webhook] Activating user by email: ${orderId}`);
+    const { error } = await supabaseAdmin
       .from("users")
       .update({ activated: true })
-      .eq("email", orderId.toLowerCase())
-      .eq("activated", false);
-  } else if (plan) {
-    // Fallback: activate the oldest unactivated user with that plan
+      .eq("email", orderId.toLowerCase());
+
+    if (error) {
+      console.error("[webhook] Supabase update error:", error.message);
+      return Response.json({ error: "DB error." }, { status: 500 });
+    }
+
+    console.log(`[webhook] User ${orderId} activated successfully`);
+    return Response.json({ ok: true });
+  }
+
+  // Fallback: activate by plan + amount
+  const plan = findPlanByAmount(priceAmount);
+  console.log(`[webhook] No email in order_id. Fallback plan by amount: plan=${plan}`);
+
+  if (plan) {
     const { data: pending } = await supabaseAdmin
       .from("users")
-      .select("id")
+      .select("id, email")
       .eq("plan", plan)
       .eq("activated", false)
       .order("created_at", { ascending: true })
@@ -69,10 +109,13 @@ export async function POST(req: NextRequest) {
       .maybeSingle();
 
     if (pending) {
+      console.log(`[webhook] Fallback: activating ${pending.email}`);
       await supabaseAdmin
         .from("users")
         .update({ activated: true })
         .eq("id", pending.id);
+    } else {
+      console.log("[webhook] No pending user found for fallback activation");
     }
   }
 
