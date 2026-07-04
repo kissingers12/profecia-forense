@@ -4,7 +4,7 @@ import Image from "next/image";
 import { Clock, Smartphone, Package, ShoppingCart } from "lucide-react";
 
 const HOTMART_URL = "https://go.hotmart.com/S106604225M";
-const LAUNCH_DATE = new Date("2026-07-04T00:00:00");
+const LAUNCH_DATE = new Date("2099-01-01T00:00:00");
 
 export default function Book() {
   const launched = new Date() >= LAUNCH_DATE;
