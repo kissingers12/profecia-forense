@@ -609,7 +609,7 @@ export default function Dashboard() {
 
         {/* Libro digital — solo usuarios Escuela Avanzada */}
         {isEscuela && (() => {
-          const launched = new Date() >= new Date("2026-07-16T00:00:00");
+          const launched = new Date() >= new Date("2026-07-04T00:00:00");
 
           const handleDownload = async (type: "pdf" | "epub") => {
             try {
