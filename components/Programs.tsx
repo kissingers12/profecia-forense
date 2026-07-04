@@ -43,7 +43,7 @@ const programs = [
     accessLabel: "Al inscribirte en la Escuela Avanzada tendrás acceso completo a:",
     accessItems: [
       { bold: "Todo el contenido de Meditación Profética", detail: "acceso completo a todas las enseñanzas publicadas en esa sección." },
-      { bold: "El libro: El Manual para Escuchar a Dios", detail: "en este libro encontrarás 12 enseñanzas proféticas de la Escuela profética resumidas en un libro, incluido como regalo exclusivo." },
+      { bold: "El libro: El Manual para Escuchar a Dios", detail: "Más que un libro, es una herencia profética: 12 enseñanzas nacidas en la Escuela Profética, reunidas en una edición exclusiva y entregadas como regalo especial para los estudiantes de la Escuela Avanzada." },
       { bold: "Videos exclusivos de YouTube para miembros", detail: "enseñanzas que solo se han compartido en privado con miembros. Si ya los viste en YouTube, aquí los tienes organizados — y además recibirás mentoría exclusiva y acceso a todas las próximas enseñanzas." },
       { bold: "Mentoría en grupo reducido", detail: "sesiones donde podrás recibir orientación directa y resolver dudas en un ambiente íntimo." },
       { bold: "Clases en vivo por Zoom", detail: "acceso a clases en tiempo real y a las grabaciones de cada sesión." },
@@ -66,7 +66,7 @@ const programs = [
     ],
     gift: {
       title: "El Manual para Escuchar a Dios",
-      description: "Un libro que concentra 12 de las enseñanzas más poderosas de la Escuela de Profetas — una selección entregada como regalo exclusivo para que el fuego de la profecía esté siempre contigo.",
+      description: "Más que un libro, es una herencia profética: 12 enseñanzas nacidas en la Escuela Profética, reunidas en una edición exclusiva y entregadas como regalo especial para los estudiantes de la Escuela Avanzada, para que lleves contigo una parte del camino que Dios ha preparado para ti.",
     },
     closing: "Una formación diseñada para acelerar tu crecimiento espiritual, desarrollar tu discernimiento y ayudarte a caminar con mayor claridad, madurez y precisión en el llamado profético.",
     duration: "Acceso 24/7",

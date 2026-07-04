@@ -651,7 +651,7 @@ export default function Dashboard() {
                       El Manual para Escuchar a Dios
                     </h3>
                     <p className="text-[#b8a888] text-sm leading-relaxed mb-4">
-                      En este libro encontrarás 12 enseñanzas proféticas de la Escuela profética resumidas en un libro. Tu guía completa para desarrollar el don profético, dada como regalo exclusivo para los estudiantes de la Escuela Avanzada.
+                      Más que un libro, es una herencia profética: 12 enseñanzas nacidas en la Escuela Profética, reunidas en una edición exclusiva y entregadas como regalo especial para los estudiantes de la Escuela Avanzada, para que lleves contigo una parte del camino que Dios ha preparado para ti.
                     </p>
                   </div>
                   {launched ? (
