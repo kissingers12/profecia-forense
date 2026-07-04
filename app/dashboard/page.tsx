@@ -611,6 +611,7 @@ export default function Dashboard() {
         {isEscuela && (() => {
           const launched = new Date() >= new Date("2026-07-16T00:00:00");
           const bookUrl = process.env.NEXT_PUBLIC_BOOK_URL ?? "";
+          const ebookUrl = process.env.NEXT_PUBLIC_EBOOK_URL ?? "";
           return (
             <div className="mb-10 rounded-2xl border border-[#c9a84c]/40 bg-[#c9a84c]/5 overflow-hidden">
               <div className="flex items-center gap-2 px-6 pt-5 pb-0">
@@ -642,21 +643,31 @@ export default function Dashboard() {
                       Las 30 enseñanzas proféticas de la Escuela resumidas en un libro. Tu guía completa para desarrollar el don profético, dada como regalo exclusivo para los estudiantes de la Escuela Avanzada.
                     </p>
                   </div>
-                  {launched && bookUrl ? (
-                    <a
-                      href={bookUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 btn-gold px-6 py-3 rounded-xl font-bold text-sm w-fit"
-                    >
-                      <Download size={16} />
-                      Descargar libro digital
-                    </a>
+                  {launched ? (
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      {bookUrl ? (
+                        <a href={bookUrl} target="_blank" rel="noopener noreferrer"
+                          className="inline-flex items-center justify-center gap-2 btn-gold px-5 py-3 rounded-xl font-bold text-sm">
+                          <Download size={15} />
+                          Descargar PDF
+                        </a>
+                      ) : null}
+                      {ebookUrl ? (
+                        <a href={ebookUrl} target="_blank" rel="noopener noreferrer"
+                          className="inline-flex items-center justify-center gap-2 bg-white/5 border border-[#c9a84c]/40 text-[#c9a84c] hover:bg-[#c9a84c]/10 px-5 py-3 rounded-xl font-bold text-sm transition-all">
+                          <Download size={15} />
+                          Descargar eBook
+                        </a>
+                      ) : null}
+                      {!bookUrl && !ebookUrl && (
+                        <span className="text-[#8a7a6a] text-sm">El libro estará disponible pronto.</span>
+                      )}
+                    </div>
                   ) : (
                     <div className="flex items-center gap-3">
                       <div className="inline-flex items-center gap-2 bg-white/5 border border-[#c9a84c]/30 text-[#c9a84c] px-5 py-2.5 rounded-xl text-sm font-bold opacity-70 cursor-not-allowed select-none">
                         <Download size={15} />
-                        Descargar libro digital
+                        Descargar libro
                       </div>
                       <span className="text-[#c9a84c] text-xs font-bold bg-[#c9a84c]/10 border border-[#c9a84c]/30 px-3 py-1.5 rounded-full">
                         Disponible 16 de julio
