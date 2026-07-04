@@ -610,8 +610,21 @@ export default function Dashboard() {
         {/* Libro digital — solo usuarios Escuela Avanzada */}
         {isEscuela && (() => {
           const launched = new Date() >= new Date("2026-07-16T00:00:00");
-          const bookUrl = process.env.NEXT_PUBLIC_BOOK_URL ?? "";
-          const ebookUrl = process.env.NEXT_PUBLIC_EBOOK_URL ?? "";
+
+          const handleDownload = async (type: "pdf" | "epub") => {
+            try {
+              const res = await fetch("/api/download", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ email: session?.email, type }),
+              });
+              const data = await res.json();
+              if (data.url) {
+                window.open(data.url, "_blank");
+              }
+            } catch {}
+          };
+
           return (
             <div className="mb-10 rounded-2xl border border-[#c9a84c]/40 bg-[#c9a84c]/5 overflow-hidden">
               <div className="flex items-center gap-2 px-6 pt-5 pb-0">
@@ -621,7 +634,6 @@ export default function Dashboard() {
                 </span>
               </div>
               <div className="flex flex-col sm:flex-row gap-6 p-6">
-                {/* Portada */}
                 <div className="shrink-0 w-28 sm:w-32 mx-auto sm:mx-0">
                   <div className="rounded-xl overflow-hidden border border-[#c9a84c]/30 shadow-lg">
                     <Image
@@ -633,7 +645,6 @@ export default function Dashboard() {
                     />
                   </div>
                 </div>
-                {/* Info */}
                 <div className="flex flex-col justify-between flex-1">
                   <div>
                     <h3 className="text-white font-extrabold text-lg leading-snug mb-1">
@@ -645,23 +656,20 @@ export default function Dashboard() {
                   </div>
                   {launched ? (
                     <div className="flex flex-col sm:flex-row gap-3">
-                      {bookUrl ? (
-                        <a href={bookUrl} target="_blank" rel="noopener noreferrer"
-                          className="inline-flex items-center justify-center gap-2 btn-gold px-5 py-3 rounded-xl font-bold text-sm">
-                          <Download size={15} />
-                          Descargar PDF
-                        </a>
-                      ) : null}
-                      {ebookUrl ? (
-                        <a href={ebookUrl} target="_blank" rel="noopener noreferrer"
-                          className="inline-flex items-center justify-center gap-2 bg-white/5 border border-[#c9a84c]/40 text-[#c9a84c] hover:bg-[#c9a84c]/10 px-5 py-3 rounded-xl font-bold text-sm transition-all">
-                          <Download size={15} />
-                          Descargar eBook
-                        </a>
-                      ) : null}
-                      {!bookUrl && !ebookUrl && (
-                        <span className="text-[#8a7a6a] text-sm">El libro estará disponible pronto.</span>
-                      )}
+                      <button
+                        onClick={() => handleDownload("pdf")}
+                        className="inline-flex items-center justify-center gap-2 btn-gold px-5 py-3 rounded-xl font-bold text-sm"
+                      >
+                        <Download size={15} />
+                        Descargar PDF
+                      </button>
+                      <button
+                        onClick={() => handleDownload("epub")}
+                        className="inline-flex items-center justify-center gap-2 bg-white/5 border border-[#c9a84c]/40 text-[#c9a84c] hover:bg-[#c9a84c]/10 px-5 py-3 rounded-xl font-bold text-sm transition-all"
+                      >
+                        <Download size={15} />
+                        Descargar eBook
+                      </button>
                     </div>
                   ) : (
                     <div className="flex items-center gap-3">
