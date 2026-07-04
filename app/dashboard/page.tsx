@@ -651,7 +651,7 @@ export default function Dashboard() {
                       El Manual para Escuchar a Dios
                     </h3>
                     <p className="text-[#b8a888] text-sm leading-relaxed mb-4">
-                      Las 30 enseñanzas proféticas de la Escuela resumidas en un libro. Tu guía completa para desarrollar el don profético, dada como regalo exclusivo para los estudiantes de la Escuela Avanzada.
+                      Las 12 enseñanzas proféticas de la Escuela resumidas en un libro. Tu guía completa para desarrollar el don profético, dada como regalo exclusivo para los estudiantes de la Escuela Avanzada.
                     </p>
                   </div>
                   {launched ? (

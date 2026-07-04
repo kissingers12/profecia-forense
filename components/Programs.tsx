@@ -43,7 +43,7 @@ const programs = [
     accessLabel: "Al inscribirte en la Escuela Avanzada tendrás acceso completo a:",
     accessItems: [
       { bold: "Todo el contenido de Meditación Profética", detail: "acceso completo a todas las enseñanzas publicadas en esa sección." },
-      { bold: "El libro: El Manual para Escuchar a Dios", detail: "las 30 enseñanzas proféticas resumidas en un libro, incluido como regalo exclusivo." },
+      { bold: "El libro: El Manual para Escuchar a Dios", detail: "las 12 enseñanzas proféticas resumidas en un libro, incluido como regalo exclusivo." },
       { bold: "Videos exclusivos de YouTube para miembros", detail: "enseñanzas que solo se han compartido en privado con miembros. Si ya los viste en YouTube, aquí los tienes organizados — y además recibirás mentoría exclusiva y acceso a todas las próximas enseñanzas." },
       { bold: "Mentoría en grupo reducido", detail: "sesiones donde podrás recibir orientación directa y resolver dudas en un ambiente íntimo." },
       { bold: "Clases en vivo por Zoom", detail: "acceso a clases en tiempo real y a las grabaciones de cada sesión." },
@@ -66,7 +66,7 @@ const programs = [
     ],
     gift: {
       title: "El Manual para Escuchar a Dios",
-      description: "Un libro donde están resumidas las 30 enseñanzas proféticas de la escuela — dado como regalo para que puedas tener toda la Escuela de Profeta en un libro.",
+      description: "Un libro donde están resumidas las 12 enseñanzas proféticas de la escuela — dado como regalo para que puedas tener toda la Escuela de Profeta en un libro.",
     },
     closing: "Una formación diseñada para acelerar tu crecimiento espiritual, desarrollar tu discernimiento y ayudarte a caminar con mayor claridad, madurez y precisión en el llamado profético.",
     duration: "Acceso 24/7",
