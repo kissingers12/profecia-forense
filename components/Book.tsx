@@ -1,9 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import { Clock, Smartphone, Package } from "lucide-react";
+import { Clock, Smartphone, Package, ShoppingCart } from "lucide-react";
+
+const HOTMART_URL = "https://go.hotmart.com/S106604225M";
+const LAUNCH_DATE = new Date("2026-07-16T00:00:00");
 
 export default function Book() {
+  const launched = new Date() >= LAUNCH_DATE;
+
   return (
     <section id="libro" className="relative min-h-screen flex items-center overflow-hidden">
       <style>{`
@@ -86,29 +91,40 @@ export default function Book() {
                   </div>
                   <div>
                     <p className="text-white text-xs font-bold">Edición Digital</p>
-                    <p className="text-[#8a7a6a] text-[10px]">PDF · ePub · App</p>
+                    <p className="text-[#8a7a6a] text-[10px]">PDF · ePub</p>
                   </div>
                 </div>
                 <div>
-                  <div className="flex items-center gap-2 mb-0.5">
-                    <span className="line-through text-[#6a5a4a] text-sm">$47</span>
-                    <span className="bg-green-500/15 border border-green-500/30 text-green-400 text-[10px] font-bold px-2 py-0.5 rounded-full">-42% PREVENTA</span>
-                  </div>
                   <div className="flex items-baseline gap-1">
-                    <span className="text-2xl font-bold text-white">$27</span>
+                    <span className="text-2xl font-bold text-white">$47</span>
                     <span className="text-[#8a7a6a] text-xs">USD</span>
                   </div>
+                  <p className="text-[#8a7a6a] text-[10px]">Pago único · Acceso inmediato</p>
                 </div>
-                <div className="bg-[#c9a84c]/10 border border-[#c9a84c]/20 rounded-lg px-3 py-2">
-                  <p className="text-[#c9a84c] text-[10px] font-bold flex items-center gap-1.5">
-                    <Clock size={10} />
-                    Sale el 16 de julio · Preventa abierta
-                  </p>
-                </div>
-                <button disabled className="w-full py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 bg-[#c9a84c]/20 text-[#c9a84c]/60 border border-[#c9a84c]/20 cursor-not-allowed mt-auto">
-                  <Clock size={13} />
-                  Disponible el 16 de julio
-                </button>
+                {!launched && (
+                  <div className="bg-[#c9a84c]/10 border border-[#c9a84c]/20 rounded-lg px-3 py-2">
+                    <p className="text-[#c9a84c] text-[10px] font-bold flex items-center gap-1.5">
+                      <Clock size={10} />
+                      Disponible el 16 de julio
+                    </p>
+                  </div>
+                )}
+                {launched ? (
+                  <a
+                    href={HOTMART_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-gold w-full py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 mt-auto"
+                  >
+                    <ShoppingCart size={13} />
+                    Comprar ahora — $47
+                  </a>
+                ) : (
+                  <button disabled className="w-full py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 bg-[#c9a84c]/20 text-[#c9a84c]/60 border border-[#c9a84c]/20 cursor-not-allowed mt-auto">
+                    <Clock size={13} />
+                    Disponible el 16 de julio
+                  </button>
+                )}
               </div>
 
               {/* Físico Amazon */}
