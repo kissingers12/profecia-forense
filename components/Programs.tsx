@@ -66,7 +66,7 @@ const programs = [
     ],
     gift: {
       title: "El Manual para Escuchar a Dios",
-      description: "En este libro encontrarás 12 enseñanzas proféticas de la Escuela profética resumidas — dado como regalo para que puedas tener toda la Escuela de Profeta en un libro.",
+      description: "Un libro que concentra 12 de las enseñanzas más poderosas de la Escuela de Profetas — una selección entregada como regalo exclusivo para que el fuego de la profecía esté siempre contigo.",
     },
     closing: "Una formación diseñada para acelerar tu crecimiento espiritual, desarrollar tu discernimiento y ayudarte a caminar con mayor claridad, madurez y precisión en el llamado profético.",
     duration: "Acceso 24/7",
