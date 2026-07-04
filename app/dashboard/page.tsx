@@ -657,18 +657,18 @@ export default function Dashboard() {
                   {launched ? (
                     <div className="flex flex-col sm:flex-row gap-3">
                       <button
-                        onClick={() => handleDownload("pdf")}
+                        onClick={() => handleDownload("epub")}
                         className="inline-flex items-center justify-center gap-2 btn-gold px-5 py-3 rounded-xl font-bold text-sm"
                       >
                         <Download size={15} />
-                        Descargar PDF
+                        Descargar eBook
                       </button>
                       <button
-                        onClick={() => handleDownload("epub")}
+                        onClick={() => handleDownload("pdf")}
                         className="inline-flex items-center justify-center gap-2 bg-white/5 border border-[#c9a84c]/40 text-[#c9a84c] hover:bg-[#c9a84c]/10 px-5 py-3 rounded-xl font-bold text-sm transition-all"
                       >
                         <Download size={15} />
-                        Descargar eBook
+                        Descargar PDF
                       </button>
                     </div>
                   ) : (
