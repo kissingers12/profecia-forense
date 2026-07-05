@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { CheckCircle, XCircle, RefreshCw, Lock, Users, LogOut, LogIn, Download, Activity } from "lucide-react";
+import { CheckCircle, XCircle, RefreshCw, Lock, Users, LogOut, LogIn, Download, Activity, Search } from "lucide-react";
 
 type User = {
   id: string;
@@ -35,6 +35,7 @@ export default function AdminPage() {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [toast, setToast] = useState("");
   const [activeTab, setActiveTab] = useState<"clientes" | "actividad">("clientes");
+  const [search, setSearch] = useState("");
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -98,6 +99,12 @@ export default function AdminPage() {
   };
 
   const activatedCount = users.filter((u) => u.activated).length;
+  const filteredUsers = search.trim()
+    ? users.filter((u) =>
+        u.email.toLowerCase().includes(search.toLowerCase()) ||
+        u.name.toLowerCase().includes(search.toLowerCase())
+      )
+    : users;
 
   if (!authed) {
     return (
@@ -224,13 +231,33 @@ export default function AdminPage() {
             <div className="flex justify-center py-20">
               <span className="w-8 h-8 border-2 border-[#c9a84c]/40 border-t-[#c9a84c] rounded-full animate-spin" />
             </div>
-          ) : users.length === 0 ? (
-            <div className="card-dark rounded-2xl p-10 text-center text-[#6a5a4a]">
-              No hay usuarios registrados aún.
-            </div>
           ) : (
+            <>
+              <div className="relative mb-5">
+                <Search size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6a5a4a]" />
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Buscar por email o nombre..."
+                  className="w-full bg-white/5 border border-[#c9a84c]/20 rounded-xl pl-10 pr-4 py-3 text-white placeholder-[#4a3a2a] text-sm focus:outline-none focus:border-[#c9a84c]/60"
+                />
+                {search && (
+                  <button
+                    onClick={() => setSearch("")}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-[#6a5a4a] hover:text-white text-xs"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
+              {filteredUsers.length === 0 ? (
+                <div className="card-dark rounded-2xl p-10 text-center text-[#6a5a4a] text-sm">
+                  No se encontró ningún cliente con ese email.
+                </div>
+              ) : (
             <div className="space-y-3">
-              {users.map((user) => (
+              {filteredUsers.map((user) => (
                 <div
                   key={user.id}
                   className="card-dark rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center gap-4"
@@ -272,6 +299,8 @@ export default function AdminPage() {
                 </div>
               ))}
             </div>
+              )}
+            </>
           )
         )}
 
