@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { CheckCircle, XCircle, RefreshCw, Lock, Users, LogOut, LogIn, Download, Activity, Search, PlayCircle } from "lucide-react";
+import { CheckCircle, XCircle, RefreshCw, Lock, Users, LogOut, LogIn, Download, Activity, Search, PlayCircle, Copy, UserPlus, DollarSign } from "lucide-react";
 
 type User = {
   id: string;
@@ -34,9 +34,10 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [toast, setToast] = useState("");
-  const [activeTab, setActiveTab] = useState<"clientes" | "actividad">("clientes");
+  const [activeTab, setActiveTab] = useState<"clientes" | "actividad" | "ingresos">("clientes");
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "pending">("all");
+  const [logSearch, setLogSearch] = useState("");
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -118,6 +119,21 @@ export default function AdminPage() {
     setActiveTab("clientes");
     setSearch("");
   };
+
+  const copyEmail = (email: string) => {
+    navigator.clipboard.writeText(email).then(() => showToast("Email copiado ✓"));
+  };
+
+  const escuelaActivos = users.filter((u) => u.activated && u.plan === "escuela").length;
+  const meditActivos = users.filter((u) => u.activated && u.plan === "meditaciones").length;
+  const totalRevenue = escuelaActivos * 777 + meditActivos * 333;
+
+  const filteredLogs = logSearch.trim()
+    ? logs.filter((l) =>
+        l.user_email.toLowerCase().includes(logSearch.toLowerCase()) ||
+        (l.user_name ?? "").toLowerCase().includes(logSearch.toLowerCase())
+      )
+    : logs;
 
   if (!authed) {
     return (
@@ -245,6 +261,17 @@ export default function AdminPage() {
               <span className="bg-[#c9a84c]/20 text-[#c9a84c] text-xs rounded-full px-1.5 py-0.5">{logs.length}</span>
             )}
           </button>
+          <button
+            onClick={() => setActiveTab("ingresos")}
+            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-bold rounded-t-xl transition-all ${
+              activeTab === "ingresos"
+                ? "text-[#c9a84c] border-b-2 border-[#c9a84c]"
+                : "text-[#6a5a4a] hover:text-white"
+            }`}
+          >
+            <DollarSign size={15} />
+            Ingresos
+          </button>
         </div>
 
         {/* Tab: Clientes */}
@@ -299,7 +326,13 @@ export default function AdminPage() {
                         </span>
                       )}
                     </div>
-                    <p className="text-[#8a7a6a] text-xs truncate">{user.email}</p>
+                    <button
+                      onClick={() => copyEmail(user.email)}
+                      className="flex items-center gap-1 text-[#8a7a6a] text-xs hover:text-[#c9a84c] transition-colors mt-0.5 max-w-full"
+                    >
+                      <span className="truncate">{user.email}</span>
+                      <Copy size={11} className="shrink-0" />
+                    </button>
                     <p className="text-[#6a5a4a] text-xs mt-0.5">
                       {PLAN_LABELS[user.plan] ?? user.plan} ·{" "}
                       {new Date(user.created_at).toLocaleDateString("es-ES", { day: "2-digit", month: "short", year: "numeric" })}
@@ -328,48 +361,111 @@ export default function AdminPage() {
 
         {/* Tab: Actividad */}
         {activeTab === "actividad" && (
-          logs.length === 0 ? (
-            <div className="card-dark rounded-2xl p-8 text-center text-[#6a5a4a] text-sm">
-              No hay actividad registrada aún. Los inicios de sesión y descargas aparecerán aquí.
+          <>
+            <div className="relative mb-5">
+              <Search size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6a5a4a]" />
+              <input
+                type="text"
+                value={logSearch}
+                onChange={(e) => setLogSearch(e.target.value)}
+                placeholder="Buscar por nombre o email..."
+                className="w-full bg-white/5 border border-[#c9a84c]/20 rounded-xl pl-10 pr-4 py-3 text-white placeholder-[#4a3a2a] text-sm focus:outline-none focus:border-[#c9a84c]/60"
+              />
+              {logSearch && (
+                <button onClick={() => setLogSearch("")} className="absolute right-4 top-1/2 -translate-y-1/2 text-[#6a5a4a] hover:text-white text-xs">✕</button>
+              )}
             </div>
-          ) : (
-            <div className="space-y-2">
-              {logs.map((log) => (
-                <div key={log.id} className="card-dark rounded-xl px-5 py-3 flex items-center gap-4">
-                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
-                    log.action === "course_access" ? "bg-green-500/10 border border-green-500/20" :
-                    log.action === "login" ? "bg-blue-500/10 border border-blue-500/20" :
-                    "bg-[#c9a84c]/10 border border-[#c9a84c]/20"
-                  }`}>
-                    {log.action === "course_access"
-                      ? <PlayCircle size={14} className="text-green-400" />
-                      : log.action === "login"
-                      ? <LogIn size={14} className="text-blue-400" />
-                      : <Download size={14} className="text-[#c9a84c]" />
-                    }
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-white text-sm font-semibold truncate">{log.user_name || log.user_email}</p>
-                    <p className="text-[#8a7a6a] text-xs truncate">{log.user_email}</p>
-                  </div>
-                  <div className="text-right shrink-0">
-                    <p className={`text-xs font-bold ${
-                      log.action === "course_access" ? "text-green-400" :
-                      log.action === "login" ? "text-blue-400" :
-                      "text-[#c9a84c]"
+            {filteredLogs.length === 0 ? (
+              <div className="card-dark rounded-2xl p-8 text-center text-[#6a5a4a] text-sm">
+                {logSearch ? "No se encontró actividad para ese usuario." : "No hay actividad registrada aún."}
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {filteredLogs.map((log) => (
+                  <div key={log.id} className="card-dark rounded-xl px-5 py-3 flex items-center gap-4">
+                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                      log.action === "course_access" ? "bg-green-500/10 border border-green-500/20" :
+                      log.action === "login" ? "bg-blue-500/10 border border-blue-500/20" :
+                      log.action === "register" ? "bg-purple-500/10 border border-purple-500/20" :
+                      "bg-[#c9a84c]/10 border border-[#c9a84c]/20"
                     }`}>
-                      {log.action === "course_access" ? "Entró al curso" :
-                       log.action === "login" ? "Inició sesión" :
-                       log.action === "download_pdf" ? "Descargó PDF" : "Descargó eBook"}
-                    </p>
-                    <p className="text-[#6a5a4a] text-xs">
-                      {new Date(log.created_at).toLocaleString("es-ES", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}
-                    </p>
+                      {log.action === "course_access" ? <PlayCircle size={14} className="text-green-400" />
+                        : log.action === "login" ? <LogIn size={14} className="text-blue-400" />
+                        : log.action === "register" ? <UserPlus size={14} className="text-purple-400" />
+                        : <Download size={14} className="text-[#c9a84c]" />
+                      }
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-white text-sm font-semibold truncate">{log.user_name || log.user_email}</p>
+                      <p className="text-[#8a7a6a] text-xs truncate">{log.user_email}</p>
+                    </div>
+                    <div className="text-right shrink-0">
+                      <p className={`text-xs font-bold ${
+                        log.action === "course_access" ? "text-green-400" :
+                        log.action === "login" ? "text-blue-400" :
+                        log.action === "register" ? "text-purple-400" :
+                        "text-[#c9a84c]"
+                      }`}>
+                        {log.action === "course_access" ? "Entró al curso" :
+                         log.action === "login" ? "Inició sesión" :
+                         log.action === "register" ? "Se registró" :
+                         log.action === "download_pdf" ? "Descargó PDF" : "Descargó eBook"}
+                      </p>
+                      <p className="text-[#6a5a4a] text-xs">
+                        {new Date(log.created_at).toLocaleString("es-ES", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Tab: Ingresos */}
+        {activeTab === "ingresos" && (
+          <div className="space-y-5">
+            <div className="card-dark rounded-2xl p-6 flex items-center gap-5">
+              <div className="w-12 h-12 rounded-xl bg-[#c9a84c]/10 border border-[#c9a84c]/30 flex items-center justify-center shrink-0">
+                <DollarSign size={22} className="text-[#c9a84c]" />
+              </div>
+              <div>
+                <p className="text-[#6a5a4a] text-xs uppercase tracking-widest mb-1">Total estimado en ingresos</p>
+                <p className="text-4xl font-bold text-[#c9a84c]">${totalRevenue.toLocaleString("es-ES")}</p>
+                <p className="text-[#6a5a4a] text-xs mt-1">Basado en {activatedCount} usuarios con acceso activo</p>
+              </div>
             </div>
-          )
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="card-dark rounded-2xl p-5">
+                <p className="text-[#6a5a4a] text-xs uppercase tracking-widest mb-3">Escuela Avanzada · $777</p>
+                <p className="text-3xl font-bold text-white mb-1">{escuelaActivos}</p>
+                <p className="text-[#c9a84c] text-sm font-bold">${(escuelaActivos * 777).toLocaleString("es-ES")}</p>
+                <div className="mt-3 h-1.5 bg-white/5 rounded-full overflow-hidden">
+                  <div className="h-full bg-[#c9a84c] rounded-full" style={{ width: activatedCount ? `${(escuelaActivos / activatedCount) * 100}%` : "0%" }} />
+                </div>
+              </div>
+              <div className="card-dark rounded-2xl p-5">
+                <p className="text-[#6a5a4a] text-xs uppercase tracking-widest mb-3">Meditación Profética · $333</p>
+                <p className="text-3xl font-bold text-white mb-1">{meditActivos}</p>
+                <p className="text-[#c9a84c] text-sm font-bold">${(meditActivos * 333).toLocaleString("es-ES")}</p>
+                <div className="mt-3 h-1.5 bg-white/5 rounded-full overflow-hidden">
+                  <div className="h-full bg-[#c9a84c] rounded-full" style={{ width: activatedCount ? `${(meditActivos / activatedCount) * 100}%` : "0%" }} />
+                </div>
+              </div>
+            </div>
+
+            <div className="card-dark rounded-2xl p-5">
+              <p className="text-[#6a5a4a] text-xs uppercase tracking-widest mb-3">Potencial si se activan todos los pendientes</p>
+              <p className="text-2xl font-bold text-white">
+                ${(
+                  users.filter((u) => !u.activated && u.plan === "escuela").length * 777 +
+                  users.filter((u) => !u.activated && u.plan === "meditaciones").length * 333
+                ).toLocaleString("es-ES")}
+              </p>
+              <p className="text-[#6a5a4a] text-xs mt-1">{users.length - activatedCount} usuarios pendientes de activación</p>
+            </div>
+          </div>
         )}
       </main>
     </div>

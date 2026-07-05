@@ -86,6 +86,13 @@ export async function POST(req: NextRequest) {
     return Response.json({ error: "Error al crear la cuenta." }, { status: 500 });
   }
 
+  // Log registration event (silent fail)
+  supabaseAdmin.from("activity_logs").insert({
+    user_email: user.email,
+    user_name: user.name,
+    action: "register",
+  }).then(() => {});
+
   // Create unique payment per user so webhook knows who paid
   const invoiceUrl = await createNowPaymentsInvoice(email.toLowerCase(), plan);
 
