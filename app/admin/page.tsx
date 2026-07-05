@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { CheckCircle, XCircle, RefreshCw, Lock, Users, LogOut, LogIn, Download, Activity, Search } from "lucide-react";
+import { CheckCircle, XCircle, RefreshCw, Lock, Users, LogOut, LogIn, Download, Activity, Search, PlayCircle } from "lucide-react";
 
 type User = {
   id: string;
@@ -315,10 +315,13 @@ export default function AdminPage() {
               {logs.map((log) => (
                 <div key={log.id} className="card-dark rounded-xl px-5 py-3 flex items-center gap-4">
                   <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                    log.action === "course_access" ? "bg-green-500/10 border border-green-500/20" :
                     log.action === "login" ? "bg-blue-500/10 border border-blue-500/20" :
                     "bg-[#c9a84c]/10 border border-[#c9a84c]/20"
                   }`}>
-                    {log.action === "login"
+                    {log.action === "course_access"
+                      ? <PlayCircle size={14} className="text-green-400" />
+                      : log.action === "login"
                       ? <LogIn size={14} className="text-blue-400" />
                       : <Download size={14} className="text-[#c9a84c]" />
                     }
@@ -328,8 +331,13 @@ export default function AdminPage() {
                     <p className="text-[#8a7a6a] text-xs truncate">{log.user_email}</p>
                   </div>
                   <div className="text-right shrink-0">
-                    <p className="text-[#c9a84c] text-xs font-bold">
-                      {log.action === "login" ? "Entró al curso" :
+                    <p className={`text-xs font-bold ${
+                      log.action === "course_access" ? "text-green-400" :
+                      log.action === "login" ? "text-blue-400" :
+                      "text-[#c9a84c]"
+                    }`}>
+                      {log.action === "course_access" ? "Entró al curso" :
+                       log.action === "login" ? "Inició sesión" :
                        log.action === "download_pdf" ? "Descargó PDF" : "Descargó eBook"}
                     </p>
                     <p className="text-[#6a5a4a] text-xs">
