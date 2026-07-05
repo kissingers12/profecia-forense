@@ -56,7 +56,7 @@ export default function Footer() {
             <ul className="space-y-3">
               {[
                 ["Inicio", "#inicio"],
-                ["Nosotros", "#nosotros"],
+                ["Libro", "#libro"],
                 ["Programas", "#programas"],
                 ["Eventos", "#eventos"],
                 ["Invitaciones", "#testimonios"],
