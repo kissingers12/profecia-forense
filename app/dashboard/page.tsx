@@ -504,17 +504,24 @@ export default function Dashboard() {
               100x100 <span className="text-[#c9a84c]">Cristianos</span>
             </span>
           </a>
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            <a
+              href="/foro"
+              className="btn-outline-gold px-4 py-2 rounded-full text-xs font-bold flex items-center gap-1.5"
+            >
+              <MessageCircle size={13} />
+              <span className="hidden sm:inline">Comunidad</span>
+            </a>
             <div className="hidden sm:block text-right">
               <p className="text-white text-sm font-semibold">{session.name}</p>
               <p className="text-[#6a5a4a] text-xs">{session.email}</p>
             </div>
             <button
               onClick={handleLogout}
-              className="btn-outline-gold px-4 py-2 rounded-full text-xs font-bold flex items-center gap-1.5"
+              className="text-[#6a5a4a] hover:text-[#c9a84c] transition-colors p-2"
+              title="Salir"
             >
-              <LogOut size={14} />
-              Salir
+              <LogOut size={16} />
             </button>
           </div>
         </div>

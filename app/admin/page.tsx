@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { CheckCircle, XCircle, RefreshCw, Lock, Users, LogOut, LogIn, Download, Activity, Search, PlayCircle, Copy, UserPlus, DollarSign } from "lucide-react";
+import { CheckCircle, XCircle, RefreshCw, Lock, Users, LogOut, LogIn, Download, Activity, Search, PlayCircle, Copy, UserPlus, DollarSign, MessageCircle, Eye, EyeOff, Trash2, Send } from "lucide-react";
 
 type User = {
   id: string;
@@ -20,6 +20,17 @@ type Log = {
   created_at: string;
 };
 
+type ForoPost = {
+  id: number;
+  user_email: string;
+  user_name: string;
+  question: string;
+  answer: string | null;
+  hidden: boolean;
+  created_at: string;
+  answered_at: string | null;
+};
+
 const PLAN_LABELS: Record<string, string> = {
   meditaciones: "Meditación $333",
   escuela: "Escuela $777",
@@ -31,10 +42,13 @@ export default function AdminPage() {
   const [authError, setAuthError] = useState("");
   const [users, setUsers] = useState<User[]>([]);
   const [logs, setLogs] = useState<Log[]>([]);
+  const [foroPosts, setForoPosts] = useState<ForoPost[]>([]);
+  const [foroAnswers, setForoAnswers] = useState<Record<number, string>>({});
+  const [foroLoading, setForoLoading] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [toast, setToast] = useState("");
-  const [activeTab, setActiveTab] = useState<"clientes" | "actividad" | "ingresos">("clientes");
+  const [activeTab, setActiveTab] = useState<"clientes" | "actividad" | "ingresos" | "foro">("clientes");
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "pending">("all");
   const [logSearch, setLogSearch] = useState("");
@@ -65,6 +79,13 @@ export default function AdminPage() {
       if (logsRes.ok) {
         const logsData = await logsRes.json();
         setLogs(logsData.logs ?? []);
+      }
+
+      // Fetch foro posts
+      const foroRes = await fetch("/api/admin/forum", { headers: { "x-admin-password": pwd } });
+      if (foroRes.ok) {
+        const foroData = await foroRes.json();
+        setForoPosts(foroData.posts ?? []);
       }
     } catch {
       setAuthError("Error de conexión.");
@@ -122,6 +143,52 @@ export default function AdminPage() {
 
   const copyEmail = (email: string) => {
     navigator.clipboard.writeText(email).then(() => showToast("Email copiado ✓"));
+  };
+
+  const handleForoAnswer = async (postId: number) => {
+    const answer = foroAnswers[postId]?.trim();
+    if (!answer) return;
+    setForoLoading(postId);
+    const res = await fetch("/api/admin/forum", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-admin-password": password },
+      body: JSON.stringify({ postId, answer }),
+    });
+    if (res.ok) {
+      setForoPosts((prev) => prev.map((p) => p.id === postId ? { ...p, answer, answered_at: new Date().toISOString() } : p));
+      setForoAnswers((prev) => { const n = { ...prev }; delete n[postId]; return n; });
+      showToast("Respuesta publicada ✓");
+    }
+    setForoLoading(null);
+  };
+
+  const handleForoToggle = async (post: ForoPost) => {
+    setForoLoading(post.id);
+    const res = await fetch("/api/admin/forum", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json", "x-admin-password": password },
+      body: JSON.stringify({ postId: post.id, hidden: !post.hidden }),
+    });
+    if (res.ok) {
+      setForoPosts((prev) => prev.map((p) => p.id === post.id ? { ...p, hidden: !p.hidden } : p));
+      showToast(post.hidden ? "Pregunta visible ✓" : "Pregunta ocultada");
+    }
+    setForoLoading(null);
+  };
+
+  const handleForoDelete = async (postId: number) => {
+    if (!confirm("¿Eliminar esta pregunta permanentemente?")) return;
+    setForoLoading(postId);
+    const res = await fetch("/api/admin/forum", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json", "x-admin-password": password },
+      body: JSON.stringify({ postId }),
+    });
+    if (res.ok) {
+      setForoPosts((prev) => prev.filter((p) => p.id !== postId));
+      showToast("Pregunta eliminada");
+    }
+    setForoLoading(null);
   };
 
   const escuelaActivos = users.filter((u) => u.activated && u.plan === "escuela").length;
@@ -271,6 +338,22 @@ export default function AdminPage() {
           >
             <DollarSign size={15} />
             Ingresos
+          </button>
+          <button
+            onClick={() => setActiveTab("foro")}
+            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-bold rounded-t-xl transition-all ${
+              activeTab === "foro"
+                ? "text-[#c9a84c] border-b-2 border-[#c9a84c]"
+                : "text-[#6a5a4a] hover:text-white"
+            }`}
+          >
+            <MessageCircle size={15} />
+            Foro
+            {foroPosts.filter((p) => !p.answer && !p.hidden).length > 0 && (
+              <span className="bg-red-500/80 text-white text-xs rounded-full px-1.5 py-0.5">
+                {foroPosts.filter((p) => !p.answer && !p.hidden).length}
+              </span>
+            )}
           </button>
         </div>
 
@@ -466,6 +549,94 @@ export default function AdminPage() {
               <p className="text-[#6a5a4a] text-xs mt-1">{users.length - activatedCount} usuarios pendientes de activación</p>
             </div>
           </div>
+        )}
+        {/* Tab: Foro */}
+        {activeTab === "foro" && (
+          foroPosts.length === 0 ? (
+            <div className="card-dark rounded-2xl p-8 text-center text-[#6a5a4a] text-sm">
+              No hay preguntas en el foro aún.
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {foroPosts.map((post) => (
+                <div
+                  key={post.id}
+                  className={`card-dark rounded-2xl p-5 transition-opacity ${post.hidden ? "opacity-40" : ""}`}
+                >
+                  {/* Header */}
+                  <div className="flex items-center gap-2 mb-3 flex-wrap">
+                    <div className="w-7 h-7 rounded-full bg-[#c9a84c]/10 border border-[#c9a84c]/30 flex items-center justify-center text-xs font-bold text-[#c9a84c] shrink-0">
+                      {post.user_name.charAt(0).toUpperCase()}
+                    </div>
+                    <span className="text-white text-sm font-semibold">{post.user_name}</span>
+                    <span className="text-[#6a5a4a] text-xs">{post.user_email}</span>
+                    {post.hidden && (
+                      <span className="text-xs bg-red-500/10 text-red-400 border border-red-500/20 rounded-full px-2 py-0.5">Oculta</span>
+                    )}
+                    {!post.answer && !post.hidden && (
+                      <span className="text-xs bg-yellow-500/10 text-yellow-400 border border-yellow-500/20 rounded-full px-2 py-0.5">Sin respuesta</span>
+                    )}
+                    <span className="text-[#6a5a4a] text-xs ml-auto shrink-0">
+                      {new Date(post.created_at).toLocaleDateString("es-ES", { day: "2-digit", month: "short", year: "numeric" })}
+                    </span>
+                  </div>
+
+                  {/* Question */}
+                  <p className="text-[#d0c0b0] text-sm leading-relaxed mb-4">{post.question}</p>
+
+                  {/* Existing answer */}
+                  {post.answer && (
+                    <div className="bg-[#c9a84c]/5 border border-[#c9a84c]/15 rounded-xl p-4 mb-4">
+                      <p className="text-[#c9a84c] text-xs font-bold mb-1">Tu respuesta:</p>
+                      <p className="text-white text-sm leading-relaxed">{post.answer}</p>
+                    </div>
+                  )}
+
+                  {/* Answer input */}
+                  {!post.answer && !post.hidden && (
+                    <div className="flex gap-2 mb-4">
+                      <input
+                        type="text"
+                        value={foroAnswers[post.id] ?? ""}
+                        onChange={(e) => setForoAnswers((prev) => ({ ...prev, [post.id]: e.target.value }))}
+                        placeholder="Escribe tu respuesta..."
+                        className="flex-1 bg-white/5 border border-[#c9a84c]/20 rounded-xl px-4 py-2.5 text-white placeholder-[#4a3a2a] text-sm focus:outline-none focus:border-[#c9a84c]/60"
+                        onKeyDown={(e) => { if (e.key === "Enter") handleForoAnswer(post.id); }}
+                      />
+                      <button
+                        onClick={() => handleForoAnswer(post.id)}
+                        disabled={foroLoading === post.id || !foroAnswers[post.id]?.trim()}
+                        className="btn-gold px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-1.5 shrink-0 disabled:opacity-50"
+                      >
+                        {foroLoading === post.id
+                          ? <span className="w-4 h-4 border-2 border-[#050510]/40 border-t-[#050510] rounded-full animate-spin" />
+                          : <><Send size={13} /> Responder</>
+                        }
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Actions */}
+                  <div className="flex gap-2 pt-3 border-t border-white/5">
+                    <button
+                      onClick={() => handleForoToggle(post)}
+                      disabled={foroLoading === post.id}
+                      className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-white/5 text-[#8a7a6a] hover:text-white transition-colors"
+                    >
+                      {post.hidden ? <><Eye size={12} /> Mostrar</> : <><EyeOff size={12} /> Ocultar</>}
+                    </button>
+                    <button
+                      onClick={() => handleForoDelete(post.id)}
+                      disabled={foroLoading === post.id}
+                      className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-lg bg-red-500/10 text-red-400 hover:bg-red-500/20 transition-colors"
+                    >
+                      <Trash2 size={12} /> Eliminar
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )
         )}
       </main>
     </div>
