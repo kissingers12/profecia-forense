@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { CheckCircle, XCircle, RefreshCw, Lock, Users, LogOut } from "lucide-react";
+import { CheckCircle, XCircle, RefreshCw, Lock, Users, LogOut, LogIn, Download, Activity } from "lucide-react";
 
 type User = {
   id: string;
@@ -9,6 +9,14 @@ type User = {
   name: string;
   plan: string;
   activated: boolean;
+  created_at: string;
+};
+
+type Log = {
+  id: number;
+  user_email: string;
+  user_name: string;
+  action: string;
   created_at: string;
 };
 
@@ -22,6 +30,7 @@ export default function AdminPage() {
   const [authed, setAuthed] = useState(false);
   const [authError, setAuthError] = useState("");
   const [users, setUsers] = useState<User[]>([]);
+  const [logs, setLogs] = useState<Log[]>([]);
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [toast, setToast] = useState("");
@@ -46,6 +55,13 @@ export default function AdminPage() {
       setUsers(data.users ?? []);
       setAuthed(true);
       setAuthError("");
+
+      // Fetch activity logs
+      const logsRes = await fetch("/api/admin/logs", { headers: { "x-admin-password": pwd } });
+      if (logsRes.ok) {
+        const logsData = await logsRes.json();
+        setLogs(logsData.logs ?? []);
+      }
     } catch {
       setAuthError("Error de conexión.");
     }
@@ -227,6 +243,48 @@ export default function AdminPage() {
             ))}
           </div>
         )}
+
+        {/* Activity Log */}
+        <div className="mt-12">
+          <h2 className="text-white font-bold text-lg mb-5 flex items-center gap-2">
+            <Activity size={18} className="text-[#c9a84c]" />
+            Actividad reciente
+          </h2>
+          {logs.length === 0 ? (
+            <div className="card-dark rounded-2xl p-8 text-center text-[#6a5a4a] text-sm">
+              No hay actividad registrada aún.
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {logs.map((log) => (
+                <div key={log.id} className="card-dark rounded-xl px-5 py-3 flex items-center gap-4">
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                    log.action === "login" ? "bg-blue-500/10 border border-blue-500/20" :
+                    "bg-[#c9a84c]/10 border border-[#c9a84c]/20"
+                  }`}>
+                    {log.action === "login"
+                      ? <LogIn size={14} className="text-blue-400" />
+                      : <Download size={14} className="text-[#c9a84c]" />
+                    }
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-white text-sm font-semibold truncate">{log.user_name || log.user_email}</p>
+                    <p className="text-[#8a7a6a] text-xs truncate">{log.user_email}</p>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <p className="text-[#c9a84c] text-xs font-bold">
+                      {log.action === "login" ? "Entró al curso" :
+                       log.action === "download_pdf" ? "Descargó PDF" : "Descargó eBook"}
+                    </p>
+                    <p className="text-[#6a5a4a] text-xs">
+                      {new Date(log.created_at).toLocaleString("es-ES", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </main>
     </div>
   );

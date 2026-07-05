@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
   // Verify user is escuela and activated
   const { data: user } = await supabaseAdmin
     .from("users")
-    .select("plan, activated")
+    .select("plan, activated, name")
     .eq("email", email.toLowerCase())
     .maybeSingle();
 
@@ -33,6 +33,13 @@ export async function POST(req: NextRequest) {
     console.error("[download] Supabase storage error:", error?.message);
     return Response.json({ error: "No se pudo generar el link de descarga." }, { status: 500 });
   }
+
+  // Log the download event (silent fail)
+  supabaseAdmin.from("activity_logs").insert({
+    user_email: email.toLowerCase(),
+    user_name: user.name ?? "",
+    action: type === "pdf" ? "download_pdf" : "download_epub",
+  }).then(() => {});
 
   return Response.json({ url: data.signedUrl });
 }

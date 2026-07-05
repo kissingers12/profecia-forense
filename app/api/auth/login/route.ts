@@ -24,6 +24,13 @@ export async function POST(req: NextRequest) {
     return Response.json({ error: "Correo o contraseña incorrectos." }, { status: 401 });
   }
 
+  // Log the login event (silent fail — doesn't block login)
+  supabaseAdmin.from("activity_logs").insert({
+    user_email: user.email,
+    user_name: user.name,
+    action: "login",
+  }).then(() => {});
+
   return Response.json({
     success: true,
     user: {
