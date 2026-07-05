@@ -36,6 +36,7 @@ export default function AdminPage() {
   const [toast, setToast] = useState("");
   const [activeTab, setActiveTab] = useState<"clientes" | "actividad">("clientes");
   const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<"all" | "active" | "pending">("all");
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -99,12 +100,24 @@ export default function AdminPage() {
   };
 
   const activatedCount = users.filter((u) => u.activated).length;
-  const filteredUsers = search.trim()
-    ? users.filter((u) =>
-        u.email.toLowerCase().includes(search.toLowerCase()) ||
-        u.name.toLowerCase().includes(search.toLowerCase())
-      )
-    : users;
+  const filteredUsers = users
+    .filter((u) =>
+      statusFilter === "active" ? u.activated :
+      statusFilter === "pending" ? !u.activated :
+      true
+    )
+    .filter((u) =>
+      search.trim()
+        ? u.email.toLowerCase().includes(search.toLowerCase()) ||
+          u.name.toLowerCase().includes(search.toLowerCase())
+        : true
+    );
+
+  const handleStatClick = (filter: "all" | "active" | "pending") => {
+    setStatusFilter((prev) => prev === filter ? "all" : filter);
+    setActiveTab("clientes");
+    setSearch("");
+  };
 
   if (!authed) {
     return (
@@ -182,18 +195,27 @@ export default function AdminPage() {
 
       <main className="max-w-5xl mx-auto px-6 py-10">
         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-8">
-          <div className="card-dark rounded-2xl p-5">
+          <button
+            onClick={() => handleStatClick("all")}
+            className={`card-dark rounded-2xl p-5 text-left transition-all ${statusFilter === "all" ? "ring-2 ring-white/30" : "hover:ring-1 hover:ring-white/10"}`}
+          >
             <p className="text-[#6a5a4a] text-xs uppercase tracking-widest mb-1">Total registrados</p>
             <p className="text-3xl font-bold text-white">{users.length}</p>
-          </div>
-          <div className="card-dark rounded-2xl p-5">
+          </button>
+          <button
+            onClick={() => handleStatClick("active")}
+            className={`card-dark rounded-2xl p-5 text-left transition-all ${statusFilter === "active" ? "ring-2 ring-[#c9a84c]/60" : "hover:ring-1 hover:ring-[#c9a84c]/20"}`}
+          >
             <p className="text-[#6a5a4a] text-xs uppercase tracking-widest mb-1">Con acceso activo</p>
             <p className="text-3xl font-bold text-[#c9a84c]">{activatedCount}</p>
-          </div>
-          <div className="card-dark rounded-2xl p-5">
+          </button>
+          <button
+            onClick={() => handleStatClick("pending")}
+            className={`card-dark rounded-2xl p-5 text-left transition-all ${statusFilter === "pending" ? "ring-2 ring-red-400/60" : "hover:ring-1 hover:ring-red-400/20"}`}
+          >
             <p className="text-[#6a5a4a] text-xs uppercase tracking-widest mb-1">Pendientes</p>
             <p className="text-3xl font-bold text-red-400">{users.length - activatedCount}</p>
-          </div>
+          </button>
         </div>
 
         {/* Tabs */}
