@@ -584,10 +584,9 @@ export default function Dashboard() {
           </a>
         )}
 
-        {/* Zoom + Comunidad — justo debajo del banner WhatsApp */}
+        {/* Zoom — justo debajo del banner WhatsApp */}
         {isEscuela && (
-          <div className="space-y-3 mb-8">
-            {/* Zoom */}
+          <div className="mb-8">
             <div className="card-dark rounded-2xl p-5 flex items-center gap-4 border border-white/5">
               <div className="w-11 h-11 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center shrink-0">
                 <Video size={20} className="text-blue-400" />
@@ -600,21 +599,6 @@ export default function Dashboard() {
                 Próximamente
               </span>
             </div>
-
-            {/* Comunidad */}
-            <a
-              href="/foro"
-              className="card-dark rounded-2xl p-5 flex items-center gap-4 border border-white/5 hover:border-[#c9a84c]/40 transition-all"
-            >
-              <div className="w-11 h-11 rounded-xl bg-[#c9a84c]/10 border border-[#c9a84c]/20 flex items-center justify-center shrink-0">
-                <MessageCircle size={20} className="text-[#c9a84c]" />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-white font-bold text-sm">Comunidad — Preguntas y respuestas</p>
-                <p className="text-[#8a7a6a] text-xs mt-0.5">Haz tus preguntas, ve las de otros estudiantes y recibe respuesta directa de Kissingers.</p>
-              </div>
-              <ChevronRight size={18} className="text-[#c9a84c] shrink-0" />
-            </a>
           </div>
         )}
 
@@ -822,6 +806,26 @@ export default function Dashboard() {
             </p>
             <a href="/#programas" className="btn-gold px-7 py-3 rounded-full font-bold text-sm inline-block">
               Ver Escuela Avanzada · $777
+            </a>
+          </div>
+        )}
+
+        {/* Comunidad — sección de cierre */}
+        {isEscuela && (
+          <div className="mt-16 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-14 bg-gradient-to-b from-transparent to-[#c9a84c]/5 border-t border-[#c9a84c]/10 text-center">
+            <div className="w-14 h-14 rounded-2xl bg-[#c9a84c]/10 border border-[#c9a84c]/20 flex items-center justify-center mx-auto mb-5">
+              <MessageCircle size={26} className="text-[#c9a84c]" />
+            </div>
+            <h2 className="text-2xl font-bold text-white mb-2">Comunidad</h2>
+            <p className="text-[#8a7a6a] text-sm max-w-sm mx-auto mb-6">
+              Haz tus preguntas, ve las de otros estudiantes y recibe respuesta directa de Kissingers.
+            </p>
+            <a
+              href="/foro"
+              className="inline-flex items-center gap-2 btn-gold px-7 py-3 rounded-full font-bold text-sm"
+            >
+              <MessageCircle size={16} />
+              Entrar a la comunidad
             </a>
           </div>
         )}
