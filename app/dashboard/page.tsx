@@ -818,7 +818,7 @@ export default function Dashboard() {
             </div>
             <h2 className="text-2xl font-bold text-white mb-2">Comunidad</h2>
             <p className="text-[#8a7a6a] text-sm max-w-sm mx-auto mb-6">
-              Haz tus preguntas, ve las de otros estudiantes y recibe respuesta directa de Kissingers.
+              Haz tus preguntas sobre el curso, comparte tus dudas y aprende también de las inquietudes de otros estudiantes. Este espacio está diseñado para que recibas respuestas claras, orientación práctica y mayor comprensión de cada tema tratado.
             </p>
             <a
               href="/foro"
