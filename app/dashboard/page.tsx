@@ -555,6 +555,16 @@ export default function Dashboard() {
       </header>
 
       <main className="max-w-7xl mx-auto px-6 pt-28 pb-16">
+        {/* Welcome */}
+        <div className="mb-10">
+          <p className="text-[#c9a84c] text-sm font-semibold uppercase tracking-widest mb-1">Bienvenido de vuelta</p>
+          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">Hola, {session.name.split(" ")[0]} 👋</h1>
+          <div className="inline-flex items-center gap-2 bg-[#c9a84c]/10 border border-[#c9a84c]/25 rounded-full px-4 py-1.5 mt-2">
+            <CheckCircle size={14} className="text-[#c9a84c]" />
+            <span className="text-[#c9a84c] text-xs font-semibold">{planLabel}</span>
+          </div>
+        </div>
+
         {/* WhatsApp group banner — solo Escuela Avanzada */}
         {isEscuela && (
           <a
@@ -573,16 +583,6 @@ export default function Dashboard() {
             <ChevronRight size={18} className="text-[#25D366] shrink-0" />
           </a>
         )}
-
-        {/* Welcome */}
-        <div className="mb-10">
-          <p className="text-[#c9a84c] text-sm font-semibold uppercase tracking-widest mb-1">Bienvenido de vuelta</p>
-          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">Hola, {session.name.split(" ")[0]} 👋</h1>
-          <div className="inline-flex items-center gap-2 bg-[#c9a84c]/10 border border-[#c9a84c]/25 rounded-full px-4 py-1.5 mt-2">
-            <CheckCircle size={14} className="text-[#c9a84c]" />
-            <span className="text-[#c9a84c] text-xs font-semibold">{planLabel}</span>
-          </div>
-        </div>
 
         {/* Anuncio primera clase en vivo — solo Escuela Avanzada */}
         {isEscuela && (
