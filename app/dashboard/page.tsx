@@ -78,6 +78,7 @@ export default function Dashboard() {
   const router = useRouter();
   const [session, setSession] = useState<UserSession | null>(null);
   const [activeLesson, setActiveLesson] = useState<number | null>(null);
+  const [watchedIds, setWatchedIds] = useState<Set<number>>(new Set());
   const [activationCode, setActivationCode] = useState("");
   const [activationError, setActivationError] = useState("");
   const [activationLoading, setActivationLoading] = useState(false);
@@ -110,6 +111,17 @@ export default function Dashboard() {
           const updated = { ...s, activated: data.user.activated, plan: data.user.plan };
           saveSession(updated);
           setSession(updated);
+          if (data.user.activated) {
+            // Load saved video progress
+            fetch(`/api/progress?email=${encodeURIComponent(s.email)}`)
+              .then((r) => r.json())
+              .then((pd) => {
+                if (pd.watchedIds?.length) {
+                  setWatchedIds(new Set(pd.watchedIds));
+                }
+              })
+              .catch(() => {});
+          }
         }
       })
       .catch(() => {});
@@ -118,6 +130,16 @@ export default function Dashboard() {
   const handleLogout = () => {
     clearSession();
     router.push("/");
+  };
+
+  const markWatched = (lessonId: number) => {
+    if (watchedIds.has(lessonId) || !session) return;
+    setWatchedIds((prev) => new Set(prev).add(lessonId));
+    fetch("/api/progress", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: session.email, videoId: lessonId }),
+    }).catch(() => {});
   };
 
   const handleGetPayment = async () => {
@@ -424,10 +446,15 @@ export default function Dashboard() {
 
   function LessonButton({ lesson, index }: { lesson: Lesson; index: number }) {
     const isActive = activeLesson === lesson.id;
+    const isWatched = watchedIds.has(lesson.id);
     return (
       <>
         <button
-          onClick={() => lesson.unlocked && setActiveLesson(isActive ? null : lesson.id)}
+          onClick={() => {
+            if (!lesson.unlocked) return;
+            if (!isActive) markWatched(lesson.id);
+            setActiveLesson(isActive ? null : lesson.id);
+          }}
           className={`w-full card-dark rounded-xl p-5 flex items-center gap-4 text-left transition-all duration-200 group ${
             isActive
               ? "border-[#c9a84c]/50 bg-[#c9a84c]/5"
@@ -437,13 +464,13 @@ export default function Dashboard() {
           }`}
         >
           <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-sm font-bold transition-colors ${
-            activeLesson && lesson.id < activeLesson && lesson.unlocked
+            isWatched && !isActive
               ? "bg-[#c9a84c] text-[#050510]"
               : isActive
               ? "bg-[#c9a84c]/20 border border-[#c9a84c] text-[#c9a84c]"
               : "bg-white/5 text-[#6a5a4a]"
           }`}>
-            {activeLesson && lesson.id < activeLesson && lesson.unlocked ? (
+            {isWatched && !isActive ? (
               <CheckCircle size={16} />
             ) : isActive ? (
               <PlayCircle size={16} />
@@ -596,21 +623,27 @@ export default function Dashboard() {
           <div className="flex-1">
             <h3 className="text-white font-bold mb-1">Tu progreso</h3>
             <p className="text-[#8a7a6a] text-sm">
-              {activeLesson ? `Clase en curso` : "Continúa donde lo dejaste"}
+              {watchedIds.size > 0
+                ? `${watchedIds.size} de ${flatContent.filter(l => l.unlocked).length} clases vistas`
+                : "Continúa donde lo dejaste"}
             </p>
             <div className="mt-3 h-2 bg-white/5 rounded-full overflow-hidden">
               <div
                 className="h-full rounded-full gradient-gold transition-all duration-700"
-                style={{ width: `${activeLesson ? Math.round((flatContent.findIndex(l => l.id === activeLesson) + 1) / flatContent.length * 100) : 5}%` }}
+                style={{ width: `${watchedIds.size > 0 ? Math.round(watchedIds.size / flatContent.filter(l => l.unlocked).length * 100) : 3}%` }}
               />
             </div>
           </div>
           <button
-            onClick={() => setActiveLesson(flatContent[0].id)}
+            onClick={() => {
+              const next = flatContent.find(l => l.unlocked && !watchedIds.has(l.id)) ?? flatContent[0];
+              markWatched(next.id);
+              setActiveLesson(next.id);
+            }}
             className="btn-gold px-6 py-3 rounded-xl font-bold flex items-center gap-2 shrink-0"
           >
             <PlayCircle size={18} />
-            {activeLesson ? "Continuar" : "Comenzar"}
+            {watchedIds.size > 0 ? "Continuar" : "Comenzar"}
           </button>
         </div>
 
