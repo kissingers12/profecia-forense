@@ -486,8 +486,13 @@ export default function Dashboard() {
           </div>
           {lesson.unlocked ? (
             <div className="flex items-center gap-2 shrink-0">
+              {isWatched && !isActive && (
+                <span className="text-[10px] font-bold text-[#c9a84c] bg-[#c9a84c]/10 border border-[#c9a84c]/30 px-2 py-0.5 rounded-full">
+                  Visto ✓
+                </span>
+              )}
               {isActive && <span className="w-2 h-2 rounded-full bg-[#c9a84c] animate-pulse" />}
-              <Video size={15} className={`text-[#c9a84c] transition-opacity ${isActive ? "opacity-100" : "opacity-40 group-hover:opacity-100"}`} />
+              {!isWatched && <Video size={15} className={`text-[#c9a84c] transition-opacity ${isActive ? "opacity-100" : "opacity-40 group-hover:opacity-100"}`} />}
               <ChevronRight size={16} className={`text-[#6a5a4a] transition-transform duration-200 ${isActive ? "rotate-90" : ""}`} />
             </div>
           ) : (
