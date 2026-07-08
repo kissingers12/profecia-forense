@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { CheckCircle, XCircle, RefreshCw, Lock, Users, LogOut, LogIn, Download, Activity, Search, PlayCircle, Copy, UserPlus, DollarSign, MessageCircle, Eye, EyeOff, Trash2, Send } from "lucide-react";
+import { CheckCircle, XCircle, RefreshCw, Lock, Users, LogOut, LogIn, Download, Activity, Search, PlayCircle, Copy, UserPlus, DollarSign, MessageCircle, Eye, EyeOff, Trash2, Send, Pencil } from "lucide-react";
 
 type User = {
   id: string;
@@ -47,6 +47,8 @@ export default function AdminPage() {
   const [foroAnswers, setForoAnswers] = useState<Record<number, string>>({});
   const [foroResponder, setForoResponder] = useState<Record<number, string>>({});
   const [foroLoading, setForoLoading] = useState<number | null>(null);
+  const [editingPost, setEditingPost] = useState<number | null>(null);
+  const [editAnswers, setEditAnswers] = useState<Record<number, string>>({});
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [toast, setToast] = useState("");
@@ -160,6 +162,25 @@ export default function AdminPage() {
     if (res.ok) {
       setForoPosts((prev) => prev.map((p) => p.id === post.id ? { ...p, hidden: !p.hidden } : p));
       showToast(post.hidden ? "Pregunta visible ✓" : "Pregunta ocultada");
+    }
+    setForoLoading(null);
+  };
+
+  const handleForoEdit = async (postId: number) => {
+    const answer = editAnswers[postId]?.trim();
+    if (!answer) return;
+    const responderName = foroResponder[postId] ?? "Kissingers";
+    setForoLoading(postId);
+    const res = await fetch("/api/admin/forum", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-admin-password": password },
+      body: JSON.stringify({ postId, answer, responderName }),
+    });
+    if (res.ok) {
+      setForoPosts((prev) => prev.map((p) => p.id === postId ? { ...p, answer, responder_name: responderName } : p));
+      setEditingPost(null);
+      setEditAnswers((prev) => { const n = { ...prev }; delete n[postId]; return n; });
+      showToast("Respuesta actualizada ✓");
     }
     setForoLoading(null);
   };
@@ -571,8 +592,47 @@ export default function AdminPage() {
                   {/* Existing answer */}
                   {post.answer && (
                     <div className="bg-[#c9a84c]/5 border border-[#c9a84c]/15 rounded-xl p-4 mb-4">
-                      <p className="text-[#c9a84c] text-xs font-bold mb-1">Tu respuesta:</p>
-                      <p className="text-white text-sm leading-relaxed">{post.answer}</p>
+                      <div className="flex items-center justify-between mb-1">
+                        <p className="text-[#c9a84c] text-xs font-bold">
+                          {post.responder_name ?? "Kissingers"} · Respuesta
+                        </p>
+                        <button
+                          onClick={() => {
+                            setEditingPost(editingPost === post.id ? null : post.id);
+                            setEditAnswers((prev) => ({ ...prev, [post.id]: post.answer ?? "" }));
+                          }}
+                          className="text-[10px] text-[#6a5a4a] hover:text-[#c9a84c] transition-colors flex items-center gap-1"
+                        >
+                          <Pencil size={10} /> Editar
+                        </button>
+                      </div>
+                      {editingPost === post.id ? (
+                        <div className="flex flex-col gap-2 mt-2">
+                          <textarea
+                            value={editAnswers[post.id] ?? ""}
+                            onChange={(e) => setEditAnswers((prev) => ({ ...prev, [post.id]: e.target.value }))}
+                            rows={3}
+                            className="w-full bg-white/5 border border-[#c9a84c]/30 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-[#c9a84c]/60 resize-none"
+                          />
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => handleForoEdit(post.id)}
+                              disabled={foroLoading === post.id || !editAnswers[post.id]?.trim()}
+                              className="btn-gold px-4 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 disabled:opacity-50"
+                            >
+                              {foroLoading === post.id ? <span className="w-3 h-3 border-2 border-[#050510]/40 border-t-[#050510] rounded-full animate-spin" /> : "Guardar"}
+                            </button>
+                            <button
+                              onClick={() => setEditingPost(null)}
+                              className="text-xs text-[#6a5a4a] hover:text-white transition-colors px-3"
+                            >
+                              Cancelar
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <p className="text-white text-sm leading-relaxed">{post.answer}</p>
+                      )}
                     </div>
                   )}
 
