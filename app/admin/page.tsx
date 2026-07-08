@@ -38,8 +38,10 @@ const PLAN_LABELS: Record<string, string> = {
 };
 
 export default function AdminPage() {
+  const [selectedProfile, setSelectedProfile] = useState<"kissingers" | "servicio" | null>(null);
   const [password, setPassword] = useState("");
   const [authed, setAuthed] = useState(false);
+  const [adminProfile, setAdminProfile] = useState<"kissingers" | "servicio">("kissingers");
   const [authError, setAuthError] = useState("");
   const [users, setUsers] = useState<User[]>([]);
   const [logs, setLogs] = useState<Log[]>([]);
@@ -60,34 +62,30 @@ export default function AdminPage() {
     setTimeout(() => setToast(""), 3000);
   };
 
-  const fetchUsers = async (pwd: string) => {
+  const fetchUsers = async (pwd: string, profile: "kissingers" | "servicio") => {
     setLoading(true);
     try {
-      const res = await fetch("/api/admin/users", {
-        headers: { "x-admin-password": pwd },
-      });
-      if (res.status === 401) {
+      // Servicio solo necesita el foro — valida con el endpoint de foro
+      const checkRes = await fetch("/api/admin/forum", { headers: { "x-admin-password": pwd } });
+      if (checkRes.status === 401) {
         setAuthError("Contraseña incorrecta.");
         setAuthed(false);
+        setLoading(false);
         return;
       }
-      const data = await res.json();
-      setUsers(data.users ?? []);
+      const foroData = await checkRes.json();
+      setForoPosts(foroData.posts ?? []);
       setAuthed(true);
+      setAdminProfile(profile);
       setAuthError("");
 
-      // Fetch activity logs
-      const logsRes = await fetch("/api/admin/logs", { headers: { "x-admin-password": pwd } });
-      if (logsRes.ok) {
-        const logsData = await logsRes.json();
-        setLogs(logsData.logs ?? []);
-      }
-
-      // Fetch foro posts
-      const foroRes = await fetch("/api/admin/forum", { headers: { "x-admin-password": pwd } });
-      if (foroRes.ok) {
-        const foroData = await foroRes.json();
-        setForoPosts(foroData.posts ?? []);
+      if (profile === "kissingers") {
+        const [usersRes, logsRes] = await Promise.all([
+          fetch("/api/admin/users", { headers: { "x-admin-password": pwd } }),
+          fetch("/api/admin/logs", { headers: { "x-admin-password": pwd } }),
+        ]);
+        if (usersRes.ok) setUsers((await usersRes.json()).users ?? []);
+        if (logsRes.ok) setLogs((await logsRes.json()).logs ?? []);
       }
     } catch {
       setAuthError("Error de conexión.");
@@ -97,7 +95,8 @@ export default function AdminPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    await fetchUsers(password);
+    if (!selectedProfile) return;
+    await fetchUsers(password, selectedProfile);
   };
 
   const handleToggle = async (user: User) => {
@@ -150,7 +149,7 @@ export default function AdminPage() {
   const handleForoAnswer = async (postId: number) => {
     const answer = foroAnswers[postId]?.trim();
     if (!answer) return;
-    const responderName = foroResponder[postId] ?? "Kissingers";
+    const responderName = adminProfile === "servicio" ? "Servicio al Estudiante" : "Kissingers";
     setForoLoading(postId);
     const res = await fetch("/api/admin/forum", {
       method: "POST",
@@ -217,29 +216,64 @@ export default function AdminPage() {
             <h1 className="text-2xl font-bold text-white">Panel Admin</h1>
             <p className="text-[#6a5a4a] text-sm mt-1">100x100 Cristianos</p>
           </div>
-          <form onSubmit={handleLogin} className="card-dark rounded-2xl p-8 space-y-5">
-            <div>
-              <label className="block text-xs font-semibold text-[#c9a84c] uppercase tracking-widest mb-2">
-                Contraseña de administrador
-              </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                placeholder="••••••••"
-                className="w-full bg-white/5 border border-[#c9a84c]/20 rounded-xl px-4 py-3 text-white placeholder-[#4a3a2a] text-sm focus:outline-none focus:border-[#c9a84c]/60"
-              />
+
+          {/* Selección de perfil */}
+          {!selectedProfile ? (
+            <div className="space-y-3">
+              <p className="text-center text-[#6a5a4a] text-xs uppercase tracking-widest mb-4">¿Quién eres?</p>
+              <button
+                onClick={() => setSelectedProfile("kissingers")}
+                className="w-full card-dark rounded-2xl p-5 flex items-center gap-4 hover:border-[#c9a84c]/40 transition-all text-left"
+              >
+                <div className="w-12 h-12 rounded-full bg-[#c9a84c]/20 border border-[#c9a84c]/50 flex items-center justify-center text-lg font-bold text-[#c9a84c] shrink-0">K</div>
+                <div>
+                  <p className="text-white font-bold">Kissingers</p>
+                  <p className="text-[#6a5a4a] text-xs">Acceso completo</p>
+                </div>
+              </button>
+              <button
+                onClick={() => setSelectedProfile("servicio")}
+                className="w-full card-dark rounded-2xl p-5 flex items-center gap-4 hover:border-[#c9a84c]/40 transition-all text-left"
+              >
+                <div className="w-12 h-12 rounded-full bg-white/5 border border-white/20 flex items-center justify-center text-lg font-bold text-white shrink-0">S</div>
+                <div>
+                  <p className="text-white font-bold">Servicio al Estudiante</p>
+                  <p className="text-[#6a5a4a] text-xs">Solo foro</p>
+                </div>
+              </button>
             </div>
-            {authError && <p className="text-red-400 text-xs">{authError}</p>}
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn-gold w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2"
-            >
-              {loading ? <span className="w-4 h-4 border-2 border-[#050510]/40 border-t-[#050510] rounded-full animate-spin" /> : "Entrar"}
-            </button>
-          </form>
+          ) : (
+            <form onSubmit={handleLogin} className="card-dark rounded-2xl p-8 space-y-5">
+              <button type="button" onClick={() => { setSelectedProfile(null); setPassword(""); setAuthError(""); }} className="text-[#6a5a4a] text-xs flex items-center gap-1 hover:text-white transition-colors">
+                ← Volver
+              </button>
+              <div className="flex items-center gap-3 pb-2 border-b border-white/5">
+                <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm shrink-0 ${selectedProfile === "kissingers" ? "bg-[#c9a84c]/20 border border-[#c9a84c]/50 text-[#c9a84c]" : "bg-white/5 border border-white/20 text-white"}`}>
+                  {selectedProfile === "kissingers" ? "K" : "S"}
+                </div>
+                <div>
+                  <p className="text-white font-bold text-sm">{selectedProfile === "kissingers" ? "Kissingers" : "Servicio al Estudiante"}</p>
+                  <p className="text-[#6a5a4a] text-xs">{selectedProfile === "kissingers" ? "Acceso completo" : "Solo foro"}</p>
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-[#c9a84c] uppercase tracking-widest mb-2">Contraseña</label>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  autoFocus
+                  placeholder="••••••••"
+                  className="w-full bg-white/5 border border-[#c9a84c]/20 rounded-xl px-4 py-3 text-white placeholder-[#4a3a2a] text-sm focus:outline-none focus:border-[#c9a84c]/60"
+                />
+              </div>
+              {authError && <p className="text-red-400 text-xs">{authError}</p>}
+              <button type="submit" disabled={loading} className="btn-gold w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2">
+                {loading ? <span className="w-4 h-4 border-2 border-[#050510]/40 border-t-[#050510] rounded-full animate-spin" /> : "Entrar"}
+              </button>
+            </form>
+          )}
         </div>
       </div>
     );
@@ -262,7 +296,7 @@ export default function AdminPage() {
           </div>
           <div className="flex items-center gap-3">
             <button
-              onClick={() => fetchUsers(password)}
+              onClick={() => fetchUsers(password, adminProfile)}
               disabled={loading}
               className="p-2 text-[#6a5a4a] hover:text-[#c9a84c] transition-colors"
               title="Actualizar"
@@ -307,7 +341,7 @@ export default function AdminPage() {
 
         {/* Tabs */}
         <div className="flex gap-2 mb-6 border-b border-[#c9a84c]/10 pb-0">
-          <button
+          {adminProfile === "kissingers" && <button
             onClick={() => setActiveTab("clientes")}
             className={`flex items-center gap-2 px-4 py-2.5 text-sm font-bold rounded-t-xl transition-all ${
               activeTab === "clientes"
@@ -317,8 +351,8 @@ export default function AdminPage() {
           >
             <Users size={15} />
             Clientes
-          </button>
-          <button
+          </button>}
+          {adminProfile === "kissingers" && <button
             onClick={() => setActiveTab("actividad")}
             className={`flex items-center gap-2 px-4 py-2.5 text-sm font-bold rounded-t-xl transition-all ${
               activeTab === "actividad"
@@ -331,8 +365,8 @@ export default function AdminPage() {
             {logs.length > 0 && (
               <span className="bg-[#c9a84c]/20 text-[#c9a84c] text-xs rounded-full px-1.5 py-0.5">{logs.length}</span>
             )}
-          </button>
-          <button
+          </button>}
+          {adminProfile === "kissingers" && <button
             onClick={() => setActiveTab("ingresos")}
             className={`flex items-center gap-2 px-4 py-2.5 text-sm font-bold rounded-t-xl transition-all ${
               activeTab === "ingresos"
@@ -342,7 +376,7 @@ export default function AdminPage() {
           >
             <DollarSign size={15} />
             Ingresos
-          </button>
+          </button>}
           <button
             onClick={() => setActiveTab("foro")}
             className={`flex items-center gap-2 px-4 py-2.5 text-sm font-bold rounded-t-xl transition-all ${
@@ -599,14 +633,6 @@ export default function AdminPage() {
                   {/* Answer input */}
                   {!post.answer && !post.hidden && (
                     <div className="flex flex-col gap-2 mb-4">
-                      <select
-                        value={foroResponder[post.id] ?? "Kissingers"}
-                        onChange={(e) => setForoResponder((prev) => ({ ...prev, [post.id]: e.target.value }))}
-                        className="bg-white/5 border border-[#c9a84c]/20 rounded-xl px-3 py-2 text-[#c9a84c] text-xs font-bold focus:outline-none focus:border-[#c9a84c]/60 w-fit"
-                      >
-                        <option value="Kissingers">Kissingers</option>
-                        <option value="Servicio al Estudiante">Servicio al Estudiante</option>
-                      </select>
                     <div className="flex gap-2">
                       <input
                         type="text"
