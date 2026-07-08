@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
 
   const { data: posts, error } = await supabaseAdmin
     .from("forum_posts")
-    .select("id, user_email, user_name, question, answer, created_at, answered_at")
+    .select("id, user_email, user_name, question, answer, created_at, answered_at, responder_name")
     .eq("hidden", false)
     .order("created_at", { ascending: false });
 

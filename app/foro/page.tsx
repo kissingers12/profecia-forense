@@ -13,6 +13,7 @@ type Post = {
   answer: string | null;
   created_at: string;
   answered_at: string | null;
+  responder_name: string | null;
 };
 
 export default function ForoPage() {
@@ -170,9 +171,9 @@ export default function ForoPage() {
                     <div className="mt-4 pt-4 border-t border-[#c9a84c]/10">
                       <div className="flex items-center gap-2 mb-2">
                         <div className="w-6 h-6 rounded-full bg-[#c9a84c]/20 border border-[#c9a84c]/50 flex items-center justify-center text-xs font-bold text-[#c9a84c] shrink-0">
-                          K
+                          {(post.responder_name ?? "Kissingers")[0].toUpperCase()}
                         </div>
-                        <span className="text-[#c9a84c] text-xs font-bold">Kissingers · Respuesta</span>
+                        <span className="text-[#c9a84c] text-xs font-bold">{post.responder_name ?? "Kissingers"} · Respuesta</span>
                         {post.answered_at && (
                           <span className="text-[#6a5a4a] text-xs ml-auto shrink-0">
                             {new Date(post.answered_at).toLocaleDateString("es-ES", { day: "2-digit", month: "short" })}

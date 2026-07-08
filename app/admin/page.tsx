@@ -29,6 +29,7 @@ type ForoPost = {
   hidden: boolean;
   created_at: string;
   answered_at: string | null;
+  responder_name: string | null;
 };
 
 const PLAN_LABELS: Record<string, string> = {
@@ -44,6 +45,7 @@ export default function AdminPage() {
   const [logs, setLogs] = useState<Log[]>([]);
   const [foroPosts, setForoPosts] = useState<ForoPost[]>([]);
   const [foroAnswers, setForoAnswers] = useState<Record<number, string>>({});
+  const [foroResponder, setForoResponder] = useState<Record<number, string>>({});
   const [foroLoading, setForoLoading] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -148,15 +150,17 @@ export default function AdminPage() {
   const handleForoAnswer = async (postId: number) => {
     const answer = foroAnswers[postId]?.trim();
     if (!answer) return;
+    const responderName = foroResponder[postId] ?? "Kissingers";
     setForoLoading(postId);
     const res = await fetch("/api/admin/forum", {
       method: "POST",
       headers: { "Content-Type": "application/json", "x-admin-password": password },
-      body: JSON.stringify({ postId, answer }),
+      body: JSON.stringify({ postId, answer, responderName }),
     });
     if (res.ok) {
-      setForoPosts((prev) => prev.map((p) => p.id === postId ? { ...p, answer, answered_at: new Date().toISOString() } : p));
+      setForoPosts((prev) => prev.map((p) => p.id === postId ? { ...p, answer, answered_at: new Date().toISOString(), responder_name: responderName } : p));
       setForoAnswers((prev) => { const n = { ...prev }; delete n[postId]; return n; });
+      setForoResponder((prev) => { const n = { ...prev }; delete n[postId]; return n; });
       showToast("Respuesta publicada ✓");
     }
     setForoLoading(null);
@@ -594,7 +598,16 @@ export default function AdminPage() {
 
                   {/* Answer input */}
                   {!post.answer && !post.hidden && (
-                    <div className="flex gap-2 mb-4">
+                    <div className="flex flex-col gap-2 mb-4">
+                      <select
+                        value={foroResponder[post.id] ?? "Kissingers"}
+                        onChange={(e) => setForoResponder((prev) => ({ ...prev, [post.id]: e.target.value }))}
+                        className="bg-white/5 border border-[#c9a84c]/20 rounded-xl px-3 py-2 text-[#c9a84c] text-xs font-bold focus:outline-none focus:border-[#c9a84c]/60 w-fit"
+                      >
+                        <option value="Kissingers">Kissingers</option>
+                        <option value="Servicio al Estudiante">Servicio al Estudiante</option>
+                      </select>
+                    <div className="flex gap-2">
                       <input
                         type="text"
                         value={foroAnswers[post.id] ?? ""}
@@ -613,6 +626,7 @@ export default function AdminPage() {
                           : <><Send size={13} /> Responder</>
                         }
                       </button>
+                    </div>
                     </div>
                   )}
 
