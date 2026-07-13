@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { CheckCircle, XCircle, RefreshCw, Lock, Users, LogOut, LogIn, Download, Activity, Search, PlayCircle, Copy, UserPlus, DollarSign, MessageCircle, Eye, EyeOff, Trash2, Send, Pencil } from "lucide-react";
+import { CheckCircle, XCircle, RefreshCw, Lock, Users, LogOut, LogIn, Download, Activity, Search, PlayCircle, Copy, UserPlus, DollarSign, MessageCircle, Eye, EyeOff, Trash2, Send, Pencil, KeyRound } from "lucide-react";
 
 type User = {
   id: string;
@@ -52,10 +52,15 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [toast, setToast] = useState("");
-  const [activeTab, setActiveTab] = useState<"clientes" | "actividad" | "ingresos" | "foro">("clientes");
+  const [activeTab, setActiveTab] = useState<"clientes" | "actividad" | "ingresos" | "foro" | "hotmart">("clientes");
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "pending">("all");
   const [logSearch, setLogSearch] = useState("");
+  const [codes, setCodes] = useState<{ id: string; code: string; file_name: string; used: boolean; created_at: string }[]>([]);
+  const [codesLoading, setCodesLoading] = useState(false);
+  const [newBook, setNewBook] = useState("ebook");
+  const [newCustomCode, setNewCustomCode] = useState("");
+  const [generatedCode, setGeneratedCode] = useState("");
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -198,6 +203,45 @@ export default function AdminPage() {
       showToast("Pregunta eliminada");
     }
     setForoLoading(null);
+  };
+
+  const fetchCodes = async () => {
+    setCodesLoading(true);
+    const res = await fetch("/api/admin/download-codes", { headers: { "x-admin-password": password } });
+    if (res.ok) setCodes((await res.json()).codes ?? []);
+    setCodesLoading(false);
+  };
+
+  const handleCreateCode = async () => {
+    setCodesLoading(true);
+    const res = await fetch("/api/admin/download-codes", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-admin-password": password },
+      body: JSON.stringify({ bookId: newBook, customCode: newCustomCode || undefined }),
+    });
+    const data = await res.json();
+    if (res.ok) {
+      setGeneratedCode(data.code);
+      setNewCustomCode("");
+      await fetchCodes();
+      showToast("Código creado ✓");
+    } else {
+      showToast(data.error || "Error al crear código.");
+    }
+    setCodesLoading(false);
+  };
+
+  const handleDeleteCode = async (id: string) => {
+    if (!confirm("¿Eliminar este código permanentemente?")) return;
+    const res = await fetch("/api/admin/download-codes", {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json", "x-admin-password": password },
+      body: JSON.stringify({ id }),
+    });
+    if (res.ok) {
+      setCodes((prev) => prev.filter((c) => c.id !== id));
+      showToast("Código eliminado");
+    }
   };
 
   const escuelaActivos = users.filter((u) => u.activated && u.plan === "escuela").length;
@@ -359,6 +403,17 @@ export default function AdminPage() {
                 {foroPosts.filter((p) => !p.answer && !p.hidden).length}
               </span>
             )}
+          </button>
+          <button
+            onClick={() => { setActiveTab("hotmart"); if (codes.length === 0) fetchCodes(); }}
+            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-bold rounded-t-xl transition-all ${
+              activeTab === "hotmart"
+                ? "text-[#c9a84c] border-b-2 border-[#c9a84c]"
+                : "text-[#6a5a4a] hover:text-white"
+            }`}
+          >
+            <KeyRound size={15} />
+            Hotmart
           </button>
         </div>
 
@@ -691,6 +746,128 @@ export default function AdminPage() {
               ))}
             </div>
           )
+        )}
+        {/* Tab: Hotmart */}
+        {activeTab === "hotmart" && (
+          <div className="space-y-6">
+            {/* Create code */}
+            <div className="card-dark rounded-2xl p-6">
+              <h3 className="text-white font-bold mb-4 flex items-center gap-2">
+                <KeyRound size={16} className="text-[#c9a84c]" />
+                Generar código de descarga
+              </h3>
+              <div className="grid sm:grid-cols-2 gap-4 mb-4">
+                <div>
+                  <label className="block text-xs font-semibold text-[#c9a84c] uppercase tracking-widest mb-2">Libro</label>
+                  <select
+                    value={newBook}
+                    onChange={(e) => setNewBook(e.target.value)}
+                    className="w-full bg-white/5 border border-[#c9a84c]/20 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#c9a84c]/60"
+                  >
+                    <option value="ebook">Manual: Escuchar a Dios (eBook)</option>
+                    <option value="pdf">Manual: Escuchar a Dios (PDF)</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-[#c9a84c] uppercase tracking-widest mb-2">Código personalizado (opcional)</label>
+                  <input
+                    type="text"
+                    value={newCustomCode}
+                    onChange={(e) => setNewCustomCode(e.target.value.toUpperCase())}
+                    placeholder="Ej: HOTMART-MARIA"
+                    className="w-full bg-white/5 border border-[#c9a84c]/20 rounded-xl px-4 py-3 text-white placeholder-[#4a3a2a] text-sm focus:outline-none focus:border-[#c9a84c]/60 uppercase tracking-widest"
+                  />
+                </div>
+              </div>
+              <button
+                onClick={handleCreateCode}
+                disabled={codesLoading}
+                className="btn-gold px-6 py-3 rounded-xl font-bold text-sm flex items-center gap-2 disabled:opacity-50"
+              >
+                {codesLoading
+                  ? <span className="w-4 h-4 border-2 border-[#050510]/40 border-t-[#050510] rounded-full animate-spin" />
+                  : <><KeyRound size={15} /> Generar código</>}
+              </button>
+              {generatedCode && (
+                <div className="mt-4 bg-[#c9a84c]/10 border border-[#c9a84c]/30 rounded-xl p-4 flex items-center justify-between gap-3">
+                  <div>
+                    <p className="text-[#c9a84c] text-xs font-bold uppercase tracking-widest mb-1">Código generado</p>
+                    <p className="text-white font-bold text-lg tracking-widest">{generatedCode}</p>
+                    <p className="text-[#8a7a6a] text-xs mt-1">Envía este código al cliente. Solo se puede usar una vez.</p>
+                  </div>
+                  <button
+                    onClick={() => { navigator.clipboard.writeText(generatedCode); showToast("Código copiado ✓"); }}
+                    className="shrink-0 p-2 text-[#c9a84c] hover:bg-[#c9a84c]/20 rounded-lg transition-colors"
+                  >
+                    <Copy size={16} />
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Code list */}
+            <div className="card-dark rounded-2xl p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-white font-bold flex items-center gap-2">
+                  <Download size={16} className="text-[#c9a84c]" />
+                  Códigos generados
+                </h3>
+                <button onClick={fetchCodes} disabled={codesLoading} className="p-2 text-[#6a5a4a] hover:text-[#c9a84c] transition-colors">
+                  <RefreshCw size={14} className={codesLoading ? "animate-spin" : ""} />
+                </button>
+              </div>
+              {codesLoading && codes.length === 0 ? (
+                <div className="flex justify-center py-8">
+                  <span className="w-6 h-6 border-2 border-[#c9a84c]/40 border-t-[#c9a84c] rounded-full animate-spin" />
+                </div>
+              ) : codes.length === 0 ? (
+                <p className="text-[#6a5a4a] text-sm text-center py-8">No hay códigos generados aún.</p>
+              ) : (
+                <div className="space-y-2">
+                  {codes.map((c) => (
+                    <div key={c.id} className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/[0.03] hover:bg-white/5 transition-colors">
+                      <div className={`w-2 h-2 rounded-full shrink-0 ${c.used ? "bg-red-400" : "bg-green-400"}`} />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-white font-bold text-sm tracking-widest">{c.code}</p>
+                        <p className="text-[#8a7a6a] text-xs truncate">{c.file_name}</p>
+                      </div>
+                      <span className={`text-xs font-bold px-2 py-0.5 rounded-full shrink-0 ${c.used ? "bg-red-500/10 text-red-400 border border-red-500/20" : "bg-green-500/10 text-green-400 border border-green-500/20"}`}>
+                        {c.used ? "Usado" : "Disponible"}
+                      </span>
+                      <p className="text-[#6a5a4a] text-xs shrink-0 hidden sm:block">
+                        {new Date(c.created_at).toLocaleDateString("es-ES", { day: "2-digit", month: "short" })}
+                      </p>
+                      {!c.used && (
+                        <button
+                          onClick={() => { navigator.clipboard.writeText(c.code); showToast("Código copiado ✓"); }}
+                          className="p-1.5 text-[#6a5a4a] hover:text-[#c9a84c] transition-colors shrink-0"
+                          title="Copiar código"
+                        >
+                          <Copy size={13} />
+                        </button>
+                      )}
+                      <button
+                        onClick={() => handleDeleteCode(c.id)}
+                        className="p-1.5 text-[#6a5a4a] hover:text-red-400 transition-colors shrink-0"
+                        title="Eliminar"
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="card-dark rounded-2xl p-5 border border-[#c9a84c]/15">
+              <p className="text-[#c9a84c] text-xs font-bold uppercase tracking-widest mb-1">Instrucciones</p>
+              <p className="text-[#b8a888] text-sm leading-relaxed">
+                Genera un código y envíaselo al cliente por email. El cliente va a{" "}
+                <span className="text-white font-semibold">kissingersaraque.com/descarga</span>,
+                ingresa el código y descarga el libro. El código queda inactivo tras el primer uso.
+              </p>
+            </div>
+          </div>
         )}
       </main>
     </div>
