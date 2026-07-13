@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
 
   const { data } = await supabaseAdmin
     .from("download_codes")
-    .select("id, code, file_name, used, used_at, created_at")
+    .select("id, code, file_name, file_name_2, used, used_at, created_at")
     .order("created_at", { ascending: false });
 
   return Response.json({ codes: data ?? [] });
@@ -34,15 +34,32 @@ export async function POST(req: NextRequest) {
   if (!checkAuth(req)) return Response.json({ error: "No autorizado." }, { status: 401 });
 
   const { bookId, customCode } = await req.json();
-  const book = BOOKS[bookId];
-  if (!book) return Response.json({ error: "Libro no válido." }, { status: 400 });
 
   const code = customCode?.trim().toUpperCase() ||
     `HOTMART-${crypto.randomBytes(3).toString("hex").toUpperCase()}`;
 
+  let insertData: Record<string, string>;
+  let displayName: string;
+
+  if (bookId === "both") {
+    insertData = {
+      code,
+      file_url: BOOKS["ebook"].url,
+      file_name: BOOKS["ebook"].name,
+      file_url_2: BOOKS["pdf"].url,
+      file_name_2: BOOKS["pdf"].name,
+    };
+    displayName = "eBook + PDF";
+  } else {
+    const book = BOOKS[bookId];
+    if (!book) return Response.json({ error: "Libro no válido." }, { status: 400 });
+    insertData = { code, file_url: book.url, file_name: book.name };
+    displayName = book.name;
+  }
+
   const { data, error } = await supabaseAdmin
     .from("download_codes")
-    .insert({ code, file_url: book.url, file_name: book.name })
+    .insert(insertData)
     .select()
     .single();
 
@@ -51,7 +68,7 @@ export async function POST(req: NextRequest) {
     return Response.json({ error: "Error al crear el código." }, { status: 500 });
   }
 
-  return Response.json({ code: data.code, fileName: book.name });
+  return Response.json({ code: data.code, fileName: displayName });
 }
 
 export async function DELETE(req: NextRequest) {

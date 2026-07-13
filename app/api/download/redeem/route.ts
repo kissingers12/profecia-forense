@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
 
   const { data } = await supabaseAdmin
     .from("download_codes")
-    .select("id, file_url, file_name, used")
+    .select("id, file_url, file_name, file_url_2, file_name_2, used")
     .eq("code", code.trim().toUpperCase())
     .maybeSingle();
 
@@ -20,5 +20,8 @@ export async function POST(req: NextRequest) {
     .update({ used: true, used_at: new Date().toISOString() })
     .eq("id", data.id);
 
-  return Response.json({ fileUrl: data.file_url, fileName: data.file_name });
+  const files = [{ url: data.file_url, name: data.file_name }];
+  if (data.file_url_2) files.push({ url: data.file_url_2, name: data.file_name_2 });
+
+  return Response.json({ files });
 }

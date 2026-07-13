@@ -4,11 +4,11 @@ import { useState } from "react";
 import Image from "next/image";
 import { Download, KeyRound, CheckCircle, BookOpen } from "lucide-react";
 
-export default function DescargaPage() {
+export default function LibroPage() {
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [result, setResult] = useState<{ fileUrl: string; fileName: string } | null>(null);
+  const [files, setFiles] = useState<{ url: string; name: string }[] | null>(null);
 
   const handleRedeem = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,7 +22,7 @@ export default function DescargaPage() {
       });
       const data = await res.json();
       if (res.ok) {
-        setResult(data);
+        setFiles(data.files);
       } else {
         setError(data.error || "Código inválido.");
       }
@@ -51,26 +51,35 @@ export default function DescargaPage() {
         </div>
 
         <div className="card-dark rounded-2xl p-8">
-          {result ? (
-            <div className="text-center space-y-6">
+          {files ? (
+            <div className="text-center space-y-5">
               <div className="w-16 h-16 rounded-full bg-[#c9a84c]/10 border border-[#c9a84c]/30 flex items-center justify-center mx-auto">
                 <CheckCircle size={32} className="text-[#c9a84c]" />
               </div>
               <div>
                 <h2 className="text-white font-bold text-lg mb-1">¡Código válido!</h2>
-                <p className="text-[#8a7a6a] text-sm">{result.fileName}</p>
+                <p className="text-[#8a7a6a] text-sm">
+                  {files.length > 1 ? "Tienes acceso a ambos formatos:" : files[0].name}
+                </p>
               </div>
-              <a
-                href={result.fileUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-gold w-full py-4 rounded-xl font-bold flex items-center justify-center gap-2 text-base"
-              >
-                <Download size={20} />
-                Descargar ahora
-              </a>
+              <div className="space-y-3">
+                {files.map((file, i) => (
+                  <a
+                    key={i}
+                    href={file.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-gold w-full py-4 rounded-xl font-bold flex items-center justify-center gap-2 text-base"
+                  >
+                    <Download size={20} />
+                    {files.length > 1
+                      ? (file.name.includes("eBook") ? "Descargar eBook" : "Descargar PDF")
+                      : "Descargar ahora"}
+                  </a>
+                ))}
+              </div>
               <p className="text-[#4a3a2a] text-xs">
-                Este código ya no podrá usarse de nuevo. Guarda el archivo después de descargarlo.
+                Este código ya no podrá usarse de nuevo. Guarda los archivos después de descargarlos.
               </p>
             </div>
           ) : (
