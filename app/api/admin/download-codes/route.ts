@@ -8,10 +8,18 @@ function checkAuth(req: NextRequest): boolean {
   return req.headers.get("x-admin-password") === adminPassword;
 }
 
-const BOOKS = {
-  ebook: { name: "Manual: Escuchar a Dios (eBook)", url: "https://drive.google.com/uc?export=download&id=1DbteSDSIqnMWZn0Amn16YOXWx9w44owG" },
-  pdf:   { name: "Manual: Escuchar a Dios (PDF)",   url: "https://drive.google.com/uc?export=download&id=19w1bxaT0p7cHjNf4c6oWelAetdZdic68" },
-};
+function getBooks() {
+  return {
+    ebook: {
+      name: "Manual: Escuchar a Dios (eBook)",
+      url: process.env.BOOK_EBOOK_URL ?? "https://drive.google.com/uc?export=download&id=1DbteSDSIqnMWZn0Amn16YOXWx9w44owG",
+    },
+    pdf: {
+      name: "Manual: Escuchar a Dios (PDF)",
+      url: process.env.BOOK_PDF_URL ?? "https://drive.google.com/uc?export=download&id=19w1bxaT0p7cHjNf4c6oWelAetdZdic68",
+    },
+  };
+}
 
 export async function GET(req: NextRequest) {
   if (!checkAuth(req)) return Response.json({ error: "No autorizado." }, { status: 401 });
@@ -28,6 +36,7 @@ export async function POST(req: NextRequest) {
   if (!checkAuth(req)) return Response.json({ error: "No autorizado." }, { status: 401 });
 
   const { bookId, customCode } = await req.json();
+  const BOOKS = getBooks();
 
   const code = customCode?.trim().toUpperCase() ||
     `HOTMART-${crypto.randomBytes(3).toString("hex").toUpperCase()}`;
@@ -36,13 +45,12 @@ export async function POST(req: NextRequest) {
   let fileName: string;
 
   if (bookId === "both") {
-    // Store both files as JSON arrays in the existing columns
     fileUrl = JSON.stringify([BOOKS.ebook.url, BOOKS.pdf.url]);
     fileName = JSON.stringify([BOOKS.ebook.name, BOOKS.pdf.name]);
   } else if (bookId === "ebook" || bookId === "pdf") {
-    const book = BOOKS[bookId as "ebook" | "pdf"];
-    fileUrl = book.url;
-    fileName = book.name;
+    const b = BOOKS[bookId as "ebook" | "pdf"];
+    fileUrl = b.url;
+    fileName = b.name;
   } else {
     return Response.json({ error: "Libro no válido." }, { status: 400 });
   }
