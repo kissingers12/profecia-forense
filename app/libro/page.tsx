@@ -8,7 +8,7 @@ export default function LibroPage() {
   const [code, setCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [files, setFiles] = useState<{ url: string; name: string }[] | null>(null);
+  const [files, setFiles] = useState<{ downloadUrl: string; name: string }[] | null>(null);
 
   const handleRedeem = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,7 +66,7 @@ export default function LibroPage() {
                 {files.map((file, i) => (
                   <a
                     key={i}
-                    href={file.url}
+                    href={file.downloadUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn-gold w-full py-4 rounded-xl font-bold flex items-center justify-center gap-2 text-base"
