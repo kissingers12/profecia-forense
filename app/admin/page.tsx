@@ -863,7 +863,7 @@ export default function AdminPage() {
               <p className="text-[#c9a84c] text-xs font-bold uppercase tracking-widest mb-1">Instrucciones</p>
               <p className="text-[#b8a888] text-sm leading-relaxed">
                 Genera un código y envíaselo al cliente por email. El cliente va a{" "}
-                <span className="text-white font-semibold">kissingersaraque.com/descarga</span>,
+                <span className="text-white font-semibold">kissingersaraque.com/libro</span>,
                 ingresa el código y descarga el libro. El código queda inactivo tras el primer uso.
               </p>
             </div>
