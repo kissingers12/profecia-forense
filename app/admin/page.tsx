@@ -58,7 +58,7 @@ export default function AdminPage() {
   const [logSearch, setLogSearch] = useState("");
   const [codes, setCodes] = useState<{ id: string; code: string; file_name: string; used: boolean; created_at: string }[]>([]);
   const [codesLoading, setCodesLoading] = useState(false);
-  const [newBook, setNewBook] = useState("ebook");
+  const [newBook, setNewBook] = useState("both");
   const [newCustomCode, setNewCustomCode] = useState("");
   const [generatedCode, setGeneratedCode] = useState("");
 
@@ -764,8 +764,9 @@ export default function AdminPage() {
                     onChange={(e) => setNewBook(e.target.value)}
                     className="w-full bg-white/5 border border-[#c9a84c]/20 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-[#c9a84c]/60"
                   >
-                    <option value="ebook">Manual: Escuchar a Dios (eBook)</option>
-                    <option value="pdf">Manual: Escuchar a Dios (PDF)</option>
+                    <option value="both">eBook + PDF (ambos formatos)</option>
+                    <option value="ebook">Solo eBook</option>
+                    <option value="pdf">Solo PDF</option>
                   </select>
                 </div>
                 <div>
@@ -829,7 +830,9 @@ export default function AdminPage() {
                       <div className={`w-2 h-2 rounded-full shrink-0 ${c.used ? "bg-red-400" : "bg-green-400"}`} />
                       <div className="flex-1 min-w-0">
                         <p className="text-white font-bold text-sm tracking-widest">{c.code}</p>
-                        <p className="text-[#8a7a6a] text-xs truncate">{c.file_name}</p>
+                        <p className="text-[#8a7a6a] text-xs truncate">
+                          {c.file_name.startsWith("[") ? "eBook + PDF" : c.file_name}
+                        </p>
                       </div>
                       <span className={`text-xs font-bold px-2 py-0.5 rounded-full shrink-0 ${c.used ? "bg-red-500/10 text-red-400 border border-red-500/20" : "bg-green-500/10 text-green-400 border border-green-500/20"}`}>
                         {c.used ? "Usado" : "Disponible"}

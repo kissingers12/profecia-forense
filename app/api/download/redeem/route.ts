@@ -1,6 +1,19 @@
 import { NextRequest } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 
+function parseFiles(fileUrl: string, fileName: string): { url: string; name: string }[] {
+  try {
+    const urls = JSON.parse(fileUrl);
+    const names = JSON.parse(fileName);
+    if (Array.isArray(urls) && Array.isArray(names)) {
+      return urls.map((url: string, i: number) => ({ url, name: names[i] }));
+    }
+  } catch {
+    // Not JSON — single file
+  }
+  return [{ url: fileUrl, name: fileName }];
+}
+
 export async function POST(req: NextRequest) {
   const { code } = await req.json();
 
@@ -20,5 +33,5 @@ export async function POST(req: NextRequest) {
     .update({ used: true, used_at: new Date().toISOString() })
     .eq("id", data.id);
 
-  return Response.json({ fileUrl: data.file_url, fileName: data.file_name });
+  return Response.json({ files: parseFiles(data.file_url, data.file_name) });
 }
