@@ -58,7 +58,7 @@ export default function AdminPage() {
   const [logSearch, setLogSearch] = useState("");
   const [codes, setCodes] = useState<{ id: string; code: string; file_name: string; used: boolean; created_at: string }[]>([]);
   const [codesLoading, setCodesLoading] = useState(false);
-  const [newBook, setNewBook] = useState<"both" | "ebook" | "pdf">("both");
+  const [newBook, setNewBook] = useState("both");
   const [newCustomCode, setNewCustomCode] = useState("");
   const [generatedCode, setGeneratedCode] = useState("");
 
