@@ -62,6 +62,7 @@ export default function AdminPage() {
   const [newCustomCode, setNewCustomCode] = useState("");
   const [generatedCode, setGeneratedCode] = useState("");
   const [codeError, setCodeError] = useState("");
+  const [setupDbLoading, setSetupDbLoading] = useState(false);
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -251,6 +252,27 @@ export default function AdminPage() {
       setCodes((prev) => prev.filter((c) => c.id !== id));
       showToast("Código eliminado");
     }
+  };
+
+  const handleSetupDb = async () => {
+    setSetupDbLoading(true);
+    try {
+      const res = await fetch("/api/admin/setup-db", {
+        method: "POST",
+        headers: { "x-admin-password": password },
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setCodeError("");
+        showToast("Tabla creada ✓ Ahora puedes generar códigos.");
+        await fetchCodes();
+      } else {
+        setCodeError(`Error al crear tabla: ${data.error}`);
+      }
+    } catch {
+      setCodeError("Error de conexión al intentar crear la tabla.");
+    }
+    setSetupDbLoading(false);
   };
 
   const escuelaActivos = users.filter((u) => u.activated && u.plan === "escuela").length;
@@ -804,7 +826,16 @@ export default function AdminPage() {
                   <p className="text-red-300 text-xs leading-relaxed">{codeError}</p>
                   {codeError.includes("download_codes") && (
                     <div className="mt-3">
-                      <p className="text-[#8a7a6a] text-xs mb-2">Copia y ejecuta este SQL en Supabase → SQL Editor:</p>
+                      <button
+                        onClick={handleSetupDb}
+                        disabled={setupDbLoading}
+                        className="btn-gold w-full py-2.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 mb-3 disabled:opacity-50"
+                      >
+                        {setupDbLoading
+                          ? <span className="w-4 h-4 border-2 border-[#050510]/40 border-t-[#050510] rounded-full animate-spin" />
+                          : "Crear tabla automáticamente"}
+                      </button>
+                      <p className="text-[#8a7a6a] text-xs mb-2">O copia y ejecuta este SQL manualmente en Supabase → SQL Editor:</p>
                       <div className="bg-[#050510] rounded-lg p-3 flex items-start justify-between gap-2">
                         <code className="text-green-400 text-xs leading-relaxed whitespace-pre-wrap font-mono">
 {`create table download_codes (
