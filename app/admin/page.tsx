@@ -61,6 +61,7 @@ export default function AdminPage() {
   const [newBook, setNewBook] = useState("both");
   const [newCustomCode, setNewCustomCode] = useState("");
   const [generatedCode, setGeneratedCode] = useState("");
+  const [codeError, setCodeError] = useState("");
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -214,19 +215,27 @@ export default function AdminPage() {
 
   const handleCreateCode = async () => {
     setCodesLoading(true);
-    const res = await fetch("/api/admin/download-codes", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "x-admin-password": password },
-      body: JSON.stringify({ bookId: newBook, customCode: newCustomCode || undefined }),
-    });
-    const data = await res.json();
-    if (res.ok) {
-      setGeneratedCode(data.code);
-      setNewCustomCode("");
-      await fetchCodes();
-      showToast("Código creado ✓");
-    } else {
-      showToast(data.error || "Error al crear código.");
+    setCodeError("");
+    try {
+      const res = await fetch("/api/admin/download-codes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-admin-password": password },
+        body: JSON.stringify({ bookId: newBook, customCode: newCustomCode || undefined }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setGeneratedCode(data.code);
+        setCodeError("");
+        setNewCustomCode("");
+        await fetchCodes();
+        showToast("Código creado ✓");
+      } else {
+        setCodeError(data.error === "TABLE_MISSING"
+          ? "La tabla download_codes no existe en Supabase. Ejecuta el SQL en el editor de Supabase."
+          : (data.error || "Error desconocido al crear el código."));
+      }
+    } catch (e) {
+      setCodeError("Error de conexión. Verifica tu internet e intenta de nuevo.");
     }
     setCodesLoading(false);
   };
@@ -789,7 +798,37 @@ export default function AdminPage() {
                   ? <span className="w-4 h-4 border-2 border-[#050510]/40 border-t-[#050510] rounded-full animate-spin" />
                   : <><KeyRound size={15} /> Generar código</>}
               </button>
-              {generatedCode && (
+              {codeError && (
+                <div className="mt-4 bg-red-500/10 border border-red-500/30 rounded-xl p-4">
+                  <p className="text-red-400 text-sm font-semibold mb-1">Error al crear el código</p>
+                  <p className="text-red-300 text-xs leading-relaxed">{codeError}</p>
+                  {codeError.includes("download_codes") && (
+                    <div className="mt-3">
+                      <p className="text-[#8a7a6a] text-xs mb-2">Copia y ejecuta este SQL en Supabase → SQL Editor:</p>
+                      <div className="bg-[#050510] rounded-lg p-3 flex items-start justify-between gap-2">
+                        <code className="text-green-400 text-xs leading-relaxed whitespace-pre-wrap font-mono">
+{`create table download_codes (
+  id uuid primary key default gen_random_uuid(),
+  code text unique not null,
+  file_url text not null,
+  file_name text not null,
+  used boolean default false,
+  used_at timestamptz,
+  created_at timestamptz default now()
+);`}
+                        </code>
+                        <button
+                          onClick={() => navigator.clipboard.writeText(`create table download_codes (\n  id uuid primary key default gen_random_uuid(),\n  code text unique not null,\n  file_url text not null,\n  file_name text not null,\n  used boolean default false,\n  used_at timestamptz,\n  created_at timestamptz default now()\n);`).then(() => showToast("SQL copiado ✓"))}
+                          className="shrink-0 p-1.5 text-[#6a5a4a] hover:text-[#c9a84c] transition-colors"
+                        >
+                          <Copy size={13} />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+              {generatedCode && !codeError && (
                 <div className="mt-4 bg-[#c9a84c]/10 border border-[#c9a84c]/30 rounded-xl p-4 flex items-center justify-between gap-3">
                   <div>
                     <p className="text-[#c9a84c] text-xs font-bold uppercase tracking-widest mb-1">Código generado</p>
