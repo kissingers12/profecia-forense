@@ -24,11 +24,12 @@ function getBooks() {
 export async function GET(req: NextRequest) {
   if (!checkAuth(req)) return Response.json({ error: "No autorizado." }, { status: 401 });
 
-  const { data } = await supabaseAdmin
+  const { data, error } = await supabaseAdmin
     .from("download_codes")
     .select("id, code, file_name, used, used_at, created_at")
     .order("created_at", { ascending: false });
 
+  if (error) return Response.json({ codes: [], error: error.message }, { status: 200 });
   return Response.json({ codes: data ?? [] });
 }
 
@@ -63,7 +64,9 @@ export async function POST(req: NextRequest) {
 
   if (error) {
     if (error.code === "23505") return Response.json({ error: "Ese código ya existe." }, { status: 409 });
-    return Response.json({ error: "Error al crear el código." }, { status: 500 });
+    const isNoTable = error.message?.includes("does not exist") || error.code === "42P01";
+    if (isNoTable) return Response.json({ error: "TABLE_MISSING" }, { status: 500 });
+    return Response.json({ error: `Error: ${error.message ?? error.code}` }, { status: 500 });
   }
 
   const displayName = bookId === "both" ? "eBook + PDF" : fileName;
