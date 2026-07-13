@@ -8,15 +8,9 @@ function checkAuth(req: NextRequest): boolean {
   return req.headers.get("x-admin-password") === adminPassword;
 }
 
-const BOOKS: Record<string, { name: string; url: string }> = {
-  "ebook": {
-    name: "Manual: Escuchar a Dios (eBook)",
-    url: "https://drive.google.com/uc?export=download&id=1DbteSDSIqnMWZn0Amn16YOXWx9w44owG",
-  },
-  "pdf": {
-    name: "Manual: Escuchar a Dios (PDF)",
-    url: "https://drive.google.com/uc?export=download&id=19w1bxaT0p7cHjNf4c6oWelAetdZdic68",
-  },
+const BOOKS = {
+  ebook: { name: "Manual: Escuchar a Dios (eBook)", url: "https://drive.google.com/uc?export=download&id=1DbteSDSIqnMWZn0Amn16YOXWx9w44owG" },
+  pdf:   { name: "Manual: Escuchar a Dios (PDF)",   url: "https://drive.google.com/uc?export=download&id=19w1bxaT0p7cHjNf4c6oWelAetdZdic68" },
 };
 
 export async function GET(req: NextRequest) {
@@ -24,7 +18,7 @@ export async function GET(req: NextRequest) {
 
   const { data } = await supabaseAdmin
     .from("download_codes")
-    .select("id, code, file_name, file_name_2, used, used_at, created_at")
+    .select("id, code, file_name, used, used_at, created_at")
     .order("created_at", { ascending: false });
 
   return Response.json({ codes: data ?? [] });
@@ -38,28 +32,24 @@ export async function POST(req: NextRequest) {
   const code = customCode?.trim().toUpperCase() ||
     `HOTMART-${crypto.randomBytes(3).toString("hex").toUpperCase()}`;
 
-  let insertData: Record<string, string>;
-  let displayName: string;
+  let fileUrl: string;
+  let fileName: string;
 
   if (bookId === "both") {
-    insertData = {
-      code,
-      file_url: BOOKS["ebook"].url,
-      file_name: BOOKS["ebook"].name,
-      file_url_2: BOOKS["pdf"].url,
-      file_name_2: BOOKS["pdf"].name,
-    };
-    displayName = "eBook + PDF";
+    // Store both files as JSON arrays in the existing columns
+    fileUrl = JSON.stringify([BOOKS.ebook.url, BOOKS.pdf.url]);
+    fileName = JSON.stringify([BOOKS.ebook.name, BOOKS.pdf.name]);
+  } else if (bookId === "ebook" || bookId === "pdf") {
+    const book = BOOKS[bookId as "ebook" | "pdf"];
+    fileUrl = book.url;
+    fileName = book.name;
   } else {
-    const book = BOOKS[bookId];
-    if (!book) return Response.json({ error: "Libro no válido." }, { status: 400 });
-    insertData = { code, file_url: book.url, file_name: book.name };
-    displayName = book.name;
+    return Response.json({ error: "Libro no válido." }, { status: 400 });
   }
 
   const { data, error } = await supabaseAdmin
     .from("download_codes")
-    .insert(insertData)
+    .insert({ code, file_url: fileUrl, file_name: fileName })
     .select()
     .single();
 
@@ -68,6 +58,7 @@ export async function POST(req: NextRequest) {
     return Response.json({ error: "Error al crear el código." }, { status: 500 });
   }
 
+  const displayName = bookId === "both" ? "eBook + PDF" : fileName;
   return Response.json({ code: data.code, fileName: displayName });
 }
 

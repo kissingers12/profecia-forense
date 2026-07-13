@@ -1,6 +1,19 @@
 import { NextRequest } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 
+function parseFiles(fileUrl: string, fileName: string): { url: string; name: string }[] {
+  try {
+    const urls = JSON.parse(fileUrl);
+    const names = JSON.parse(fileName);
+    if (Array.isArray(urls) && Array.isArray(names)) {
+      return urls.map((url: string, i: number) => ({ url, name: names[i] }));
+    }
+  } catch {
+    // Not JSON — single file
+  }
+  return [{ url: fileUrl, name: fileName }];
+}
+
 export async function POST(req: NextRequest) {
   const { code } = await req.json();
 
@@ -8,7 +21,7 @@ export async function POST(req: NextRequest) {
 
   const { data } = await supabaseAdmin
     .from("download_codes")
-    .select("id, file_url, file_name, file_url_2, file_name_2, used")
+    .select("id, file_url, file_name, used")
     .eq("code", code.trim().toUpperCase())
     .maybeSingle();
 
@@ -20,8 +33,5 @@ export async function POST(req: NextRequest) {
     .update({ used: true, used_at: new Date().toISOString() })
     .eq("id", data.id);
 
-  const files = [{ url: data.file_url, name: data.file_name }];
-  if (data.file_url_2) files.push({ url: data.file_url_2, name: data.file_name_2 });
-
-  return Response.json({ files });
+  return Response.json({ files: parseFiles(data.file_url, data.file_name) });
 }
