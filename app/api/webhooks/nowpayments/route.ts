@@ -23,9 +23,11 @@ function verifySignature(rawBody: string, signature: string, secret: string): bo
 }
 
 function findPlanByAmount(priceAmount: number): string | null {
-  for (const [price, plan] of Object.entries(PRICE_TO_PLAN)) {
+  // Sort descending so $777 is checked before $333 (avoids $777 matching $333 plan)
+  const entries = Object.entries(PRICE_TO_PLAN).sort((a, b) => Number(b[0]) - Number(a[0]));
+  for (const [price, plan] of entries) {
     const expected = Number(price);
-    if (priceAmount >= expected * (1 - PARTIAL_TOLERANCE)) {
+    if (priceAmount >= expected * (1 - PARTIAL_TOLERANCE) && priceAmount <= expected * 1.15) {
       return plan;
     }
   }
