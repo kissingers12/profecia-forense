@@ -63,6 +63,9 @@ export default function AdminPage() {
   const [generatedCode, setGeneratedCode] = useState("");
   const [codeError, setCodeError] = useState("");
   const [setupDbLoading, setSetupDbLoading] = useState(false);
+  const [resetEmail, setResetEmail] = useState<string | null>(null);
+  const [resetPwd, setResetPwd] = useState("");
+  const [resetLoading, setResetLoading] = useState(false);
   const [paymentCheck, setPaymentCheck] = useState<Record<string, string> | null>(null);
   const [paymentCheckLoading, setPaymentCheckLoading] = useState(false);
 
@@ -93,6 +96,29 @@ export default function AdminPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     await fetchUsers(password);
+  };
+
+  const handleResetPassword = async () => {
+    if (!resetEmail || !resetPwd) return;
+    setResetLoading(true);
+    try {
+      const res = await fetch("/api/admin/reset-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-admin-password": password },
+        body: JSON.stringify({ email: resetEmail, newPassword: resetPwd }),
+      });
+      if (res.ok) {
+        showToast("Contraseña cambiada ✓");
+        setResetEmail(null);
+        setResetPwd("");
+      } else {
+        const d = await res.json();
+        showToast(d.error || "Error al cambiar contraseña.");
+      }
+    } catch {
+      showToast("Error de conexión.");
+    }
+    setResetLoading(false);
   };
 
   const handleToggle = async (user: User) => {
@@ -528,19 +554,28 @@ export default function AdminPage() {
                       {new Date(user.created_at).toLocaleDateString("es-ES", { day: "2-digit", month: "short", year: "numeric" })}
                     </p>
                   </div>
-                  <button
-                    onClick={() => handleToggle(user)}
-                    disabled={actionLoading === user.email}
-                    className={`shrink-0 px-5 py-2 rounded-xl text-sm font-bold transition-all ${
-                      user.activated
-                        ? "bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20"
-                        : "btn-gold"
-                    }`}
-                  >
-                    {actionLoading === user.email ? (
-                      <span className="w-4 h-4 border-2 border-current/40 border-t-current rounded-full animate-spin inline-block" />
-                    ) : user.activated ? "Desactivar" : "Activar acceso"}
-                  </button>
+                  <div className="flex flex-col gap-2 shrink-0">
+                    <button
+                      onClick={() => handleToggle(user)}
+                      disabled={actionLoading === user.email}
+                      className={`px-5 py-2 rounded-xl text-sm font-bold transition-all ${
+                        user.activated
+                          ? "bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20"
+                          : "btn-gold"
+                      }`}
+                    >
+                      {actionLoading === user.email ? (
+                        <span className="w-4 h-4 border-2 border-current/40 border-t-current rounded-full animate-spin inline-block" />
+                      ) : user.activated ? "Desactivar" : "Activar acceso"}
+                    </button>
+                    <button
+                      onClick={() => { setResetEmail(user.email); setResetPwd(""); }}
+                      className="flex items-center justify-center gap-1.5 px-5 py-2 rounded-xl text-sm font-bold bg-white/5 text-[#c9a84c] border border-[#c9a84c]/20 hover:bg-[#c9a84c]/10 transition-all"
+                    >
+                      <KeyRound size={13} />
+                      Contraseña
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -983,6 +1018,44 @@ export default function AdminPage() {
           </div>
         )}
       </main>
+
+      {/* Reset password modal */}
+      {resetEmail && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
+          <div className="card-dark rounded-2xl p-6 w-full max-w-sm border border-[#c9a84c]/30">
+            <h3 className="text-white font-bold mb-1 flex items-center gap-2">
+              <KeyRound size={16} className="text-[#c9a84c]" />
+              Cambiar contraseña
+            </h3>
+            <p className="text-[#8a7a6a] text-xs mb-4 truncate">{resetEmail}</p>
+            <input
+              type="password"
+              value={resetPwd}
+              onChange={(e) => setResetPwd(e.target.value)}
+              placeholder="Nueva contraseña (mín. 6 caracteres)"
+              className="w-full bg-white/5 border border-[#c9a84c]/20 rounded-xl px-4 py-3 text-white placeholder-[#4a3a2a] text-sm focus:outline-none focus:border-[#c9a84c]/60 mb-4"
+              onKeyDown={(e) => e.key === "Enter" && handleResetPassword()}
+            />
+            <div className="flex gap-3">
+              <button
+                onClick={() => { setResetEmail(null); setResetPwd(""); }}
+                className="flex-1 py-2.5 rounded-xl text-sm font-bold bg-white/5 text-[#8a7a6a] hover:text-white border border-white/10 transition-all"
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={handleResetPassword}
+                disabled={resetLoading || resetPwd.length < 6}
+                className="flex-1 py-2.5 rounded-xl text-sm font-bold btn-gold disabled:opacity-50 transition-all"
+              >
+                {resetLoading ? (
+                  <span className="w-4 h-4 border-2 border-[#050510]/40 border-t-[#050510] rounded-full animate-spin inline-block" />
+                ) : "Guardar"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
