@@ -84,6 +84,7 @@ export default function Dashboard() {
   const router = useRouter();
   const [session, setSession] = useState<UserSession | null>(null);
   const [activeLesson, setActiveLesson] = useState<number | null>(null);
+  const [openGroups, setOpenGroups] = useState<Set<number>>(new Set());
   const [watchedIds, setWatchedIds] = useState<Set<number>>(new Set());
   const [activationCode, setActivationCode] = useState("");
   const [activationError, setActivationError] = useState("");
@@ -634,6 +635,10 @@ export default function Dashboard() {
               const next = flatContent.find(l => l.unlocked && !watchedIds.has(l.id)) ?? flatContent[0];
               markWatched(next.id);
               setActiveLesson(next.id);
+              if (isEscuela) {
+                const gi = escuelaGroups.findIndex(g => g.lessons.some(l => l.id === next.id));
+                if (gi >= 0) setOpenGroups(prev => new Set(prev).add(gi));
+              }
             }}
             className="btn-gold px-6 py-3 rounded-xl font-bold flex items-center gap-2 shrink-0"
           >
@@ -730,22 +735,44 @@ export default function Dashboard() {
         </h2>
 
         {isEscuela ? (
-          <div className="space-y-10">
-            {escuelaGroups.map((group, gi) => (
-              <div key={gi}>
-                <h3 className="text-[#c9a84c] text-xs font-bold uppercase tracking-[0.25em] mb-4 flex items-center gap-2">
-                  <span className="w-6 h-px bg-[#c9a84c]/40" />
-                  {group.groupTitle}
-                  <span className="flex-1 h-px bg-[#c9a84c]/20" />
-                </h3>
+          <div className="space-y-4">
+            {escuelaGroups.map((group, gi) => {
+              const isOpen = openGroups.has(gi);
+              return (
+                <div key={gi} className={`rounded-2xl border transition-colors ${isOpen ? "border-[#c9a84c]/30 bg-[#c9a84c]/[0.03]" : "border-white/10"}`}>
+                  <button
+                    onClick={() => {
+                      setOpenGroups((prev) => {
+                        const next = new Set(prev);
+                        if (next.has(gi)) next.delete(gi); else next.add(gi);
+                        return next;
+                      });
+                    }}
+                    className="w-full flex items-center gap-3 p-5 text-left cursor-pointer group"
+                  >
+                    <span className="w-6 h-px bg-[#c9a84c]/40 shrink-0" />
+                    <span className="text-[#c9a84c] text-xs font-bold uppercase tracking-[0.25em] flex-1">
+                      {group.groupTitle}
+                    </span>
+                    <span className="text-[#6a5a4a] text-xs shrink-0">
+                      {group.lessons.length} {group.lessons.length === 1 ? "clase" : "clases"}
+                    </span>
+                    <ChevronRight
+                      size={18}
+                      className={`text-[#c9a84c] shrink-0 transition-transform duration-200 ${isOpen ? "rotate-90" : ""}`}
+                    />
+                  </button>
 
-                <div className="space-y-3">
-                  {group.lessons.map((lesson, i) => (
-                    <LessonButton key={lesson.id} lesson={lesson} index={i} />
-                  ))}
+                  {isOpen && (
+                    <div className="space-y-3 px-4 pb-4">
+                      {group.lessons.map((lesson, i) => (
+                        <LessonButton key={lesson.id} lesson={lesson} index={i} />
+                      ))}
+                    </div>
+                  )}
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         ) : (
           <div className="space-y-3">
