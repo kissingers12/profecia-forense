@@ -67,7 +67,13 @@ const escuelaGroups: Group[] = [
       { id: 208, title: "(Parte 1) esto me hizo millonario", duration: "", unlocked: true, vimeoId: "1204621966" },
       { id: 209, title: "(Parte 2) esto me hizo millonario", duration: "", unlocked: true, vimeoId: "1204621894" },
       { id: 210, title: "Si lo crees ya eres profeta", duration: "", unlocked: true, vimeoId: "1204621749" },
-      { id: 211, title: "Próximamente", duration: "", unlocked: false, vimeoId: null },
+    ],
+  },
+  {
+    groupTitle: "Profecía Forense",
+    lessons: [
+      { id: 301, title: "Profecía Forense 1", duration: "", unlocked: true, vimeoId: "1213817829" },
+      { id: 302, title: "Próximamente", duration: "", unlocked: false, vimeoId: null },
     ],
   },
 ];
