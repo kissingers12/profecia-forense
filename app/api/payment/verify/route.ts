@@ -19,6 +19,8 @@ export async function POST(req: NextRequest) {
   if (!user) return Response.json({ error: "Cuenta no encontrada." }, { status: 404 });
   if (user.activated) return Response.json({ activated: true });
 
+  const PLAN_PRICES: Record<string, number> = { escuela: 777, meditaciones: 333 };
+
   try {
     // Query payments by order_id (email)
     const res = await fetch(
@@ -34,10 +36,15 @@ export async function POST(req: NextRequest) {
     const data = await res.json();
     const payments: Record<string, unknown>[] = data.data ?? [];
 
+    const expectedPrice = user.plan ? (PLAN_PRICES[user.plan] ?? 0) : 0;
+
     const confirmed = payments.find((p) => {
       const status = p.payment_status as string;
       const priceAmount = Number(p.price_amount ?? 0);
       const actuallyPaid = Number(p.actually_paid ?? 0);
+
+      // Verify the payment amount corresponds to the user's registered plan
+      if (expectedPrice > 0 && priceAmount < expectedPrice * (1 - PARTIAL_TOLERANCE)) return false;
 
       if (status === "finished" || status === "confirmed") return true;
 

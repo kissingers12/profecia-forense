@@ -84,6 +84,19 @@ export async function POST(req: NextRequest) {
   }
 
   if (orderId && orderId.includes("@")) {
+    const { data: planUser } = await supabaseAdmin
+      .from("users")
+      .select("plan")
+      .eq("email", orderId.toLowerCase())
+      .maybeSingle();
+
+    const planForAmount = findPlanByAmount(priceAmount);
+
+    if (planUser && planForAmount && planForAmount !== planUser.plan) {
+      await log("WEBHOOK_PLAN_MISMATCH", `email=${orderId} paid_plan=${planForAmount} registered_plan=${planUser.plan} amount=${priceAmount}`);
+      return Response.json({ ok: true, skipped: true });
+    }
+
     const { error } = await supabaseAdmin
       .from("users")
       .update({ activated: true })
