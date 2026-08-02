@@ -7,7 +7,10 @@ const PRICE_TO_PLAN: Record<number, string> = {
   777: "escuela",
 };
 
-const PARTIAL_TOLERANCE = 0.02;
+// $20 absolute fiat tolerance (covers crypto conversion fees)
+const FIAT_TOLERANCE = 20;
+// 2.6% crypto-to-crypto tolerance (for when outcome_amount is unavailable)
+const CRYPTO_TOLERANCE = 0.026;
 
 async function log(event: string, detail: string) {
   await supabaseAdmin.from("activity_logs").insert({
@@ -33,7 +36,7 @@ function findPlanByAmount(priceAmount: number): string | null {
   const entries = Object.entries(PRICE_TO_PLAN).sort((a, b) => Number(b[0]) - Number(a[0]));
   for (const [price, plan] of entries) {
     const expected = Number(price);
-    if (priceAmount >= expected * (1 - PARTIAL_TOLERANCE) && priceAmount <= expected * 1.15) {
+    if (priceAmount >= expected - FIAT_TOLERANCE && priceAmount <= expected * 1.15) {
       return plan;
     }
   }
@@ -67,16 +70,25 @@ export async function POST(req: NextRequest) {
 
   const status = payload.payment_status as string;
   const orderId = (payload.order_id as string | undefined) ?? "";
-  const priceAmount = Number(payload.price_amount);
-  const actuallyPaid = Number(payload.actually_paid ?? 0);
+  const priceAmount = Number(payload.price_amount);          // USD requested (e.g. 777)
+  const actuallyPaid = Number(payload.actually_paid ?? 0);   // crypto paid (e.g. 0.012 BTC)
+  const payAmount = Number(payload.pay_amount ?? 0);         // crypto required (e.g. 0.01231 BTC)
+  const outcomeAmount = Number(payload.outcome_amount ?? 0); // fiat/USDC actually received (e.g. 765)
 
-  await log("WEBHOOK_OK", `status=${status} order_id=${orderId} amount=${priceAmount}`);
+  await log("WEBHOOK_OK", `status=${status} order_id=${orderId} price=${priceAmount} actually_paid=${actuallyPaid} outcome=${outcomeAmount}`);
 
   const isFinished = status === "finished" || status === "confirmed";
   const isPartialOk =
     status === "partially_paid" &&
     actuallyPaid > 0 &&
-    actuallyPaid >= priceAmount * (1 - PARTIAL_TOLERANCE);
+    (
+      // Best: outcome_amount is already converted to stablecoin/fiat — compare directly
+      (outcomeAmount > 0 && outcomeAmount >= priceAmount - FIAT_TOLERANCE) ||
+      // Good: compare crypto paid vs crypto required (same units, no currency mismatch)
+      (payAmount > 0 && actuallyPaid >= payAmount * (1 - CRYPTO_TOLERANCE)) ||
+      // Fallback: stablecoin payments where actually_paid ≈ USD
+      actuallyPaid >= priceAmount - FIAT_TOLERANCE
+    );
 
   if (!isFinished && !isPartialOk) {
     await log("WEBHOOK_SKIP", `status=${status} — not final`);
@@ -84,6 +96,19 @@ export async function POST(req: NextRequest) {
   }
 
   if (orderId && orderId.includes("@")) {
+    const { data: planUser } = await supabaseAdmin
+      .from("users")
+      .select("plan")
+      .eq("email", orderId.toLowerCase())
+      .maybeSingle();
+
+    const planForAmount = findPlanByAmount(priceAmount);
+
+    if (planUser && planForAmount && planForAmount !== planUser.plan) {
+      await log("WEBHOOK_PLAN_MISMATCH", `email=${orderId} paid_plan=${planForAmount} registered_plan=${planUser.plan} amount=${priceAmount}`);
+      return Response.json({ ok: true, skipped: true });
+    }
+
     const { error } = await supabaseAdmin
       .from("users")
       .update({ activated: true })

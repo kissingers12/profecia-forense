@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
     .eq("id", user.id);
 
   await resend.emails.send({
-    from: "100x100Cristianos <onboarding@resend.dev>",
+    from: process.env.RESEND_FROM_EMAIL ?? "100x100Cristianos <onboarding@resend.dev>",
     to: email.toLowerCase(),
     subject: "Recupera tu contraseña — 100x100Cristianos",
     html: `
