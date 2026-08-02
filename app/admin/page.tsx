@@ -761,6 +761,7 @@ export default function AdminPage() {
                           onClick={() => {
                             setEditingPost(editingPost === post.id ? null : post.id);
                             setEditAnswers((prev) => ({ ...prev, [post.id]: post.answer ?? "" }));
+                            setForoResponder((prev) => ({ ...prev, [post.id]: post.responder_name ?? "Kissingers" }));
                           }}
                           className="text-[10px] text-[#6a5a4a] hover:text-[#c9a84c] transition-colors flex items-center gap-1"
                         >
@@ -769,6 +770,14 @@ export default function AdminPage() {
                       </div>
                       {editingPost === post.id ? (
                         <div className="flex flex-col gap-2 mt-2">
+                          <select
+                            value={foroResponder[post.id] ?? "Kissingers"}
+                            onChange={(e) => setForoResponder((prev) => ({ ...prev, [post.id]: e.target.value }))}
+                            className="bg-white/5 border border-[#c9a84c]/20 rounded-xl px-3 py-2 text-[#c9a84c] text-xs font-bold focus:outline-none focus:border-[#c9a84c]/60 w-fit"
+                          >
+                            <option value="Kissingers">Kissingers</option>
+                            <option value="Servicio al Estudiante">Servicio al Estudiante</option>
+                          </select>
                           <textarea
                             value={editAnswers[post.id] ?? ""}
                             onChange={(e) => setEditAnswers((prev) => ({ ...prev, [post.id]: e.target.value }))}
