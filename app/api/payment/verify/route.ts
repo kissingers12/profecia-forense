@@ -1,7 +1,8 @@
 import { NextRequest } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 
-const PARTIAL_TOLERANCE = 0.02; // accept if paid ≥ 98% of required
+const FIAT_TOLERANCE = 20;    // accept if within $20 of required price
+const CRYPTO_TOLERANCE = 0.026; // 2.6% for crypto-to-crypto comparison
 
 export async function POST(req: NextRequest) {
   const { email } = await req.json();
@@ -40,17 +41,23 @@ export async function POST(req: NextRequest) {
 
     const confirmed = payments.find((p) => {
       const status = p.payment_status as string;
-      const priceAmount = Number(p.price_amount ?? 0);
-      const actuallyPaid = Number(p.actually_paid ?? 0);
+      const priceAmount = Number(p.price_amount ?? 0);    // USD requested
+      const actuallyPaid = Number(p.actually_paid ?? 0);  // crypto paid
+      const payAmount = Number(p.pay_amount ?? 0);        // crypto required
+      const outcomeAmount = Number(p.outcome_amount ?? 0); // fiat/USDC received
 
-      // Verify the payment amount corresponds to the user's registered plan
-      if (expectedPrice > 0 && priceAmount < expectedPrice * (1 - PARTIAL_TOLERANCE)) return false;
+      // Verify this payment was for the correct plan (price_amount set by our system)
+      if (expectedPrice > 0 && priceAmount < expectedPrice - FIAT_TOLERANCE) return false;
 
       if (status === "finished" || status === "confirmed") return true;
 
-      // Accept partially_paid if within tolerance
-      if (status === "partially_paid" && actuallyPaid > 0 && priceAmount > 0) {
-        return actuallyPaid >= priceAmount * (1 - PARTIAL_TOLERANCE);
+      // Accept partially_paid if within $20 tolerance
+      if (status === "partially_paid" && actuallyPaid > 0) {
+        return (
+          (outcomeAmount > 0 && outcomeAmount >= priceAmount - FIAT_TOLERANCE) ||
+          (payAmount > 0 && actuallyPaid >= payAmount * (1 - CRYPTO_TOLERANCE)) ||
+          actuallyPaid >= priceAmount - FIAT_TOLERANCE
+        );
       }
 
       return false;
