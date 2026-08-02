@@ -808,19 +808,18 @@ export default function AdminPage() {
                         <option value="Kissingers">Kissingers</option>
                         <option value="Servicio al Estudiante">Servicio al Estudiante</option>
                       </select>
-                    <div className="flex gap-2">
-                      <input
-                        type="text"
+                    <div className="flex flex-col gap-2">
+                      <textarea
                         value={foroAnswers[post.id] ?? ""}
                         onChange={(e) => setForoAnswers((prev) => ({ ...prev, [post.id]: e.target.value }))}
                         placeholder="Escribe tu respuesta..."
-                        className="flex-1 bg-white/5 border border-[#c9a84c]/20 rounded-xl px-4 py-2.5 text-white placeholder-[#4a3a2a] text-sm focus:outline-none focus:border-[#c9a84c]/60"
-                        onKeyDown={(e) => { if (e.key === "Enter") handleForoAnswer(post.id); }}
+                        rows={4}
+                        className="w-full bg-white/5 border border-[#c9a84c]/20 rounded-xl px-4 py-2.5 text-white placeholder-[#4a3a2a] text-sm focus:outline-none focus:border-[#c9a84c]/60 resize-none"
                       />
                       <button
                         onClick={() => handleForoAnswer(post.id)}
                         disabled={foroLoading === post.id || !foroAnswers[post.id]?.trim()}
-                        className="btn-gold px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-1.5 shrink-0 disabled:opacity-50"
+                        className="btn-gold px-4 py-2.5 rounded-xl text-sm font-bold flex items-center gap-1.5 self-end disabled:opacity-50"
                       >
                         {foroLoading === post.id
                           ? <span className="w-4 h-4 border-2 border-[#050510]/40 border-t-[#050510] rounded-full animate-spin" />
