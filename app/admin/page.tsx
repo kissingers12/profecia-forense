@@ -802,15 +802,29 @@ export default function AdminPage() {
               </div>
             ) : (
               <div className="space-y-2">
-                {filteredLogs.map((log) => (
+                {filteredLogs.map((log) => {
+                  // Los avisos técnicos de NOWPayments llevan el detalle en `action`,
+                  // así que se identifican por quién los escribe, no por su texto
+                  const esWebhook = log.user_email === "webhook@nowpayments";
+                  const etiquetaWebhook =
+                    log.user_name === "WEBHOOK_ACTIVATED" ? "Cliente activado por pago" :
+                    log.user_name === "WEBHOOK_SIG_FAIL" ? "Aviso rechazado (clave incorrecta)" :
+                    log.user_name === "WEBHOOK_RECEIVED" ? "Aviso de pago recibido" :
+                    log.user_name === "WEBHOOK_OK" ? "Aviso verificado" :
+                    log.user_name === "WEBHOOK_SKIP" ? "Aviso sin pago completo" :
+                    log.user_name === "WEBHOOK_PLAN_MISMATCH" ? "Importe no coincide con el plan" :
+                    "Aviso de NOWPayments";
+                  return (
                   <div key={log.id} className="card-dark rounded-xl px-5 py-3 flex items-center gap-4">
                     <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                      esWebhook ? "bg-white/5 border border-white/10" :
                       log.action === "course_access" ? "bg-green-500/10 border border-green-500/20" :
                       log.action === "login" ? "bg-blue-500/10 border border-blue-500/20" :
                       log.action === "register" ? "bg-purple-500/10 border border-purple-500/20" :
                       "bg-[#c9a84c]/10 border border-[#c9a84c]/20"
                     }`}>
-                      {log.action === "course_access" ? <PlayCircle size={14} className="text-green-400" />
+                      {esWebhook ? <DollarSign size={14} className="text-[#8a7a6a]" />
+                        : log.action === "course_access" ? <PlayCircle size={14} className="text-green-400" />
                         : log.action === "login" ? <LogIn size={14} className="text-blue-400" />
                         : log.action === "register" ? <UserPlus size={14} className="text-purple-400" />
                         : <Download size={14} className="text-[#c9a84c]" />
@@ -818,26 +832,32 @@ export default function AdminPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-white text-sm font-semibold truncate">{log.user_name || log.user_email}</p>
-                      <p className="text-[#8a7a6a] text-xs truncate">{log.user_email}</p>
+                      <p className="text-[#8a7a6a] text-xs truncate">
+                        {esWebhook ? log.action : log.user_email}
+                      </p>
                     </div>
                     <div className="text-right shrink-0">
                       <p className={`text-xs font-bold ${
+                        esWebhook ? (log.user_name === "WEBHOOK_SIG_FAIL" ? "text-red-400" : "text-[#8a7a6a]") :
                         log.action === "course_access" ? "text-green-400" :
                         log.action === "login" ? "text-blue-400" :
                         log.action === "register" ? "text-purple-400" :
                         "text-[#c9a84c]"
                       }`}>
-                        {log.action === "course_access" ? "Entró al curso" :
+                        {esWebhook ? etiquetaWebhook :
+                         log.action === "course_access" ? "Entró al curso" :
                          log.action === "login" ? "Inició sesión" :
                          log.action === "register" ? "Se registró" :
-                         log.action === "download_pdf" ? "Descargó PDF" : "Descargó eBook"}
+                         log.action === "download_pdf" ? "Descargó PDF" :
+                         log.action === "download_epub" ? "Descargó eBook" : log.action}
                       </p>
                       <p className="text-[#6a5a4a] text-xs">
                         {new Date(log.created_at).toLocaleString("es-ES", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}
                       </p>
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </>
