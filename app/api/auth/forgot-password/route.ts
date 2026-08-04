@@ -2,12 +2,23 @@ import { NextRequest } from "next/server";
 import crypto from "crypto";
 import { supabaseAdmin } from "@/lib/supabase";
 import { Resend } from "resend";
+import { allow, clientIp } from "@/lib/rate-limit";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(req: NextRequest) {
   const { email } = await req.json();
   if (!email) return Response.json({ error: "Correo requerido." }, { status: 400 });
+
+  // Evita que alguien inunde de correos a un alumno pidiendo códigos sin parar:
+  // 4 códigos por alumno cada 4 h, y 15 por dispositivo cada 24 h
+  if (
+    !allow("olvide-cuenta", String(email).toLowerCase(), 4, 4 * 60 * 60_000) ||
+    !allow("olvide-ip", clientIp(req), 15, 24 * 60 * 60_000)
+  ) {
+    // Se responde igual que en el caso normal para no dar pistas
+    return Response.json({ success: true });
+  }
 
   const { data: user } = await supabaseAdmin
     .from("users")

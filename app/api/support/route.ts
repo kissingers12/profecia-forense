@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import { supabaseAdmin } from "@/lib/supabase";
+import { allow, clientIp } from "@/lib/rate-limit";
 
 const PLAN_LABELS: Record<string, string> = {
   meditaciones: "Meditación Profética — $333",
   escuela: "Escuela Avanzada de Profecía — $777",
+  clases: "Escuela de Profetas Todas las Clases — $555",
 };
 
 function escapeHtml(str: string): string {
@@ -22,6 +24,23 @@ export async function POST(req: NextRequest) {
 
     if (!email) {
       return NextResponse.json({ ok: false, error: "Email requerido." }, { status: 400 });
+    }
+
+    // Evita que un bot llene el buzón de soporte de mensajes:
+    // 3 por persona y 10 por dispositivo cada 24 h
+    const DIA = 24 * 60 * 60_000;
+    if (
+      !allow("soporte-cuenta", String(email).toLowerCase(), 3, DIA) ||
+      !allow("soporte-ip", clientIp(req), 10, DIA)
+    ) {
+      return NextResponse.json(
+        { ok: false, error: "Ya recibimos tu solicitud. Te responderemos pronto." },
+        { status: 429 }
+      );
+    }
+
+    if (typeof message === "string" && message.length > 2000) {
+      return NextResponse.json({ ok: false, error: "El mensaje es demasiado largo." }, { status: 400 });
     }
 
     // Only allow registered users to send support requests

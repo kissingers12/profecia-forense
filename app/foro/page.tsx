@@ -28,8 +28,9 @@ export default function ForoPage() {
 
   useEffect(() => {
     const s = getSession();
-    if (!s || !s.activated) {
-      router.push("/login");
+    // El foro es exclusivo de la Escuela Avanzada ($777); el plan "clases" no lo incluye
+    if (!s || !s.activated || s.plan !== "escuela") {
+      router.push(!s ? "/login" : "/dashboard");
       return;
     }
     setSession(s);

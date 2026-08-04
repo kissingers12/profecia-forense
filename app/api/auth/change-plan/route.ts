@@ -4,11 +4,13 @@ import { supabaseAdmin } from "@/lib/supabase";
 const PLAN_PRICES: Record<string, number> = {
   meditaciones: 333,
   escuela: 777,
+  clases: 555,
 };
 
 const PLAN_LABELS: Record<string, string> = {
   meditaciones: "Meditación Profética - 100x100Cristianos",
   escuela: "Escuela Avanzada de Profecía - 100x100Cristianos",
+  clases: "Escuela de Profetas Todas las Clases - 100x100Cristianos",
 };
 
 const FALLBACK_URLS: Record<string, string> = {
@@ -21,6 +23,10 @@ export async function PATCH(req: NextRequest) {
 
   if (!email || !newPlan || !PLAN_PRICES[newPlan]) {
     return Response.json({ error: "Datos inválidos." }, { status: 400 });
+  }
+
+  if (newPlan === "escuela") {
+    return Response.json({ error: "Las plazas de la Escuela Avanzada están agotadas por el momento." }, { status: 400 });
   }
 
   const { data: user } = await supabaseAdmin
@@ -55,9 +61,9 @@ export async function PATCH(req: NextRequest) {
           price_currency: "usd",
           order_id: email.toLowerCase(),
           order_description: PLAN_LABELS[newPlan],
-          ipn_callback_url: "https://kissingersaraque.com/api/webhooks/nowpayments",
-          success_url: "https://kissingersaraque.com/dashboard",
-          cancel_url: "https://kissingersaraque.com/login",
+          ipn_callback_url: "https://www.kissingersaraque.com/api/webhooks/nowpayments",
+          success_url: "https://www.kissingersaraque.com/dashboard",
+          cancel_url: "https://www.kissingersaraque.com/login",
         }),
       });
       const data = await res.json();

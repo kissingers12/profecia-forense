@@ -1,12 +1,25 @@
 import { NextRequest } from "next/server";
 import bcrypt from "bcryptjs";
 import { supabaseAdmin } from "@/lib/supabase";
+import { allow, reset, clientIp } from "@/lib/rate-limit";
+
+const DIA = 24 * 60 * 60_000;
 
 export async function POST(req: NextRequest) {
   const { email, password } = await req.json();
 
   if (!email || !password) {
     return Response.json({ error: "Datos incompletos." }, { status: 400 });
+  }
+
+  // Freno anti fuerza bruta: por cuenta y por dispositivo, ventana de 24 h
+  const ip = clientIp(req);
+  const cuenta = String(email).toLowerCase();
+  if (!allow("login-cuenta", cuenta, 10, DIA) || !allow("login-ip", ip, 40, DIA)) {
+    return Response.json(
+      { error: "Demasiados intentos fallidos. Si olvidaste tu contraseña, usa «¿Olvidaste tu contraseña?» para recuperarla." },
+      { status: 429 }
+    );
   }
 
   const { data: user, error } = await supabaseAdmin
@@ -23,6 +36,9 @@ export async function POST(req: NextRequest) {
   if (!valid) {
     return Response.json({ error: "Correo o contraseña incorrectos." }, { status: 401 });
   }
+
+  // Entró bien: se limpia el contador de intentos de esa cuenta
+  reset("login-cuenta", cuenta);
 
   // Log login or course access depending on activation status
   supabaseAdmin.from("activity_logs").insert({

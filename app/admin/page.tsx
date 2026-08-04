@@ -32,10 +32,39 @@ type ForoPost = {
   responder_name: string | null;
 };
 
+type PaymentRow = {
+  id: number;
+  email: string;
+  fecha: string;
+  status: string;
+  precio: number;
+  pagado: number;
+  moneda: string;
+  recibido: number;
+  paymentId: string;
+  nombre: string | null;
+  plan: string | null;
+  activado: boolean | null;
+};
+
 const PLAN_LABELS: Record<string, string> = {
   meditaciones: "Meditación $333",
   mentoria: "Mentoría $555",
   escuela: "Escuela $777",
+  clases: "Clases $555",
+};
+
+// Estados de NOWPayments traducidos
+const PAYMENT_STATUS: Record<string, { label: string; color: string }> = {
+  waiting: { label: "Esperando pago", color: "text-[#8a7a6a] bg-white/5 border-white/10" },
+  confirming: { label: "Confirmando en la red", color: "text-blue-400 bg-blue-500/10 border-blue-500/20" },
+  confirmed: { label: "Confirmado", color: "text-green-400 bg-green-500/10 border-green-500/20" },
+  sending: { label: "Enviando", color: "text-blue-400 bg-blue-500/10 border-blue-500/20" },
+  partially_paid: { label: "PAGO PARCIAL", color: "text-orange-400 bg-orange-500/10 border-orange-500/30" },
+  finished: { label: "PAGADO ✓", color: "text-green-400 bg-green-500/10 border-green-500/30" },
+  failed: { label: "Fallido", color: "text-red-400 bg-red-500/10 border-red-500/20" },
+  refunded: { label: "Reembolsado", color: "text-red-400 bg-red-500/10 border-red-500/20" },
+  expired: { label: "Caducado", color: "text-[#6a5a4a] bg-white/5 border-white/10" },
 };
 
 type PaymentEntry = {
@@ -70,7 +99,9 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [toast, setToast] = useState("");
-  const [activeTab, setActiveTab] = useState<"clientes" | "actividad" | "ingresos" | "foro" | "hotmart">("clientes");
+  const [activeTab, setActiveTab] = useState<"clientes" | "pagos" | "actividad" | "ingresos" | "foro" | "hotmart">("clientes");
+  const [payments, setPayments] = useState<PaymentRow[]>([]);
+  const [paymentsLoading, setPaymentsLoading] = useState(false);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "pending">("all");
   const [logSearch, setLogSearch] = useState("");
@@ -153,14 +184,57 @@ export default function AdminPage() {
         },
         body: JSON.stringify({ email: user.email, activated: !user.activated }),
       });
+      const data = await res.json().catch(() => ({}));
       if (res.ok) {
         setUsers((prev) =>
           prev.map((u) => u.email === user.email ? { ...u, activated: !u.activated } : u)
         );
-        showToast(user.activated ? `${user.name} desactivado` : `${user.name} activado ✓`);
+        if (user.activated) {
+          showToast(`${user.name} desactivado`);
+        } else if (data.emailSent) {
+          showToast(`${user.name} activado ✓ · correo de bienvenida enviado 📧`);
+        } else {
+          showToast(`${user.name} activado ✓ · el correo NO salió: ${data.emailError ?? "error desconocido"}`);
+        }
       }
     } catch {
       showToast("Error al actualizar.");
+    }
+    setActionLoading(null);
+  };
+
+  const fetchPayments = async () => {
+    setPaymentsLoading(true);
+    try {
+      const res = await fetch("/api/admin/payments", { headers: { "x-admin-password": password } });
+      if (res.ok) setPayments((await res.json()).payments ?? []);
+    } catch {
+      showToast("Error al cargar los pagos.");
+    }
+    setPaymentsLoading(false);
+  };
+
+  const handleDeleteUser = async (user: User) => {
+    const ok = window.confirm(
+      `¿Eliminar el registro de ${user.name} (${user.email})?\n\nPodrá registrarse de nuevo en el futuro y elegir otro plan.`
+    );
+    if (!ok) return;
+    setActionLoading(user.email);
+    try {
+      const res = await fetch("/api/admin/users", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json", "x-admin-password": password },
+        body: JSON.stringify({ email: user.email }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setUsers((prev) => prev.filter((u) => u.email !== user.email));
+        showToast("Registro eliminado ✓");
+      } else {
+        showToast(data.error ?? "Error al eliminar.");
+      }
+    } catch {
+      showToast("Error de conexión.");
     }
     setActionLoading(null);
   };
@@ -313,10 +387,10 @@ export default function AdminPage() {
       const data = await res.json();
       if (res.ok) {
         setCodeError("");
-        showToast("Tabla creada ✓ Ahora puedes generar códigos.");
+        showToast(data.message ?? "Base de datos actualizada ✓");
         await fetchCodes();
       } else {
-        setCodeError(`Error al crear tabla: ${data.error}`);
+        setCodeError(`Error al actualizar la base de datos: ${data.error}`);
       }
     } catch {
       setCodeError("Error de conexión al intentar crear la tabla.");
@@ -377,7 +451,8 @@ export default function AdminPage() {
   const escuelaActivos = users.filter((u) => u.activated && u.plan === "escuela").length;
   const mentoriaActivos = users.filter((u) => u.activated && u.plan === "mentoria").length;
   const meditActivos = users.filter((u) => u.activated && u.plan === "meditaciones").length;
-  const totalRevenue = escuelaActivos * 777 + mentoriaActivos * 555 + meditActivos * 333;
+  const clasesActivos = users.filter((u) => u.activated && u.plan === "clases").length;
+  const totalRevenue = escuelaActivos * 777 + meditActivos * 333 + clasesActivos * 555;
 
   const filteredLogs = logSearch.trim()
     ? logs.filter((l) =>
@@ -493,6 +568,17 @@ export default function AdminPage() {
           >
             <Users size={15} />
             Clientes
+          </button>
+          <button
+            onClick={() => { setActiveTab("pagos"); fetchPayments(); }}
+            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-bold rounded-t-xl transition-all ${
+              activeTab === "pagos"
+                ? "text-[#c9a84c] border-b-2 border-[#c9a84c]"
+                : "text-[#6a5a4a] hover:text-white"
+            }`}
+          >
+            <DollarSign size={15} />
+            Pagos
           </button>
           <button
             onClick={() => setActiveTab("actividad")}
@@ -633,6 +719,17 @@ export default function AdminPage() {
                       <KeyRound size={13} />
                       Contraseña
                     </button>
+                    {!user.activated && (
+                      <button
+                        onClick={() => handleDeleteUser(user)}
+                        disabled={actionLoading === user.email}
+                        title="Eliminar registro (podrá registrarse de nuevo)"
+                        className="flex items-center justify-center gap-1.5 px-5 py-1.5 rounded-xl text-xs font-bold text-red-400/80 border border-red-500/20 hover:bg-red-500/10 hover:text-red-400 transition-all"
+                      >
+                        <Trash2 size={12} />
+                        Eliminar
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}
@@ -640,6 +737,112 @@ export default function AdminPage() {
               )}
             </>
           )
+        )}
+
+        {/* Tab: Pagos */}
+        {activeTab === "pagos" && (
+          <div className="space-y-4">
+            <div className="card-dark rounded-2xl p-5 border border-[#c9a84c]/15">
+              <div className="flex items-start justify-between gap-4 flex-wrap">
+                <div>
+                  <p className="text-[#c9a84c] text-xs font-bold uppercase tracking-widest mb-1">Pagos recibidos de NOWPayments</p>
+                  <p className="text-[#8a7a6a] text-xs leading-relaxed max-w-xl">
+                    Cada aviso que NOWPayments envía al cobrar aparece aquí: quién pagó, su correo y cuánto.
+                    Incluye los pagos parciales. Si alguien pagó y no tiene acceso, actívalo con un clic desde aquí.
+                  </p>
+                </div>
+                <button
+                  onClick={fetchPayments}
+                  disabled={paymentsLoading}
+                  className="btn-gold px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 disabled:opacity-50 shrink-0"
+                >
+                  <RefreshCw size={13} className={paymentsLoading ? "animate-spin" : ""} />
+                  Actualizar
+                </button>
+              </div>
+            </div>
+
+            {paymentsLoading ? (
+              <div className="text-center py-10">
+                <span className="w-6 h-6 border-2 border-[#c9a84c]/40 border-t-[#c9a84c] rounded-full animate-spin inline-block" />
+              </div>
+            ) : payments.length === 0 ? (
+              <div className="card-dark rounded-2xl p-8 text-center">
+                <DollarSign size={30} className="text-[#c9a84c]/30 mx-auto mb-3" />
+                <p className="text-white font-semibold text-sm mb-1">Aún no hay pagos registrados</p>
+                <p className="text-[#6a5a4a] text-xs max-w-md mx-auto">
+                  Aquí aparecerán automáticamente los pagos en cuanto NOWPayments avise del primero.
+                  Los pagos anteriores a hoy no salen porque este registro empieza ahora.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {payments.map((p) => {
+                  const st = PAYMENT_STATUS[p.status] ?? { label: p.status, color: "text-[#8a7a6a] bg-white/5 border-white/10" };
+                  const faltante = p.precio - (p.recibido > 0 ? p.recibido : p.pagado);
+                  const esParcial = p.status === "partially_paid";
+                  return (
+                    <div key={p.id} className="card-dark rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center gap-4">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
+                          <p className="text-white font-semibold text-sm truncate">{p.nombre ?? "Sin cuenta registrada"}</p>
+                          <span className={`shrink-0 text-[10px] font-bold border rounded-full px-2 py-0.5 ${st.color}`}>
+                            {st.label}
+                          </span>
+                          {p.activado === true && (
+                            <span className="shrink-0 inline-flex items-center gap-1 text-[10px] bg-green-500/10 text-green-400 border border-green-500/20 rounded-full px-2 py-0.5">
+                              <CheckCircle size={10} />
+                              Con acceso
+                            </span>
+                          )}
+                          {p.activado === false && (
+                            <span className="shrink-0 inline-flex items-center gap-1 text-[10px] bg-red-500/10 text-red-400 border border-red-500/20 rounded-full px-2 py-0.5">
+                              <XCircle size={10} />
+                              Sin acceso
+                            </span>
+                          )}
+                        </div>
+                        <button
+                          onClick={() => copyEmail(p.email)}
+                          className="flex items-center gap-1 text-[#8a7a6a] text-xs hover:text-[#c9a84c] transition-colors max-w-full"
+                        >
+                          <span className="truncate">{p.email}</span>
+                          <Copy size={11} className="shrink-0" />
+                        </button>
+                        <p className="text-[#6a5a4a] text-xs mt-1">
+                          Debía pagar <span className="text-[#c9a84c] font-bold">${p.precio}</span>
+                          {p.recibido > 0 && <> · recibido <span className="text-white font-bold">${p.recibido}</span></>}
+                          {p.pagado > 0 && <> · envió {p.pagado} {p.moneda.toUpperCase()}</>}
+                          {" · "}
+                          {new Date(p.fecha).toLocaleString("es-ES", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}
+                        </p>
+                        {esParcial && faltante > 0 && (
+                          <p className="text-orange-400 text-xs mt-1 font-semibold">
+                            Faltan ${faltante.toFixed(2)} para completar el pago
+                          </p>
+                        )}
+                      </div>
+                      {p.activado === false && (
+                        <button
+                          onClick={() => {
+                            const u = users.find((x) => x.email.toLowerCase() === p.email.toLowerCase());
+                            if (u) handleToggle(u).then(() => fetchPayments());
+                            else showToast("Ese correo no tiene cuenta en la web.");
+                          }}
+                          disabled={actionLoading === p.email}
+                          className="btn-gold px-5 py-2 rounded-xl text-sm font-bold shrink-0"
+                        >
+                          {actionLoading === p.email ? (
+                            <span className="w-4 h-4 border-2 border-current/40 border-t-current rounded-full animate-spin inline-block" />
+                          ) : "Dar acceso"}
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         )}
 
         {/* Tab: Actividad */}
@@ -664,15 +867,29 @@ export default function AdminPage() {
               </div>
             ) : (
               <div className="space-y-2">
-                {filteredLogs.map((log) => (
+                {filteredLogs.map((log) => {
+                  // Los avisos técnicos de NOWPayments llevan el detalle en `action`,
+                  // así que se identifican por quién los escribe, no por su texto
+                  const esWebhook = log.user_email === "webhook@nowpayments";
+                  const etiquetaWebhook =
+                    log.user_name === "WEBHOOK_ACTIVATED" ? "Cliente activado por pago" :
+                    log.user_name === "WEBHOOK_SIG_FAIL" ? "Aviso rechazado (clave incorrecta)" :
+                    log.user_name === "WEBHOOK_RECEIVED" ? "Aviso de pago recibido" :
+                    log.user_name === "WEBHOOK_OK" ? "Aviso verificado" :
+                    log.user_name === "WEBHOOK_SKIP" ? "Aviso sin pago completo" :
+                    log.user_name === "WEBHOOK_PLAN_MISMATCH" ? "Importe no coincide con el plan" :
+                    "Aviso de NOWPayments";
+                  return (
                   <div key={log.id} className="card-dark rounded-xl px-5 py-3 flex items-center gap-4">
                     <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 ${
+                      esWebhook ? "bg-white/5 border border-white/10" :
                       log.action === "course_access" ? "bg-green-500/10 border border-green-500/20" :
                       log.action === "login" ? "bg-blue-500/10 border border-blue-500/20" :
                       log.action === "register" ? "bg-purple-500/10 border border-purple-500/20" :
                       "bg-[#c9a84c]/10 border border-[#c9a84c]/20"
                     }`}>
-                      {log.action === "course_access" ? <PlayCircle size={14} className="text-green-400" />
+                      {esWebhook ? <DollarSign size={14} className="text-[#8a7a6a]" />
+                        : log.action === "course_access" ? <PlayCircle size={14} className="text-green-400" />
                         : log.action === "login" ? <LogIn size={14} className="text-blue-400" />
                         : log.action === "register" ? <UserPlus size={14} className="text-purple-400" />
                         : <Download size={14} className="text-[#c9a84c]" />
@@ -680,26 +897,32 @@ export default function AdminPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <p className="text-white text-sm font-semibold truncate">{log.user_name || log.user_email}</p>
-                      <p className="text-[#8a7a6a] text-xs truncate">{log.user_email}</p>
+                      <p className="text-[#8a7a6a] text-xs truncate">
+                        {esWebhook ? log.action : log.user_email}
+                      </p>
                     </div>
                     <div className="text-right shrink-0">
                       <p className={`text-xs font-bold ${
+                        esWebhook ? (log.user_name === "WEBHOOK_SIG_FAIL" ? "text-red-400" : "text-[#8a7a6a]") :
                         log.action === "course_access" ? "text-green-400" :
                         log.action === "login" ? "text-blue-400" :
                         log.action === "register" ? "text-purple-400" :
                         "text-[#c9a84c]"
                       }`}>
-                        {log.action === "course_access" ? "Entró al curso" :
+                        {esWebhook ? etiquetaWebhook :
+                         log.action === "course_access" ? "Entró al curso" :
                          log.action === "login" ? "Inició sesión" :
                          log.action === "register" ? "Se registró" :
-                         log.action === "download_pdf" ? "Descargó PDF" : "Descargó eBook"}
+                         log.action === "download_pdf" ? "Descargó PDF" :
+                         log.action === "download_epub" ? "Descargó eBook" : log.action}
                       </p>
                       <p className="text-[#6a5a4a] text-xs">
                         {new Date(log.created_at).toLocaleString("es-ES", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}
                       </p>
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </>
@@ -719,13 +942,21 @@ export default function AdminPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="card-dark rounded-2xl p-5">
                 <p className="text-[#6a5a4a] text-xs uppercase tracking-widest mb-3">Escuela Avanzada · $777</p>
                 <p className="text-3xl font-bold text-white mb-1">{escuelaActivos}</p>
                 <p className="text-[#c9a84c] text-sm font-bold">${(escuelaActivos * 777).toLocaleString("es-ES")}</p>
                 <div className="mt-3 h-1.5 bg-white/5 rounded-full overflow-hidden">
                   <div className="h-full bg-[#c9a84c] rounded-full" style={{ width: activatedCount ? `${(escuelaActivos / activatedCount) * 100}%` : "0%" }} />
+                </div>
+              </div>
+              <div className="card-dark rounded-2xl p-5">
+                <p className="text-[#6a5a4a] text-xs uppercase tracking-widest mb-3">Todas las Clases · $555</p>
+                <p className="text-3xl font-bold text-white mb-1">{clasesActivos}</p>
+                <p className="text-[#c9a84c] text-sm font-bold">${(clasesActivos * 555).toLocaleString("es-ES")}</p>
+                <div className="mt-3 h-1.5 bg-white/5 rounded-full overflow-hidden">
+                  <div className="h-full bg-[#c9a84c] rounded-full" style={{ width: activatedCount ? `${(clasesActivos / activatedCount) * 100}%` : "0%" }} />
                 </div>
               </div>
               <div className="card-dark rounded-2xl p-5">
@@ -743,7 +974,7 @@ export default function AdminPage() {
               <p className="text-2xl font-bold text-white">
                 ${(
                   users.filter((u) => !u.activated && u.plan === "escuela").length * 777 +
-                  users.filter((u) => !u.activated && u.plan === "mentoria").length * 555 +
+                  users.filter((u) => !u.activated && u.plan === "clases").length * 555 +
                   users.filter((u) => !u.activated && u.plan === "meditaciones").length * 333
                 ).toLocaleString("es-ES")}
               </p>

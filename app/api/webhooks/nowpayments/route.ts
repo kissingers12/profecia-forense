@@ -4,7 +4,7 @@ import { supabaseAdmin } from "@/lib/supabase";
 
 const PRICE_TO_PLAN: Record<number, string> = {
   333: "meditaciones",
-  555: "mentoria",
+  555: "clases",
   777: "escuela",
 };
 
@@ -79,6 +79,22 @@ export async function POST(req: NextRequest) {
   const isStablecoin = ["usd", "usdc", "usdp", "usdt", "busd", "dai"].includes(payCurrency);
 
   await log("WEBHOOK_OK", `status=${status} order_id=${orderId} price=${priceAmount} actually_paid=${actuallyPaid} outcome=${outcomeAmount} currency=${payCurrency}`);
+
+  // Registro legible para el panel /admin → pestaña Pagos.
+  // Guarda TODOS los avisos (también parciales y en espera) para que Kissingers
+  // pueda ver quién pagó y cuánto sin entrar en NOWPayments.
+  await supabaseAdmin.from("activity_logs").insert({
+    user_email: orderId || "sin-email",
+    user_name: "PAGO",
+    action: JSON.stringify({
+      status,
+      precio: priceAmount,
+      pagado: actuallyPaid,
+      moneda: payload.pay_currency ?? "",
+      recibido: outcomeAmount,
+      paymentId: payload.payment_id ?? "",
+    }),
+  }).then(() => {});
 
   const isFinished = status === "finished" || status === "confirmed";
   const isPartialOk =
