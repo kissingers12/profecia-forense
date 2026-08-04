@@ -216,6 +216,26 @@ export default function AdminPage() {
     setActionLoading(null);
   };
 
+  const handleNotifyUnpaid = async (email: string, nombre: string | null) => {
+    const ok = window.confirm(
+      `¿Enviar a ${nombre ?? email} el aviso de que su pago no se completó?\n\nRecibirá el correo con el diseño de la web y las instrucciones para pagar.`
+    );
+    if (!ok) return;
+    setActionLoading(email);
+    try {
+      const res = await fetch("/api/admin/notify-unpaid", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-admin-password": password },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      showToast(res.ok ? `Aviso enviado a ${email} 📧` : (data.error ?? "No se pudo enviar."));
+    } catch {
+      showToast("Error de conexión.");
+    }
+    setActionLoading(null);
+  };
+
   const fetchPayments = async () => {
     setPaymentsLoading(true);
     try {
@@ -853,19 +873,32 @@ export default function AdminPage() {
                         )}
                       </div>
                       {p.activado === false && (
-                        <button
-                          onClick={() => {
-                            const u = users.find((x) => x.email.toLowerCase() === p.email.toLowerCase());
-                            if (u) handleToggle(u).then(() => fetchPayments());
-                            else showToast("Ese correo no tiene cuenta en la web.");
-                          }}
-                          disabled={actionLoading === p.email}
-                          className="btn-gold px-5 py-2 rounded-xl text-sm font-bold shrink-0"
-                        >
-                          {actionLoading === p.email ? (
-                            <span className="w-4 h-4 border-2 border-current/40 border-t-current rounded-full animate-spin inline-block" />
-                          ) : "Dar acceso"}
-                        </button>
+                        <div className="flex flex-col gap-2 shrink-0">
+                          <button
+                            onClick={() => {
+                              const u = users.find((x) => x.email.toLowerCase() === p.email.toLowerCase());
+                              if (u) handleToggle(u).then(() => fetchPayments());
+                              else showToast("Ese correo no tiene cuenta en la web.");
+                            }}
+                            disabled={actionLoading === p.email}
+                            className="btn-gold px-5 py-2 rounded-xl text-sm font-bold"
+                          >
+                            {actionLoading === p.email ? (
+                              <span className="w-4 h-4 border-2 border-current/40 border-t-current rounded-full animate-spin inline-block" />
+                            ) : "Dar acceso"}
+                          </button>
+                          {p.pagado <= 0 && (
+                            <button
+                              onClick={() => handleNotifyUnpaid(p.email, p.nombre)}
+                              disabled={actionLoading === p.email}
+                              title="Enviarle el correo explicando que su pago no llegó a completarse"
+                              className="flex items-center justify-center gap-1.5 px-5 py-2 rounded-xl text-xs font-bold bg-white/5 text-[#c9a84c] border border-[#c9a84c]/25 hover:bg-[#c9a84c]/10 transition-all"
+                            >
+                              <Send size={12} />
+                              Avisar: no pagó
+                            </button>
+                          )}
+                        </div>
                       )}
                     </div>
                   );

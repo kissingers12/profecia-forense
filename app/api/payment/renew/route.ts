@@ -39,6 +39,18 @@ export async function POST(req: NextRequest) {
     return Response.json({ error: "Esta cuenta ya está activada." }, { status: 400 });
   }
 
+  // La Escuela Avanzada está agotada: no se generan cobros de $777.
+  // Quien siga registrado en ella debe elegir antes otra formación.
+  if (user.plan === "escuela") {
+    return Response.json(
+      {
+        error:
+          "La Escuela Avanzada ya no admite inscripciones. Elige abajo otra formación para continuar con tu pago.",
+      },
+      { status: 400 }
+    );
+  }
+
   const plan = user.plan;
   const apiKey = process.env.NOWPAYMENTS_API_KEY;
   let paymentUrl = FALLBACK_URLS[plan] ?? null;
