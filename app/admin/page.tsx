@@ -916,24 +916,6 @@ export default function AdminPage() {
               <p className="text-[#6a5a4a] text-xs mt-1">{users.length - activatedCount} usuarios pendientes de activación</p>
             </div>
 
-            <div className="card-dark rounded-2xl p-5 border border-red-500/30">
-              <p className="text-red-400 text-xs font-bold uppercase tracking-widest mb-3">⚠️ Habilitar plan $555 en la base de datos</p>
-              <p className="text-[#8a7a6a] text-xs mb-3">
-                La base de datos solo aceptaba los planes de $333 y $777. Pulsa este botón UNA VEZ para que también acepte
-                inscripciones del plan de $555 (Todas las Clases). Sin esto, el registro de ese plan da error.
-              </p>
-              <button
-                onClick={handleSetupDb}
-                disabled={setupDbLoading}
-                className="btn-gold px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 disabled:opacity-50"
-              >
-                {setupDbLoading
-                  ? <span className="w-3 h-3 border-2 border-[#050510]/40 border-t-[#050510] rounded-full animate-spin" />
-                  : "Habilitar plan $555"}
-              </button>
-              {codeError && <p className="text-red-400 text-xs mt-2">{codeError}</p>}
-            </div>
-
             <div className="card-dark rounded-2xl p-5 border border-[#c9a84c]/15">
               <p className="text-[#c9a84c] text-xs font-bold uppercase tracking-widest mb-3">Diagnóstico — activación automática</p>
               <p className="text-[#8a7a6a] text-xs mb-3">Prueba si la conexión con NOWPayments funciona correctamente para activar clientes tras el pago.</p>
