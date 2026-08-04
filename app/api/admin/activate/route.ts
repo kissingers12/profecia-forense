@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import nodemailer from "nodemailer";
 import { supabaseAdmin } from "@/lib/supabase";
 import { checkAdmin } from "@/lib/admin-auth";
+import { nombreDeSaludo } from "@/lib/nombre";
 
 function checkAuth(req: NextRequest): boolean {
   return checkAdmin(req);
@@ -20,7 +21,7 @@ function escapeHtml(str: string): string {
 async function sendWelcomeEmail(email: string, name: string) {
   if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) return false;
 
-  const safeName = escapeHtml(name || "");
+  const safeName = escapeHtml(nombreDeSaludo(name));
   const safeEmail = escapeHtml(email);
 
   const transporter = nodemailer.createTransport({

@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import nodemailer from "nodemailer";
 import { supabaseAdmin } from "@/lib/supabase";
 import { checkAdmin } from "@/lib/admin-auth";
+import { nombreDeSaludo } from "@/lib/nombre";
 
 function escapeHtml(str: string): string {
   return str
@@ -37,7 +38,8 @@ export async function POST(req: NextRequest) {
     return Response.json({ error: "Faltan las credenciales de correo (EMAIL_USER / EMAIL_PASS)." }, { status: 500 });
   }
 
-  const safeName = escapeHtml(user.name?.trim() ?? "");
+  const nombre = nombreDeSaludo(user.name);
+  const safeName = escapeHtml(nombre);
   const safeEmail = escapeHtml(user.email);
 
   const transporter = nodemailer.createTransport({
@@ -50,7 +52,7 @@ export async function POST(req: NextRequest) {
     to: user.email,
     subject: "Sobre tu pago — no llegó a completarse 🙏",
     text:
-      `¡Bendiciones${safeName ? ", " + user.name.trim() : ""}! 🙏\n\n` +
+      `¡Bendiciones${nombre ? ", " + nombre : ""}! 🙏\n\n` +
       `Gracias por escribirnos. Revisamos tu inscripción con detalle y vimos que tu pago quedó iniciado pero no llegó a completarse: ` +
       `el sistema generó tu enlace de pago, pero no se recibió ningún envío. Por eso tu acceso sigue bloqueado.\n\n` +
       `Esto suele ocurrir cuando se abre la pantalla de pago y se cierra antes de enviar la criptomoneda desde el monedero, ` +
