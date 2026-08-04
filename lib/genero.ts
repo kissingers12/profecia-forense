@@ -26,6 +26,8 @@ const FEMENINOS = new Set([
   "mariangel", "maryori", "yolimar", "yubisay", "naybeth", "damaris", "dámaris",
   "yosmar", "yeidy", "kelly", "shirley", "yamil", "aracelis", "mariel", "meybel",
   "nohely", "noely", "yulissa", "roxana", "ivon", "yvon", "yubi", "lucy", "cindy",
+  // Nombres de mujer que terminan en -o (la regla los daría por hombre)
+  "rosario", "amparo", "socorro", "consuelo", "milagro", "refugio",
 ]);
 
 // Nombres de hombre que SÍ terminan en -a, o que no terminan en -o
