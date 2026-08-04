@@ -1,7 +1,7 @@
 export type UserSession = {
   email: string;
   name: string;
-  plan: "meditaciones" | "escuela" | null;
+  plan: "meditaciones" | "mentoria" | "escuela" | null;
   accessCode: string;
   activated: boolean;
 };
@@ -28,5 +28,6 @@ export function clearSession() {
 
 export const PLAN_LABELS: Record<string, string> = {
   meditaciones: "Meditación Profética",
+  mentoria: "Mentoría Profética",
   escuela: "Escuela Avanzada de Profecía",
 };

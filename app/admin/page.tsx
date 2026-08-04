@@ -34,7 +34,25 @@ type ForoPost = {
 
 const PLAN_LABELS: Record<string, string> = {
   meditaciones: "Meditación $333",
+  mentoria: "Mentoría $555",
   escuela: "Escuela $777",
+};
+
+type PaymentEntry = {
+  payment_id: string | number;
+  payment_status: string;
+  order_id: string;
+  price_amount: number;
+  price_currency: string;
+  pay_amount: number;
+  actually_paid: number;
+  pay_currency: string;
+  outcome_amount: number;
+  outcome_currency: string;
+  created_at: string;
+  user_name: string | null;
+  user_activated: boolean | null;
+  user_plan: string | null;
 };
 
 export default function AdminPage() {
@@ -68,6 +86,9 @@ export default function AdminPage() {
   const [resetLoading, setResetLoading] = useState(false);
   const [paymentCheck, setPaymentCheck] = useState<Record<string, string> | null>(null);
   const [paymentCheckLoading, setPaymentCheckLoading] = useState(false);
+  const [paymentsList, setPaymentsList] = useState<PaymentEntry[]>([]);
+  const [paymentsListLoading, setPaymentsListLoading] = useState(false);
+  const [paymentsListError, setPaymentsListError] = useState("");
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -303,6 +324,42 @@ export default function AdminPage() {
     setSetupDbLoading(false);
   };
 
+  const fetchPaymentsList = async () => {
+    setPaymentsListLoading(true);
+    setPaymentsListError("");
+    try {
+      const res = await fetch("/api/admin/payments-list", { headers: { "x-admin-password": password } });
+      const data = await res.json();
+      if (res.ok) {
+        setPaymentsList(data.payments ?? []);
+      } else {
+        setPaymentsListError(data.error ?? "Error al cargar pagos.");
+      }
+    } catch {
+      setPaymentsListError("Error de conexión.");
+    }
+    setPaymentsListLoading(false);
+  };
+
+  const handleActivateFromPayment = async (email: string) => {
+    try {
+      const res = await fetch("/api/admin/payments-list", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-admin-password": password },
+        body: JSON.stringify({ email }),
+      });
+      if (res.ok) {
+        setPaymentsList((prev) =>
+          prev.map((p) => p.order_id?.toLowerCase() === email.toLowerCase() ? { ...p, user_activated: true } : p)
+        );
+        setUsers((prev) => prev.map((u) => u.email === email ? { ...u, activated: true } : u));
+        showToast("Cliente activado ✓");
+      }
+    } catch {
+      showToast("Error al activar.");
+    }
+  };
+
   const handlePaymentCheck = async () => {
     setPaymentCheckLoading(true);
     try {
@@ -318,8 +375,9 @@ export default function AdminPage() {
   };
 
   const escuelaActivos = users.filter((u) => u.activated && u.plan === "escuela").length;
+  const mentoriaActivos = users.filter((u) => u.activated && u.plan === "mentoria").length;
   const meditActivos = users.filter((u) => u.activated && u.plan === "meditaciones").length;
-  const totalRevenue = escuelaActivos * 777 + meditActivos * 333;
+  const totalRevenue = escuelaActivos * 777 + mentoriaActivos * 555 + meditActivos * 333;
 
   const filteredLogs = logSearch.trim()
     ? logs.filter((l) =>
@@ -685,6 +743,7 @@ export default function AdminPage() {
               <p className="text-2xl font-bold text-white">
                 ${(
                   users.filter((u) => !u.activated && u.plan === "escuela").length * 777 +
+                  users.filter((u) => !u.activated && u.plan === "mentoria").length * 555 +
                   users.filter((u) => !u.activated && u.plan === "meditaciones").length * 333
                 ).toLocaleString("es-ES")}
               </p>
@@ -711,6 +770,122 @@ export default function AdminPage() {
                       <span className="break-all">{String(v)}</span>
                     </div>
                   ))}
+                </div>
+              )}
+            </div>
+
+            {/* PAGOS RECIBIDOS DE NOWPAYMENTS */}
+            <div className="card-dark rounded-2xl p-5">
+              <div className="flex items-center justify-between mb-1">
+                <p className="text-[#c9a84c] text-xs font-bold uppercase tracking-widest">Pagos recibidos de NOWPayments</p>
+                <button
+                  onClick={fetchPaymentsList}
+                  disabled={paymentsListLoading}
+                  className="p-1.5 text-[#6a5a4a] hover:text-[#c9a84c] transition-colors"
+                  title="Actualizar"
+                >
+                  <RefreshCw size={14} className={paymentsListLoading ? "animate-spin" : ""} />
+                </button>
+              </div>
+              <p className="text-[#8a7a6a] text-xs mb-4">Cada aviso que NOWPayments envía al cobrar aparece aquí: quién pagó, su correo y cuánto. Incluye los pagos parciales. Si alguien pagó y no tiene acceso, actívalo con un clic desde aquí.</p>
+              {!paymentsList.length && !paymentsListLoading && !paymentsListError && (
+                <button
+                  onClick={fetchPaymentsList}
+                  className="btn-gold px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2"
+                >
+                  <RefreshCw size={13} /> Actualizar
+                </button>
+              )}
+              {paymentsListLoading && (
+                <div className="flex justify-center py-6">
+                  <span className="w-5 h-5 border-2 border-[#c9a84c]/40 border-t-[#c9a84c] rounded-full animate-spin" />
+                </div>
+              )}
+              {paymentsListError && (
+                <p className="text-red-400 text-xs">{paymentsListError}</p>
+              )}
+              {paymentsList.length > 0 && (
+                <div className="space-y-3">
+                  {paymentsList.map((p) => {
+                    const statusMap: Record<string, string> = {
+                      waiting: "Esperando pago",
+                      confirming: "Confirmando en la red",
+                      confirmed: "Confirmado",
+                      sending: "Enviando",
+                      partially_paid: "PAGO PARCIAL",
+                      finished: "Completado",
+                      failed: "Fallido",
+                      refunded: "Reembolsado",
+                    };
+                    const statusLabel = statusMap[p.payment_status] ?? p.payment_status;
+                    const isOk = p.payment_status === "finished" || p.payment_status === "confirmed";
+                    const isPartial = p.payment_status === "partially_paid";
+                    const isSending = p.payment_status === "sending";
+                    const payCurrency = p.pay_currency.toLowerCase();
+                    const isStablecoin = ["usd", "usdc", "usdp", "usdt", "busd", "dai"].includes(payCurrency);
+
+                    // Received amount: use outcome (fiat) if available, else crypto with unit
+                    const receivedStr = p.outcome_amount > 0
+                      ? `$${p.outcome_amount.toFixed(2)}`
+                      : isStablecoin
+                        ? `$${p.actually_paid.toFixed(2)}`
+                        : `${p.actually_paid} ${payCurrency.toUpperCase()}`;
+
+                    // "Faltan" only meaningful when we have fiat or stablecoin reference
+                    const fiatReceived = p.outcome_amount > 0
+                      ? p.outcome_amount
+                      : isStablecoin ? p.actually_paid : null;
+                    const faltan = fiatReceived !== null ? Math.max(0, p.price_amount - fiatReceived) : null;
+
+                    // Crypto comparison for "complete enough"
+                    const cryptoPaid = p.pay_amount > 0 && p.actually_paid >= p.pay_amount * 0.974;
+
+                    return (
+                      <div key={p.payment_id} className="bg-white/[0.03] border border-white/5 rounded-xl p-4">
+                        <div className="flex flex-wrap items-center gap-2 mb-2">
+                          <span className="text-white text-sm font-semibold">{p.user_name ?? p.order_id}</span>
+                          <span className={`text-xs font-bold px-2 py-0.5 rounded-full border ${
+                            isOk ? "bg-green-500/10 text-green-400 border-green-500/20" :
+                            isPartial ? "bg-orange-500/10 text-orange-400 border-orange-500/20" :
+                            isSending ? "bg-blue-500/10 text-blue-400 border-blue-500/20" :
+                            "bg-white/5 text-[#8a7a6a] border-white/10"
+                          }`}>
+                            {statusLabel}
+                          </span>
+                          {p.user_activated === true && (
+                            <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-[#c9a84c]/10 text-[#c9a84c] border border-[#c9a84c]/20">Con acceso</span>
+                          )}
+                          {p.user_activated === false && (
+                            <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-red-500/10 text-red-400 border border-red-500/20">Sin acceso</span>
+                          )}
+                        </div>
+                        <p className="text-[#8a7a6a] text-xs mb-1">{p.order_id}</p>
+                        <p className="text-[#d0c0b0] text-xs">
+                          Debía pagar <span className="text-white font-semibold">${p.price_amount}</span>
+                          {p.actually_paid > 0 && <> · recibido <span className="text-white font-semibold">{receivedStr}</span></>}
+                          {!isStablecoin && p.pay_amount > 0 && <> · envió {p.pay_amount} {payCurrency.toUpperCase()}</>}
+                          {p.created_at && <> · {new Date(p.created_at).toLocaleDateString("es-ES", { day: "2-digit", month: "short" })}, {new Date(p.created_at).toLocaleTimeString("es-ES", { hour: "2-digit", minute: "2-digit" })}</>}
+                        </p>
+                        {isPartial && (
+                          faltan !== null && faltan > 20 ? (
+                            <p className="text-orange-400 text-xs mt-1">Faltan ${faltan.toFixed(2)} para completar el pago</p>
+                          ) : (faltan !== null && faltan <= 20) || cryptoPaid ? (
+                            <p className="text-green-400 text-xs mt-1">Pago completo (diferencia por conversión) ✓</p>
+                          ) : (
+                            <p className="text-[#8a7a6a] text-xs mt-1">Pago parcial — verificar manualmente</p>
+                          )
+                        )}
+                        {p.user_activated === false && (isOk || isPartial) && (
+                          <button
+                            onClick={() => handleActivateFromPayment(p.order_id)}
+                            className="mt-2 btn-gold px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1.5"
+                          >
+                            <CheckCircle size={11} /> Activar acceso
+                          </button>
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>

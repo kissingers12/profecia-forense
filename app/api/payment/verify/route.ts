@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
   if (!user) return Response.json({ error: "Cuenta no encontrada." }, { status: 404 });
   if (user.activated) return Response.json({ activated: true });
 
-  const PLAN_PRICES: Record<string, number> = { escuela: 777, meditaciones: 333 };
+  const PLAN_PRICES: Record<string, number> = { escuela: 777, mentoria: 555, meditaciones: 333 };
 
   try {
     // Query payments by order_id (email)
@@ -51,12 +51,15 @@ export async function POST(req: NextRequest) {
 
       if (status === "finished" || status === "confirmed") return true;
 
-      // Accept partially_paid if within $20 tolerance
+      // Accept partially_paid if within tolerance
       if (status === "partially_paid" && actuallyPaid > 0) {
+        const payCurrency = ((p.pay_currency as string) ?? "").toLowerCase();
+        const isStablecoin = ["usd", "usdc", "usdp", "usdt", "busd", "dai"].includes(payCurrency);
         return (
           (outcomeAmount > 0 && outcomeAmount >= priceAmount - FIAT_TOLERANCE) ||
           (payAmount > 0 && actuallyPaid >= payAmount * (1 - CRYPTO_TOLERANCE)) ||
-          actuallyPaid >= priceAmount - FIAT_TOLERANCE
+          // Only compare directly when pay_currency is a USD stablecoin
+          (isStablecoin && actuallyPaid >= priceAmount - FIAT_TOLERANCE)
         );
       }
 

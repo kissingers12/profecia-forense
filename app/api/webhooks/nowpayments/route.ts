@@ -4,6 +4,7 @@ import { supabaseAdmin } from "@/lib/supabase";
 
 const PRICE_TO_PLAN: Record<number, string> = {
   333: "meditaciones",
+  555: "mentoria",
   777: "escuela",
 };
 
@@ -74,20 +75,22 @@ export async function POST(req: NextRequest) {
   const actuallyPaid = Number(payload.actually_paid ?? 0);   // crypto paid (e.g. 0.012 BTC)
   const payAmount = Number(payload.pay_amount ?? 0);         // crypto required (e.g. 0.01231 BTC)
   const outcomeAmount = Number(payload.outcome_amount ?? 0); // fiat/USDC actually received (e.g. 765)
+  const payCurrency = ((payload.pay_currency as string) ?? "").toLowerCase();
+  const isStablecoin = ["usd", "usdc", "usdp", "usdt", "busd", "dai"].includes(payCurrency);
 
-  await log("WEBHOOK_OK", `status=${status} order_id=${orderId} price=${priceAmount} actually_paid=${actuallyPaid} outcome=${outcomeAmount}`);
+  await log("WEBHOOK_OK", `status=${status} order_id=${orderId} price=${priceAmount} actually_paid=${actuallyPaid} outcome=${outcomeAmount} currency=${payCurrency}`);
 
   const isFinished = status === "finished" || status === "confirmed";
   const isPartialOk =
     status === "partially_paid" &&
     actuallyPaid > 0 &&
     (
-      // Best: outcome_amount is already converted to stablecoin/fiat — compare directly
+      // Best: outcome_amount is already converted to fiat — compare directly
       (outcomeAmount > 0 && outcomeAmount >= priceAmount - FIAT_TOLERANCE) ||
       // Good: compare crypto paid vs crypto required (same units, no currency mismatch)
       (payAmount > 0 && actuallyPaid >= payAmount * (1 - CRYPTO_TOLERANCE)) ||
-      // Fallback: stablecoin payments where actually_paid ≈ USD
-      actuallyPaid >= priceAmount - FIAT_TOLERANCE
+      // Fallback: only valid for stablecoins where actually_paid ≈ USD
+      (isStablecoin && actuallyPaid >= priceAmount - FIAT_TOLERANCE)
     );
 
   if (!isFinished && !isPartialOk) {
