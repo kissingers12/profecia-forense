@@ -29,7 +29,7 @@ async function sendWelcomeEmail(email: string, name: string) {
   });
 
   await transporter.sendMail({
-    from: `"Kissingers Araque · 100x100Cristianos" <${process.env.EMAIL_USER}>`,
+    from: `"Servicio al Estudiante · 100x100Cristianos" <${process.env.EMAIL_USER}>`,
     to: email,
     subject: "¡Tu acceso ya está activado! 🙏",
     text:
@@ -38,7 +38,7 @@ async function sendWelcomeEmail(email: string, name: string) {
       `Entra aquí: https://www.kissingersaraque.com/login\n\n` +
       `Oramos para que este tiempo de formación sea de mucha edificación.\n\n` +
       `Si llegas a tener alguna dificultad, escríbenos y con gusto te ayudaremos.\n\n` +
-      `Kissingers Araque · 100x100Cristianos`,
+      `Servicio al Estudiante · 100x100Cristianos`,
     html: `
       <div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;background:#050510;color:#f0e6d3;padding:36px 32px;border-radius:14px;border:1px solid #c9a84c33">
         <p style="color:#c9a84c;font-size:12px;letter-spacing:3px;text-transform:uppercase;margin:0 0 14px">100×100 Cristianos</p>
@@ -73,7 +73,7 @@ async function sendWelcomeEmail(email: string, name: string) {
           Si llegas a tener alguna dificultad, escríbenos y con gusto te ayudaremos.
         </p>
         <p style="font-size:13px;color:#6a5a4a;margin:0">
-          Kissingers Araque · <a href="https://www.kissingersaraque.com" style="color:#c9a84c;text-decoration:none">kissingersaraque.com</a>
+          <strong style="color:#8a7a6a">Servicio al Estudiante</strong> · <a href="https://www.kissingersaraque.com" style="color:#c9a84c;text-decoration:none">kissingersaraque.com</a>
         </p>
       </div>
     `,
