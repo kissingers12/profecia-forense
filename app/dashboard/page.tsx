@@ -129,6 +129,10 @@ export default function Dashboard() {
               })
               .catch(() => {});
           }
+        } else {
+          // La sesión no corresponde a ningún usuario real — expulsar
+          clearSession();
+          router.push("/login");
         }
       })
       .catch(() => {});
@@ -400,13 +404,18 @@ export default function Dashboard() {
                 </button>
               )}
 
-              {/* Opción 3: Pagué pero no funciona */}
+            </div>
+
+            {/* Opción 3: Pagué pero no funciona */}
+            <div className="border-t border-white/5 pt-4 space-y-3">
+              <p className="text-xs font-semibold text-[#c9a84c] uppercase tracking-widest">¿Pagaste y no puedes entrar?</p>
               <button
                 type="button"
                 onClick={() => setShowSupport(true)}
-                className="w-full text-center text-sm text-[#8a7a6a] hover:text-[#c9a84c] transition-colors py-1"
+                className="w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 text-sm bg-white/5 border border-[#c9a84c]/40 text-[#c9a84c] hover:bg-[#c9a84c]/10 transition-all"
               >
-                ¿Pagaste y la verificación no funciona?
+                <MessageCircle size={16} />
+                Escríbenos y te activamos manualmente
               </button>
             </div>
 

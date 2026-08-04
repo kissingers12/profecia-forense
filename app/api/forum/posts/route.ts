@@ -1,12 +1,14 @@
 import { NextRequest } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 
+// El foro es exclusivo del plan Escuela Avanzada ($777)
 async function getActivatedUser(email: string) {
   const { data } = await supabaseAdmin
     .from("users")
-    .select("email, name, activated")
+    .select("email, name, activated, plan")
     .eq("email", email.toLowerCase())
     .maybeSingle();
+  if (!data || data.plan !== "escuela") return null;
   return data;
 }
 

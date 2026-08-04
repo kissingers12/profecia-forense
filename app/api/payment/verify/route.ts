@@ -4,6 +4,26 @@ import { supabaseAdmin } from "@/lib/supabase";
 const FIAT_TOLERANCE = 20;    // accept if within $20 of required price
 const CRYPTO_TOLERANCE = 0.026; // 2.6% for crypto-to-crypto comparison
 
+// La lista de pagos de NOWPayments exige un token JWT obtenido con el
+// email/contraseña de la cuenta (env NOWPAYMENTS_EMAIL / NOWPAYMENTS_PASSWORD)
+async function getJwtToken(): Promise<string | null> {
+  const npEmail = process.env.NOWPAYMENTS_EMAIL;
+  const npPassword = process.env.NOWPAYMENTS_PASSWORD;
+  if (!npEmail || !npPassword) return null;
+  try {
+    const res = await fetch("https://api.nowpayments.io/v1/auth", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: npEmail, password: npPassword }),
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.token ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export async function POST(req: NextRequest) {
   const { email } = await req.json();
   if (!email) return Response.json({ error: "Email requerido." }, { status: 400 });
@@ -20,13 +40,23 @@ export async function POST(req: NextRequest) {
   if (!user) return Response.json({ error: "Cuenta no encontrada." }, { status: 404 });
   if (user.activated) return Response.json({ activated: true });
 
-  const PLAN_PRICES: Record<string, number> = { escuela: 777, meditaciones: 333 };
+  const PLAN_PRICES: Record<string, number> = { escuela: 777, clases: 555, meditaciones: 333 };
 
   try {
+    const token = await getJwtToken();
+    if (!token) {
+      // Sin credenciales de cuenta no podemos listar pagos; el webhook activa solo
+      return Response.json({
+        activated: false,
+        message:
+          "Tu pago se activa automáticamente al confirmarse en la red (suele tardar 10-30 minutos). Si ya pasó más tiempo, usa el botón de ayuda y te activamos manualmente.",
+      });
+    }
+
     // Query payments by order_id (email)
     const res = await fetch(
       `https://api.nowpayments.io/v1/payment?order_id=${encodeURIComponent(email.toLowerCase())}&limit=20`,
-      { headers: { "x-api-key": apiKey } }
+      { headers: { "x-api-key": apiKey, Authorization: `Bearer ${token}` } }
     );
 
     if (!res.ok) {
