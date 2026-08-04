@@ -39,13 +39,26 @@ type PaymentRow = {
   status: string;
   precio: number;
   pagado: number;
+  requerido: number;
   moneda: string;
   recibido: number;
+  monedaRecibida: string;
   paymentId: string;
   nombre: string | null;
   plan: string | null;
   activado: boolean | null;
 };
+
+const STABLES = ["usd", "usdc", "usdp", "usdt", "busd", "dai"];
+
+// Formatea un importe con su moneda real: $555 si es dólar/stablecoin,
+// 0.0086424 BTC si es cripto. Antes se ponía "$" a todo, lo que hacía
+// parecer que un pago de 0.0086 BTC eran 0,008 dólares.
+function importe(cantidad: number, moneda: string): string {
+  const m = (moneda || "").toLowerCase();
+  if (!m || STABLES.includes(m)) return `$${cantidad}`;
+  return `${cantidad} ${m.toUpperCase()}`;
+}
 
 const PLAN_LABELS: Record<string, string> = {
   meditaciones: "Meditación $333",
@@ -778,9 +791,20 @@ export default function AdminPage() {
             ) : (
               <div className="space-y-3">
                 {payments.map((p) => {
-                  const st = PAYMENT_STATUS[p.status] ?? { label: p.status, color: "text-[#8a7a6a] bg-white/5 border-white/10" };
-                  const faltante = p.precio - (p.recibido > 0 ? p.recibido : p.pagado);
+                  let st = PAYMENT_STATUS[p.status] ?? { label: p.status, color: "text-[#8a7a6a] bg-white/5 border-white/10" };
+
+                  // Comparar SIEMPRE en la misma moneda: la cripto enviada contra
+                  // la cripto que se le pidió. NOWPayments marca "pago parcial"
+                  // por diferencias mínimas de redondeo aunque haya pagado todo.
+                  const cubierto = p.requerido > 0 ? p.pagado / p.requerido : 0;
+                  const faltaCripto = p.requerido > 0 ? p.requerido - p.pagado : 0;
                   const esParcial = p.status === "partially_paid";
+                  const casiCompleto = esParcial && cubierto >= 0.974;
+                  const faltaDeVerdad = esParcial && p.requerido > 0 && cubierto < 0.974;
+
+                  if (casiCompleto) {
+                    st = { label: "PAGADO ✓ (diferencia mínima)", color: "text-green-400 bg-green-500/10 border-green-500/30" };
+                  }
                   return (
                     <div key={p.id} className="card-dark rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center gap-4">
                       <div className="flex-1 min-w-0">
@@ -811,14 +835,20 @@ export default function AdminPage() {
                         </button>
                         <p className="text-[#6a5a4a] text-xs mt-1">
                           Debía pagar <span className="text-[#c9a84c] font-bold">${p.precio}</span>
-                          {p.recibido > 0 && <> · recibido <span className="text-white font-bold">${p.recibido}</span></>}
-                          {p.pagado > 0 && <> · envió {p.pagado} {p.moneda.toUpperCase()}</>}
+                          {p.requerido > 0 && <> (= {importe(p.requerido, p.moneda)})</>}
+                          {p.pagado > 0 && <> · envió <span className="text-white font-bold">{importe(p.pagado, p.moneda)}</span></>}
+                          {p.recibido > 0 && <> · llegó {importe(p.recibido, p.monedaRecibida || p.moneda)}</>}
                           {" · "}
                           {new Date(p.fecha).toLocaleString("es-ES", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}
                         </p>
-                        {esParcial && faltante > 0 && (
+                        {casiCompleto && (
+                          <p className="text-green-400 text-xs mt-1">
+                            Pagó el {(cubierto * 100).toFixed(1)}% — la diferencia es por comisiones de red, se considera pagado
+                          </p>
+                        )}
+                        {faltaDeVerdad && (
                           <p className="text-orange-400 text-xs mt-1 font-semibold">
-                            Faltan ${faltante.toFixed(2)} para completar el pago
+                            Pagó solo el {(cubierto * 100).toFixed(1)}% — faltan {importe(Number(faltaCripto.toFixed(8)), p.moneda)}
                           </p>
                         )}
                       </div>

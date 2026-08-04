@@ -88,10 +88,12 @@ export async function POST(req: NextRequest) {
     user_name: "PAGO",
     action: JSON.stringify({
       status,
-      precio: priceAmount,
-      pagado: actuallyPaid,
-      moneda: payload.pay_currency ?? "",
-      recibido: outcomeAmount,
+      precio: priceAmount,                                  // USD que debía pagar
+      pagado: actuallyPaid,                                 // cripto que envió
+      requerido: payAmount,                                 // cripto que se le pidió
+      moneda: payload.pay_currency ?? "",                   // moneda que envió (btc, usdt…)
+      recibido: outcomeAmount,                              // lo que llegó a la cartera
+      monedaRecibida: payload.outcome_currency ?? "",       // en qué moneda llegó
       paymentId: payload.payment_id ?? "",
     }),
   }).then(() => {});
@@ -101,8 +103,14 @@ export async function POST(req: NextRequest) {
     status === "partially_paid" &&
     actuallyPaid > 0 &&
     (
-      // Best: outcome_amount is already converted to fiat — compare directly
-      (outcomeAmount > 0 && outcomeAmount >= priceAmount - FIAT_TOLERANCE) ||
+      // outcome_amount solo sirve para comparar con el precio en USD cuando
+      // llega en dólares o stablecoin. Si la cartera recibe BTC, comparar
+      // 0.0085 BTC con 555 USD no tiene sentido.
+      (outcomeAmount > 0 &&
+        ["usd", "usdc", "usdp", "usdt", "busd", "dai"].includes(
+          ((payload.outcome_currency as string) ?? "").toLowerCase()
+        ) &&
+        outcomeAmount >= priceAmount - FIAT_TOLERANCE) ||
       // Good: compare crypto paid vs crypto required (same units, no currency mismatch)
       (payAmount > 0 && actuallyPaid >= payAmount * (1 - CRYPTO_TOLERANCE)) ||
       // Fallback: only valid for stablecoins where actually_paid ≈ USD

@@ -11,10 +11,12 @@ type PaymentRow = {
   email: string;
   fecha: string;
   status: string;
-  precio: number;
-  pagado: number;
-  moneda: string;
-  recibido: number;
+  precio: number;          // USD que debía pagar
+  pagado: number;          // cripto que envió
+  requerido: number;       // cripto que se le pidió
+  moneda: string;          // moneda enviada (btc, usdt…)
+  recibido: number;        // lo que llegó a la cartera
+  monedaRecibida: string;  // moneda en que llegó
   paymentId: string;
   nombre: string | null;
   plan: string | null;
@@ -57,8 +59,10 @@ export async function GET(req: NextRequest) {
       status: String(parsed.status ?? "desconocido"),
       precio: Number(parsed.precio ?? 0),
       pagado: Number(parsed.pagado ?? 0),
+      requerido: Number(parsed.requerido ?? 0),
       moneda: String(parsed.moneda ?? ""),
       recibido: Number(parsed.recibido ?? 0),
+      monedaRecibida: String(parsed.monedaRecibida ?? ""),
       paymentId: String(parsed.paymentId ?? ""),
       nombre: u?.name ?? null,
       plan: u?.plan ?? null,
