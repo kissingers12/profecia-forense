@@ -121,10 +121,13 @@ export async function POST(req: NextRequest) {
       .eq("email", orderId.toLowerCase())
       .maybeSingle();
 
-    const planForAmount = findPlanByAmount(priceAmount);
-
-    if (planUser && planForAmount && planForAmount !== planUser.plan) {
-      await log("WEBHOOK_PLAN_MISMATCH", `email=${orderId} paid_plan=${planForAmount} registered_plan=${planUser.plan} amount=${priceAmount}`);
+    // Verify the paid amount is consistent with the user's registered plan.
+    // We check price range rather than plan-name equality so that alias plans
+    // (e.g. "mentoria" and "clases" both at $555) don't cause false mismatches.
+    const PLAN_PRICE: Record<string, number> = { meditaciones: 333, mentoria: 555, clases: 555, escuela: 777 };
+    const expectedPrice = planUser ? (PLAN_PRICE[planUser.plan ?? ""] ?? 0) : 0;
+    if (planUser && expectedPrice > 0 && priceAmount < expectedPrice - FIAT_TOLERANCE) {
+      await log("WEBHOOK_PLAN_MISMATCH", `email=${orderId} paid=${priceAmount} expected=${expectedPrice} plan=${planUser.plan}`);
       return Response.json({ ok: true, skipped: true });
     }
 

@@ -40,7 +40,7 @@ export async function POST(req: NextRequest) {
   if (!user) return Response.json({ error: "Cuenta no encontrada." }, { status: 404 });
   if (user.activated) return Response.json({ activated: true });
 
-  const PLAN_PRICES: Record<string, number> = { escuela: 777, clases: 555, meditaciones: 333 };
+  const PLAN_PRICES: Record<string, number> = { escuela: 777, clases: 555, mentoria: 555, meditaciones: 333 };
 
   try {
     const token = await getJwtToken();

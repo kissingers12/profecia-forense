@@ -1,7 +1,7 @@
 export type UserSession = {
   email: string;
   name: string;
-  plan: "meditaciones" | "escuela" | "clases" | null;
+  plan: "meditaciones" | "escuela" | "clases" | "mentoria" | null;
   accessCode: string;
   activated: boolean;
 };
