@@ -5,8 +5,11 @@ import { allow, clientIp } from "@/lib/rate-limit";
 
 const PLAN_LABELS: Record<string, string> = {
   meditaciones: "Meditación Profética — $333",
-  escuela: "Escuela Avanzada de Profecía — $777",
-  clases: "Escuela de Profetas Todas las Clases — $555",
+  // La Escuela Avanzada está agotada: quien siga registrado en ella tiene que
+  // cambiar de formación, así que el aviso lo deja claro en vez de pedir $777
+  escuela: "⚠️ Registrado en la Escuela Avanzada (AGOTADA) — debe cambiar de formación",
+  clases: "Escuela de Profetas · Todas las Clases — $555",
+  mentoria: "Mentoría Profética — $555",
 };
 
 function escapeHtml(str: string): string {
@@ -128,10 +131,10 @@ export async function POST(req: NextRequest) {
           <p style="background:#0a0a20;padding:16px;border-radius:8px;border-left:3px solid #c9a84c;line-height:1.6">${safeMessage}</p>
           ` : ""}
           <hr style="border-color:#c9a84c22;margin:20px 0"/>
-          <p style="color:#c9a84c;font-size:13px;font-weight:bold">Acción requerida:</p>
-          <p style="color:#8a7a6a;font-size:13px">1. Verifica el pago en NowPayments buscando por email: <strong style="color:#f0e6d3">${safeEmail}</strong></p>
-          <p style="color:#8a7a6a;font-size:13px">2. Si el pago está confirmado, actívalo en: <a href="https://kissingersaraque.com/admin" style="color:#c9a84c">kissingersaraque.com/admin</a></p>
-          <p style="color:#8a7a6a;font-size:13px">3. Responde a este email para informarle al cliente.</p>
+          <p style="color:#c9a84c;font-size:13px;font-weight:bold">Qué hacer:</p>
+          <p style="color:#8a7a6a;font-size:13px">1. Mira el recuadro de arriba: ya indica si envió el dinero o no.</p>
+          <p style="color:#8a7a6a;font-size:13px">2. Si <strong style="color:#f0e6d3">SÍ pagó</strong>, actívalo con un clic en <a href="https://www.kissingersaraque.com/admin" style="color:#c9a84c">/admin → Pagos</a> (recibirá el correo de bienvenida automáticamente).</p>
+          <p style="color:#8a7a6a;font-size:13px">3. Si <strong style="color:#f0e6d3">NO pagó</strong>, respóndele pidiéndole el comprobante de su monedero, o que repita el pago desde su cuenta.</p>
         </div>
       `,
     });
