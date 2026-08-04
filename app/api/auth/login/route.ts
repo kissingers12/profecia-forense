@@ -3,6 +3,8 @@ import bcrypt from "bcryptjs";
 import { supabaseAdmin } from "@/lib/supabase";
 import { allow, reset, clientIp } from "@/lib/rate-limit";
 
+const DIA = 24 * 60 * 60_000;
+
 export async function POST(req: NextRequest) {
   const { email, password } = await req.json();
 
@@ -10,12 +12,12 @@ export async function POST(req: NextRequest) {
     return Response.json({ error: "Datos incompletos." }, { status: 400 });
   }
 
-  // Freno anti fuerza bruta: por cuenta y por dispositivo
+  // Freno anti fuerza bruta: por cuenta y por dispositivo, ventana de 24 h
   const ip = clientIp(req);
   const cuenta = String(email).toLowerCase();
-  if (!allow("login-cuenta", cuenta, 10, 15 * 60_000) || !allow("login-ip", ip, 40, 15 * 60_000)) {
+  if (!allow("login-cuenta", cuenta, 10, DIA) || !allow("login-ip", ip, 40, DIA)) {
     return Response.json(
-      { error: "Demasiados intentos fallidos. Espera 15 minutos e inténtalo de nuevo." },
+      { error: "Demasiados intentos fallidos. Si olvidaste tu contraseña, usa «¿Olvidaste tu contraseña?» para recuperarla." },
       { status: 429 }
     );
   }

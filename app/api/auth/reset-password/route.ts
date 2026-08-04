@@ -15,10 +15,11 @@ export async function POST(req: NextRequest) {
 
   // El código es de 6 dígitos: sin este freno se podría adivinar probando
   // combinaciones hasta robar la cuenta.
+  const DIA = 24 * 60 * 60_000;
   const cuenta = String(email).toLowerCase();
-  if (!allow("reset-cuenta", cuenta, 5, 15 * 60_000) || !allow("reset-ip", clientIp(req), 20, 15 * 60_000)) {
+  if (!allow("reset-cuenta", cuenta, 5, DIA) || !allow("reset-ip", clientIp(req), 20, DIA)) {
     return Response.json(
-      { error: "Demasiados intentos. Solicita un código nuevo en 15 minutos." },
+      { error: "Demasiados intentos con el código. Escríbenos y te ayudamos a recuperar tu cuenta." },
       { status: 429 }
     );
   }
@@ -44,7 +45,10 @@ export async function POST(req: NextRequest) {
     .update({ password_hash: passwordHash, reset_token: null, reset_expires: null })
     .eq("id", user.id);
 
+  // Cambió la contraseña demostrando que controla su correo: se le levantan
+  // los bloqueos para que pueda entrar aunque hubiera fallado muchas veces
   resetLimit("reset-cuenta", cuenta);
+  resetLimit("login-cuenta", cuenta);
 
   return Response.json({ success: true });
 }

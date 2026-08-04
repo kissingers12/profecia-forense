@@ -10,10 +10,11 @@ export async function POST(req: NextRequest) {
   const { email } = await req.json();
   if (!email) return Response.json({ error: "Correo requerido." }, { status: 400 });
 
-  // Evita que alguien inunde de correos a un alumno pidiendo códigos sin parar
+  // Evita que alguien inunde de correos a un alumno pidiendo códigos sin parar:
+  // 4 códigos por alumno cada 4 h, y 15 por dispositivo cada 24 h
   if (
-    !allow("olvide-cuenta", String(email).toLowerCase(), 4, 30 * 60_000) ||
-    !allow("olvide-ip", clientIp(req), 15, 30 * 60_000)
+    !allow("olvide-cuenta", String(email).toLowerCase(), 4, 4 * 60 * 60_000) ||
+    !allow("olvide-ip", clientIp(req), 15, 24 * 60 * 60_000)
   ) {
     // Se responde igual que en el caso normal para no dar pistas
     return Response.json({ success: true });

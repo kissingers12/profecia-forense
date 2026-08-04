@@ -26,10 +26,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: false, error: "Email requerido." }, { status: 400 });
     }
 
-    // Evita que un bot llene el buzón de soporte de mensajes
+    // Evita que un bot llene el buzón de soporte de mensajes:
+    // 3 por persona y 10 por dispositivo cada 24 h
+    const DIA = 24 * 60 * 60_000;
     if (
-      !allow("soporte-cuenta", String(email).toLowerCase(), 3, 60 * 60_000) ||
-      !allow("soporte-ip", clientIp(req), 10, 60 * 60_000)
+      !allow("soporte-cuenta", String(email).toLowerCase(), 3, DIA) ||
+      !allow("soporte-ip", clientIp(req), 10, DIA)
     ) {
       return NextResponse.json(
         { ok: false, error: "Ya recibimos tu solicitud. Te responderemos pronto." },
