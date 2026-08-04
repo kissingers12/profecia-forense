@@ -32,9 +32,9 @@ async function createNowPaymentsInvoice(email: string, plan: string): Promise<st
         price_currency: "usd",
         order_id: email,
         order_description: PLAN_LABELS[plan],
-        ipn_callback_url: "https://kissingersaraque.com/api/webhooks/nowpayments",
-        success_url: "https://kissingersaraque.com/dashboard",
-        cancel_url: "https://kissingersaraque.com/login",
+        ipn_callback_url: "https://www.kissingersaraque.com/api/webhooks/nowpayments",
+        success_url: "https://www.kissingersaraque.com/dashboard",
+        cancel_url: "https://www.kissingersaraque.com/login",
       }),
     });
     const data = await res.json();
