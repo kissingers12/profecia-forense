@@ -171,20 +171,20 @@ export default function Dashboard() {
     setPaymentLoading(false);
   };
 
-  const handleUpgradePlan = async () => {
+  const handleUpgradePlan = async (newPlan: "clases" | "meditaciones") => {
     setUpgradeLoading(true);
     setUpgradeError("");
     try {
       const res = await fetch("/api/auth/change-plan", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: session?.email, newPlan: "clases" }),
+        body: JSON.stringify({ email: session?.email, newPlan }),
       });
       const data = await res.json();
       if (!res.ok) {
         setUpgradeError(data.error ?? "Error al cambiar el plan.");
       } else {
-        const updated = { ...session!, plan: "clases" as const };
+        const updated = { ...session!, plan: newPlan };
         saveSession(updated);
         setSession(updated);
         setPaymentUrl(data.paymentUrl);
@@ -419,31 +419,45 @@ export default function Dashboard() {
               </button>
             </div>
 
-            {/* Opción 4: Cambiar a Escuela de Profetas (solo si está en plan meditaciones) */}
-            {session.plan === "meditaciones" && (
-              <div className="border-t border-white/5 pt-4 space-y-3">
-                <p className="text-xs font-semibold text-[#c9a84c] uppercase tracking-widest">
-                  ¿Quieres todas las clases?
-                </p>
-                <p className="text-[#8a7a6a] text-xs leading-relaxed">
-                  Actualmente tienes seleccionado el plan de Meditación ($333). Si prefieres el acceso completo a todas las clases de la Escuela de Profetas, puedes cambiar aquí.
-                </p>
-                {upgradeError && <p className="text-red-400 text-xs">{upgradeError}</p>}
+            {/* Opción 4: Cambiar de formación (cualquier plan sin activar) */}
+            <div className="border-t border-white/5 pt-4 space-y-3">
+              <p className="text-xs font-semibold text-[#c9a84c] uppercase tracking-widest">
+                ¿Quieres cambiar de formación?
+              </p>
+              <p className="text-[#8a7a6a] text-xs leading-relaxed">
+                {session.plan === "escuela"
+                  ? "La Escuela Avanzada ($777) tiene las plazas agotadas. Puedes cambiar tu registro a otra formación disponible y pagar esa."
+                  : `Actualmente tienes seleccionado: ${session.plan ? PLAN_LABELS[session.plan] : "sin plan"}. Puedes cambiar a otra formación antes de pagar.`}
+              </p>
+              {upgradeError && <p className="text-red-400 text-xs">{upgradeError}</p>}
+              {session.plan !== "clases" && (
                 <button
                   type="button"
-                  onClick={handleUpgradePlan}
+                  onClick={() => handleUpgradePlan("clases")}
                   disabled={upgradeLoading}
                   className="w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 text-sm border border-[#c9a84c]/60 text-[#c9a84c] bg-[#c9a84c]/5 hover:bg-[#c9a84c]/15 transition-all"
                 >
                   {upgradeLoading
                     ? <span className="w-4 h-4 border-2 border-[#c9a84c]/40 border-t-[#c9a84c] rounded-full animate-spin" />
-                    : "Cambiar a Escuela de Profetas — $555"}
+                    : "Cambiar a Escuela de Profetas · Todas las Clases — $555"}
                 </button>
-                <p className="text-[#6a5a4a] text-[10px] text-center">
-                  Esto actualizará tu plan. Tu cuenta anterior de meditación quedará cancelada.
-                </p>
-              </div>
-            )}
+              )}
+              {session.plan !== "meditaciones" && (
+                <button
+                  type="button"
+                  onClick={() => handleUpgradePlan("meditaciones")}
+                  disabled={upgradeLoading}
+                  className="w-full py-3 rounded-xl font-bold flex items-center justify-center gap-2 text-sm border border-white/10 text-[#c8b89a] bg-white/5 hover:border-[#c9a84c]/40 hover:text-[#c9a84c] transition-all"
+                >
+                  {upgradeLoading
+                    ? <span className="w-4 h-4 border-2 border-[#c9a84c]/40 border-t-[#c9a84c] rounded-full animate-spin" />
+                    : "Cambiar a Meditación Profética — $333"}
+                </button>
+              )}
+              <p className="text-[#6a5a4a] text-[10px] text-center">
+                Al cambiar, tu registro se actualiza y se genera un nuevo enlace de pago con el precio de la formación elegida.
+              </p>
+            </div>
           </div>
           <div className="text-center mt-6">
             <button onClick={handleLogout} className="text-[#6a5a4a] text-xs hover:text-[#c9a84c]">

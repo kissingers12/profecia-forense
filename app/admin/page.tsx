@@ -145,6 +145,31 @@ export default function AdminPage() {
     setActionLoading(null);
   };
 
+  const handleDeleteUser = async (user: User) => {
+    const ok = window.confirm(
+      `¿Eliminar el registro de ${user.name} (${user.email})?\n\nPodrá registrarse de nuevo en el futuro y elegir otro plan.`
+    );
+    if (!ok) return;
+    setActionLoading(user.email);
+    try {
+      const res = await fetch("/api/admin/users", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json", "x-admin-password": password },
+        body: JSON.stringify({ email: user.email }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setUsers((prev) => prev.filter((u) => u.email !== user.email));
+        showToast("Registro eliminado ✓");
+      } else {
+        showToast(data.error ?? "Error al eliminar.");
+      }
+    } catch {
+      showToast("Error de conexión.");
+    }
+    setActionLoading(null);
+  };
+
   const activatedCount = users.filter((u) => u.activated).length;
   const filteredUsers = users
     .filter((u) =>
@@ -577,6 +602,17 @@ export default function AdminPage() {
                       <KeyRound size={13} />
                       Contraseña
                     </button>
+                    {!user.activated && (
+                      <button
+                        onClick={() => handleDeleteUser(user)}
+                        disabled={actionLoading === user.email}
+                        title="Eliminar registro (podrá registrarse de nuevo)"
+                        className="flex items-center justify-center gap-1.5 px-5 py-1.5 rounded-xl text-xs font-bold text-red-400/80 border border-red-500/20 hover:bg-red-500/10 hover:text-red-400 transition-all"
+                      >
+                        <Trash2 size={12} />
+                        Eliminar
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}
