@@ -8,14 +8,16 @@ import { saveSession } from "@/lib/auth";
 
 const PLANS = [
   { value: "meditaciones", label: "Meditación Profética", price: 333 },
-  { value: "escuela", label: "Escuela Avanzada de Profecía", price: 777 },
+  { value: "clases", label: "Escuela de Profetas — Todas las Clases", price: 555 },
 ];
 
 function LoginContent() {
   const router = useRouter();
   const params = useSearchParams();
   const defaultTab = params.get("tab") === "register" ? "register" : "login";
-  const defaultPlan = params.get("plan") ?? "";
+  // El plan "escuela" está agotado — los enlaces antiguos se redirigen al plan de todas las clases
+  const rawPlan = params.get("plan") ?? "";
+  const defaultPlan = rawPlan === "escuela" ? "clases" : rawPlan;
 
   const [tab, setTab] = useState<"login" | "register">(defaultTab as "login" | "register");
   const [showPwd, setShowPwd] = useState(false);

@@ -1,10 +1,61 @@
 "use client";
 
-import { BookOpen, Eye, ArrowRight, Tag, ShieldCheck, Gift } from "lucide-react";
+import { useState } from "react";
+import { BookOpen, Eye, ArrowRight, Tag, ShieldCheck, Gift, GraduationCap, ChevronDown } from "lucide-react";
+
+type CurriculumItem = { title: string; detail: string };
+type CurriculumLevel = { level: string; count: string; items: CurriculumItem[] };
+
+const curriculumClases: CurriculumLevel[] = [
+  {
+    level: "Nivel Básico — Escuela de Profetas",
+    count: "8 clases",
+    items: [
+      { title: "Desbloqueando los ojos espirituales", detail: "El primer paso para dejar de orar \"a ciegas\" y empezar a percibir el mundo espiritual." },
+      { title: "Cómo recibir Espíritu de Profecía", detail: "La impartición que encendió a los profetas de la Biblia, y cómo recibirla hoy." },
+      { title: "Primeros pasos profetizando", detail: "Pasa de espectador a profeta: da tus primeras palabras proféticas con seguridad." },
+      { title: "La honra y el llamado a profetizar", detail: "El principio sin el cual la profecía no fluye." },
+      { title: "Profecía por interpretación", detail: "Aprende a leer lo que Dios te muestra en imágenes y símbolos." },
+      { title: "Profecía al tocar una persona", detail: "Lo que ocurre en el espíritu con el contacto, y cómo activarlo." },
+      { title: "Cómo ver letras y nombres en el espíritu", detail: "El nivel donde tu profecía se vuelve específica." },
+      { title: "Abrir los ojos y tener visiones", detail: "Ejercicios prácticos para activar la visión espiritual." },
+    ],
+  },
+  {
+    level: "Nivel Intermedio — Meditación Profética",
+    count: "5 sesiones",
+    items: [
+      { title: "Los 4 Secretos de la Meditación Profética", detail: "Quien no medita jamás se desarrolla plenamente en lo profético: aquí está el fundamento de todo." },
+      { title: "4 horas de música instrumental para meditar", detail: "Acompañamiento sonoro para tus tiempos de meditación profunda." },
+    ],
+  },
+  {
+    level: "Nivel Avanzado",
+    count: "10 clases",
+    items: [
+      { title: "La Llave de la Ciencia", detail: "Jesús nunca dijo \"reciban\": les dio conocimiento. Sin esta enseñanza no hay acceso al mundo espiritual." },
+      { title: "La Meditación de los profetas para salir del cuerpo", detail: "Experiencias espirituales y principios de los viajes en el espíritu." },
+      { title: "Actos Proféticos 1, 2 y 3", detail: "Cómo un acto en lo natural desata resultados en lo espiritual." },
+      { title: "Ángeles, Fantasmas y sombras", detail: "Discernimiento para reconocer cada manifestación espiritual y no confundirlas." },
+      { title: "El secreto de la prosperidad", detail: "Los principios espirituales detrás de la transformación financiera." },
+      { title: "\"Esto me hizo millonario\" (partes 1 y 2)", detail: "El testimonio y las claves que cambiaron la economía del pastor Kissingers." },
+      { title: "Si lo crees ya eres profeta", detail: "La identidad que desbloquea el don." },
+    ],
+  },
+  {
+    level: "Profecía Forense — Serie nueva",
+    count: "En crecimiento",
+    items: [
+      { title: "Precisión y detalles específicos", detail: "El nivel más alto: ver nombres, fechas y datos \"ocultos\". Cada nuevo video de esta serie queda incluido automáticamente en tu acceso." },
+    ],
+  },
+];
 
 const programs = [
   {
     id: 1,
+    planValue: "meditaciones",
+    soldOut: false,
     icon: <Eye size={28} className="text-[#c9a84c]" />,
     tag: "Meditación",
     title: "Meditación Profética",
@@ -21,18 +72,48 @@ const programs = [
       "Principios para comprender las experiencias espirituales descritas en las Escrituras y su aplicación práctica.",
       "La Llave de la Ciencia: una enseñanza clave. Jesús nunca dijo 'reciban', Jesús les dio conocimientos — y esta enseñanza es donde ocurre la verdadera impartición. La Biblia dice: en parte conocemos, en parte profetizamos. Sin esta enseñanza no tendrás acceso al mundo espiritual.",
     ],
+    curriculum: null as CurriculumLevel[] | null,
     closing: "Estas enseñanzas están diseñadas para llevar a un profeta de 0 a 100, ya que quien no medita jamás podrá desarrollarse plenamente en lo profético.",
     duration: "Acceso 24/7",
     level: "Todos los niveles",
     originalPrice: 444,
     price: 333,
     discount: 25,
-    gift: null,
-    paymentUrl: "https://nowpayments.io/payment/?iid=6358579774&paymentId=4532704630",
+    gift: null as { title: string; description: string } | null,
     accent: "#8b5cf6",
   },
   {
+    id: 3,
+    planValue: "clases",
+    soldOut: false,
+    icon: <GraduationCap size={28} className="text-[#c9a84c]" />,
+    tag: "Acceso Completo",
+    title: "Escuela de Profetas — Todas las Clases",
+    paragraphs: [
+      "El contenido completo de la Escuela Avanzada — más de 25 enseñanzas — sin mentoría grupal y sin clases por Zoom, a un precio más accesible.",
+      "Aprende a tu propio ritmo, con acceso 24/7 desde cualquier dispositivo: desde desbloquear tus ojos espirituales hasta la Profecía Forense, el nivel donde se ven nombres, fechas y detalles específicos.",
+    ],
+    accessLabel: null,
+    accessItems: null,
+    learnsLabel: "Lo que aprenderás:",
+    learns: [] as string[],
+    curriculum: curriculumClases,
+    closing: "El camino completo de formación profética, de 0 a Profecía Forense, para recorrerlo a tu ritmo.",
+    duration: "Acceso 24/7",
+    level: "Todos los niveles",
+    originalPrice: 777,
+    price: 555,
+    discount: 29,
+    gift: {
+      title: "El Manual para Escuchar a Dios",
+      description: "Más que un libro, es una herencia profética: 12 enseñanzas nacidas en la Escuela Profética, reunidas en una edición exclusiva y entregadas como regalo para los estudiantes, para que lleves contigo una parte del camino que Dios ha preparado para ti.",
+    },
+    accent: "#22c55e",
+  },
+  {
     id: 2,
+    planValue: "escuela",
+    soldOut: true,
     icon: <BookOpen size={28} className="text-[#c9a84c]" />,
     tag: "Formación",
     title: "Escuela Avanzada de Profecía",
@@ -64,6 +145,7 @@ const programs = [
       "Activaciones prácticas y ejercicios supervisados.",
       "Preguntas y respuestas en grupo de WhatsApp con el pastor Kissingers.",
     ],
+    curriculum: null,
     gift: {
       title: "El Manual para Escuchar a Dios",
       description: "Más que un libro, es una herencia profética: 12 enseñanzas nacidas en la Escuela Profética, reunidas en una edición exclusiva y entregadas como regalo especial para los estudiantes de la Escuela Avanzada, para que lleves contigo una parte del camino que Dios ha preparado para ti.",
@@ -74,10 +156,80 @@ const programs = [
     originalPrice: 1200,
     price: 777,
     discount: 35,
-    paymentUrl: "https://nowpayments.io/payment/?iid=5100234736&paymentId=5746183612",
     accent: "#3b82f6",
   },
 ];
+
+function Curriculum({ levels }: { levels: CurriculumLevel[] }) {
+  const [openLevel, setOpenLevel] = useState<number | null>(null);
+  const [openItems, setOpenItems] = useState<Set<string>>(new Set());
+
+  const toggleItem = (key: string) => {
+    setOpenItems((prev) => {
+      const next = new Set(prev);
+      if (next.has(key)) next.delete(key); else next.add(key);
+      return next;
+    });
+  };
+
+  return (
+    <div className="space-y-2">
+      {levels.map((lvl, li) => {
+        const isOpen = openLevel === li;
+        return (
+          <div key={li} className={`rounded-xl border transition-colors ${isOpen ? "border-[#c9a84c]/30 bg-[#c9a84c]/[0.04]" : "border-white/10"}`}>
+            <button
+              type="button"
+              onClick={() => setOpenLevel(isOpen ? null : li)}
+              className="w-full flex items-center gap-2 p-3.5 text-left cursor-pointer"
+            >
+              <span className="text-[#c9a84c] text-[11px] font-bold uppercase tracking-wider flex-1 leading-snug">
+                {lvl.level}
+              </span>
+              <span className="text-[#6a5a4a] text-[10px] shrink-0">{lvl.count}</span>
+              <ChevronDown
+                size={15}
+                className={`text-[#c9a84c] shrink-0 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+              />
+            </button>
+
+            {isOpen && (
+              <ul className="px-3.5 pb-3.5 space-y-1">
+                {lvl.items.map((item, ii) => {
+                  const key = `${li}-${ii}`;
+                  const itemOpen = openItems.has(key);
+                  return (
+                    <li key={key} className="border-t border-white/5 first:border-t-0">
+                      <button
+                        type="button"
+                        onClick={() => toggleItem(key)}
+                        className="w-full flex items-start gap-2 py-2 text-left cursor-pointer group"
+                      >
+                        <ShieldCheck size={13} className="text-[#c9a84c] shrink-0 mt-0.5" />
+                        <span className={`text-[13px] leading-snug flex-1 transition-colors ${itemOpen ? "text-[#c9a84c] font-semibold" : "text-white group-hover:text-[#c9a84c]"}`}>
+                          {item.title}
+                        </span>
+                        <ChevronDown
+                          size={13}
+                          className={`text-[#6a5a4a] shrink-0 mt-0.5 transition-transform duration-200 ${itemOpen ? "rotate-180" : ""}`}
+                        />
+                      </button>
+                      {itemOpen && (
+                        <p className="text-[#b8a888] text-xs leading-relaxed pb-2.5 pl-[21px]">
+                          {item.detail}
+                        </p>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 export default function Programs() {
   return (
@@ -103,7 +255,7 @@ export default function Programs() {
         </div>
 
         {/* Cards */}
-        <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto items-start">
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto items-start">
           {programs.map((p) => (
             <div key={p.id} className="card-dark card-hover rounded-2xl overflow-hidden group flex flex-col">
               {/* Top gradient bar */}
@@ -112,7 +264,14 @@ export default function Programs() {
                 style={{ background: `linear-gradient(90deg, ${p.accent}, #c9a84c)` }}
               />
 
-              <div className="p-8 flex flex-col flex-1">
+              {/* Cinta de agotado */}
+              {p.soldOut && (
+                <div className="bg-red-500/15 border-b border-red-500/30 text-red-400 text-[11px] font-bold tracking-[0.3em] uppercase text-center py-2.5 shrink-0">
+                  Plazas agotadas
+                </div>
+              )}
+
+              <div className={`p-8 flex flex-col flex-1 ${p.soldOut ? "opacity-60" : ""}`}>
                 {/* Tag + Icon */}
                 <div className="flex items-center justify-between mb-5">
                   <span
@@ -183,14 +342,23 @@ export default function Programs() {
                   <p className="text-white text-xs font-bold uppercase tracking-widest mb-3">
                     {p.learnsLabel}
                   </p>
-                  <ul className="space-y-2.5">
-                    {p.learns.map((item, i) => (
-                      <li key={i} className="flex items-start gap-2.5 text-sm text-[#c8b89a]">
-                        <ShieldCheck size={15} className="text-[#c9a84c] shrink-0 mt-0.5" />
-                        <span className="leading-relaxed">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  {p.curriculum ? (
+                    <>
+                      <p className="text-[#6a5a4a] text-xs mb-3">
+                        Toca cada nivel para ver sus clases, y cada clase para descubrir lo que aprenderás.
+                      </p>
+                      <Curriculum levels={p.curriculum} />
+                    </>
+                  ) : (
+                    <ul className="space-y-2.5">
+                      {p.learns.map((item, i) => (
+                        <li key={i} className="flex items-start gap-2.5 text-sm text-[#c8b89a]">
+                          <ShieldCheck size={15} className="text-[#c9a84c] shrink-0 mt-0.5" />
+                          <span className="leading-relaxed">{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
                 </div>
 
                 {/* Closing statement */}
@@ -214,7 +382,7 @@ export default function Programs() {
 
                 {/* Price block */}
                 <div className="border-t border-[#c9a84c]/15 pt-5 mb-5">
-                  {p.discount && p.originalPrice && (
+                  {p.discount && p.originalPrice && !p.soldOut && (
                     <div className="flex items-center gap-2 mb-1">
                       <span className="line-through text-[#6a5a4a] text-sm">${p.originalPrice}</span>
                       <span className="inline-flex items-center gap-1 bg-green-500/15 border border-green-500/30 text-green-400 text-xs font-bold px-2 py-0.5 rounded-full">
@@ -227,21 +395,36 @@ export default function Programs() {
                     <span className="text-3xl font-bold text-white">${p.price}</span>
                     <span className="text-[#8a7a6a] text-sm">USD</span>
                   </div>
-                  <span className="text-[#6a5a4a] text-xs">Pago único · Acceso 24/7</span>
+                  <span className="text-[#6a5a4a] text-xs">
+                    {p.soldOut ? "Sin plazas disponibles" : "Pago único · Acceso 24/7"}
+                  </span>
                 </div>
 
                 {/* CTA */}
-                <a
-                  href={`/login?tab=register&plan=${p.id === 1 ? "meditaciones" : "escuela"}`}
-                  className="btn-gold w-full py-3.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 mt-auto group"
-                >
-                  Inscribirme · ${p.price}
-                  <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-                </a>
-                <p className="text-center text-xs text-[#6a5a4a] mt-2">
-                  Elige tu criptomoneda favorita al pagar —{" "}
-                  <span className="text-[#c9a84c]/70">Bitcoin, USDT, ETH y más de 100 opciones.</span>
-                </p>
+                {p.soldOut ? (
+                  <>
+                    <div className="w-full py-3.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 mt-auto bg-white/5 border border-white/10 text-[#8a7a6a] cursor-not-allowed select-none">
+                      Agotado
+                    </div>
+                    <p className="text-center text-xs text-[#6a5a4a] mt-2">
+                      Este programa no acepta nuevas inscripciones por el momento.
+                    </p>
+                  </>
+                ) : (
+                  <>
+                    <a
+                      href={`/login?tab=register&plan=${p.planValue}`}
+                      className="btn-gold w-full py-3.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 mt-auto group"
+                    >
+                      Inscribirme · ${p.price}
+                      <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                    </a>
+                    <p className="text-center text-xs text-[#6a5a4a] mt-2">
+                      Elige tu criptomoneda favorita al pagar —{" "}
+                      <span className="text-[#c9a84c]/70">Bitcoin, USDT, ETH y más de 100 opciones.</span>
+                    </p>
+                  </>
+                )}
                 <a
                   href="/login"
                   className="text-center text-xs text-[#8a7a6a] hover:text-[#c9a84c] mt-2 transition-colors block"

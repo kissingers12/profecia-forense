@@ -5,6 +5,7 @@ import { supabaseAdmin } from "@/lib/supabase";
 const PLAN_LABELS: Record<string, string> = {
   meditaciones: "Meditación Profética — $333",
   escuela: "Escuela Avanzada de Profecía — $777",
+  clases: "Escuela de Profetas Todas las Clases — $555",
 };
 
 function escapeHtml(str: string): string {

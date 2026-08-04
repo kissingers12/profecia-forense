@@ -35,6 +35,7 @@ type ForoPost = {
 const PLAN_LABELS: Record<string, string> = {
   meditaciones: "Meditación $333",
   escuela: "Escuela $777",
+  clases: "Clases $555",
 };
 
 export default function AdminPage() {
@@ -319,7 +320,8 @@ export default function AdminPage() {
 
   const escuelaActivos = users.filter((u) => u.activated && u.plan === "escuela").length;
   const meditActivos = users.filter((u) => u.activated && u.plan === "meditaciones").length;
-  const totalRevenue = escuelaActivos * 777 + meditActivos * 333;
+  const clasesActivos = users.filter((u) => u.activated && u.plan === "clases").length;
+  const totalRevenue = escuelaActivos * 777 + meditActivos * 333 + clasesActivos * 555;
 
   const filteredLogs = logSearch.trim()
     ? logs.filter((l) =>
@@ -661,13 +663,21 @@ export default function AdminPage() {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div className="card-dark rounded-2xl p-5">
                 <p className="text-[#6a5a4a] text-xs uppercase tracking-widest mb-3">Escuela Avanzada · $777</p>
                 <p className="text-3xl font-bold text-white mb-1">{escuelaActivos}</p>
                 <p className="text-[#c9a84c] text-sm font-bold">${(escuelaActivos * 777).toLocaleString("es-ES")}</p>
                 <div className="mt-3 h-1.5 bg-white/5 rounded-full overflow-hidden">
                   <div className="h-full bg-[#c9a84c] rounded-full" style={{ width: activatedCount ? `${(escuelaActivos / activatedCount) * 100}%` : "0%" }} />
+                </div>
+              </div>
+              <div className="card-dark rounded-2xl p-5">
+                <p className="text-[#6a5a4a] text-xs uppercase tracking-widest mb-3">Todas las Clases · $555</p>
+                <p className="text-3xl font-bold text-white mb-1">{clasesActivos}</p>
+                <p className="text-[#c9a84c] text-sm font-bold">${(clasesActivos * 555).toLocaleString("es-ES")}</p>
+                <div className="mt-3 h-1.5 bg-white/5 rounded-full overflow-hidden">
+                  <div className="h-full bg-[#c9a84c] rounded-full" style={{ width: activatedCount ? `${(clasesActivos / activatedCount) * 100}%` : "0%" }} />
                 </div>
               </div>
               <div className="card-dark rounded-2xl p-5">
@@ -685,6 +695,7 @@ export default function AdminPage() {
               <p className="text-2xl font-bold text-white">
                 ${(
                   users.filter((u) => !u.activated && u.plan === "escuela").length * 777 +
+                  users.filter((u) => !u.activated && u.plan === "clases").length * 555 +
                   users.filter((u) => !u.activated && u.plan === "meditaciones").length * 333
                 ).toLocaleString("es-ES")}
               </p>

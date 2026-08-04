@@ -4,6 +4,7 @@ import { supabaseAdmin } from "@/lib/supabase";
 
 const PRICE_TO_PLAN: Record<number, string> = {
   333: "meditaciones",
+  555: "clases",
   777: "escuela",
 };
 

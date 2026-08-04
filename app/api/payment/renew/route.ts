@@ -4,11 +4,13 @@ import { supabaseAdmin } from "@/lib/supabase";
 const PLAN_PRICES: Record<string, number> = {
   meditaciones: 333,
   escuela: 777,
+  clases: 555,
 };
 
 const PLAN_LABELS: Record<string, string> = {
   meditaciones: "Meditación Profética - 100x100Cristianos",
   escuela: "Escuela Avanzada de Profecía - 100x100Cristianos",
+  clases: "Escuela de Profetas Todas las Clases - 100x100Cristianos",
 };
 
 const FALLBACK_URLS: Record<string, string> = {

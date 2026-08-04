@@ -5,11 +5,13 @@ import { supabaseAdmin } from "@/lib/supabase";
 const PLAN_PRICES: Record<string, number> = {
   meditaciones: 333,
   escuela: 777,
+  clases: 555,
 };
 
 const PLAN_LABELS: Record<string, string> = {
   meditaciones: "Meditación Profética - 100x100Cristianos",
   escuela: "Escuela Avanzada de Profecía - 100x100Cristianos",
+  clases: "Escuela de Profetas Todas las Clases - 100x100Cristianos",
 };
 
 const FALLBACK_URLS: Record<string, string> = {
@@ -49,8 +51,8 @@ export async function POST(req: NextRequest) {
     return Response.json({ error: "Todos los campos son requeridos." }, { status: 400 });
   }
 
-  if (plan === "escuela" && !whatsapp) {
-    return Response.json({ error: "El número de WhatsApp es obligatorio para este programa." }, { status: 400 });
+  if (plan === "escuela") {
+    return Response.json({ error: "Las plazas de la Escuela Avanzada están agotadas por el momento." }, { status: 400 });
   }
 
   if (!PLAN_PRICES[plan]) {

@@ -174,13 +174,13 @@ export default function Dashboard() {
       const res = await fetch("/api/auth/change-plan", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: session?.email, newPlan: "escuela" }),
+        body: JSON.stringify({ email: session?.email, newPlan: "clases" }),
       });
       const data = await res.json();
       if (!res.ok) {
         setUpgradeError(data.error ?? "Error al cambiar el plan.");
       } else {
-        const updated = { ...session!, plan: "escuela" as const };
+        const updated = { ...session!, plan: "clases" as const };
         saveSession(updated);
         setSession(updated);
         setPaymentUrl(data.paymentUrl);
@@ -410,14 +410,14 @@ export default function Dashboard() {
               </button>
             </div>
 
-            {/* Opción 4: Cambiar a Escuela Avanzada (solo si está en plan meditaciones) */}
+            {/* Opción 4: Cambiar a Escuela de Profetas (solo si está en plan meditaciones) */}
             {session.plan === "meditaciones" && (
               <div className="border-t border-white/5 pt-4 space-y-3">
                 <p className="text-xs font-semibold text-[#c9a84c] uppercase tracking-widest">
-                  ¿Quieres el Nivel Avanzado?
+                  ¿Quieres todas las clases?
                 </p>
                 <p className="text-[#8a7a6a] text-xs leading-relaxed">
-                  Actualmente tienes seleccionado el plan de Meditación ($333). Si prefieres el programa completo de la Escuela Avanzada, puedes cambiar aquí.
+                  Actualmente tienes seleccionado el plan de Meditación ($333). Si prefieres el acceso completo a todas las clases de la Escuela de Profetas, puedes cambiar aquí.
                 </p>
                 {upgradeError && <p className="text-red-400 text-xs">{upgradeError}</p>}
                 <button
@@ -428,7 +428,7 @@ export default function Dashboard() {
                 >
                   {upgradeLoading
                     ? <span className="w-4 h-4 border-2 border-[#c9a84c]/40 border-t-[#c9a84c] rounded-full animate-spin" />
-                    : "Cambiar a Escuela Avanzada — $777"}
+                    : "Cambiar a Escuela de Profetas — $555"}
                 </button>
                 <p className="text-[#6a5a4a] text-[10px] text-center">
                   Esto actualizará tu plan. Tu cuenta anterior de meditación quedará cancelada.
@@ -447,7 +447,9 @@ export default function Dashboard() {
   }
 
   const isEscuela = session.plan === "escuela";
-  const flatContent = isEscuela ? allEscuelaLessons : meditacionesContent;
+  // "clases" ($555) incluye todas las clases y el libro, pero sin WhatsApp, Zoom ni Comunidad
+  const hasAllClasses = isEscuela || session.plan === "clases";
+  const flatContent = hasAllClasses ? allEscuelaLessons : meditacionesContent;
   const planLabel = session.plan ? PLAN_LABELS[session.plan] : "Sin plan";
   const activeLesson_obj = flatContent.find((l) => l.id === activeLesson);
 
@@ -544,13 +546,15 @@ export default function Dashboard() {
             </span>
           </a>
           <div className="flex items-center gap-3">
-            <a
-              href="/foro"
-              className="btn-outline-gold px-4 py-2 rounded-full text-xs font-bold flex items-center gap-1.5"
-            >
-              <MessageCircle size={13} />
-              <span className="hidden sm:inline">Comunidad</span>
-            </a>
+            {session.plan === "escuela" && (
+              <a
+                href="/foro"
+                className="btn-outline-gold px-4 py-2 rounded-full text-xs font-bold flex items-center gap-1.5"
+              >
+                <MessageCircle size={13} />
+                <span className="hidden sm:inline">Comunidad</span>
+              </a>
+            )}
             <div className="hidden sm:block text-right">
               <p className="text-white text-sm font-semibold">{session.name}</p>
               <p className="text-[#6a5a4a] text-xs">{session.email}</p>
@@ -635,7 +639,7 @@ export default function Dashboard() {
               const next = flatContent.find(l => l.unlocked && !watchedIds.has(l.id)) ?? flatContent[0];
               markWatched(next.id);
               setActiveLesson(next.id);
-              if (isEscuela) {
+              if (hasAllClasses) {
                 const gi = escuelaGroups.findIndex(g => g.lessons.some(l => l.id === next.id));
                 if (gi >= 0) setOpenGroups(prev => new Set(prev).add(gi));
               }
@@ -648,7 +652,7 @@ export default function Dashboard() {
         </div>
 
         {/* Libro digital — solo usuarios Escuela Avanzada */}
-        {isEscuela && (() => {
+        {hasAllClasses && (() => {
           const launched = new Date() >= new Date("2026-07-04T00:00:00");
 
           const handleDownload = async (type: "pdf" | "epub") => {
@@ -734,7 +738,7 @@ export default function Dashboard() {
           Contenido de tu programa
         </h2>
 
-        {isEscuela ? (
+        {hasAllClasses ? (
           <div className="space-y-4">
             {escuelaGroups.map((group, gi) => {
               const isOpen = openGroups.has(gi);
@@ -787,10 +791,10 @@ export default function Dashboard() {
           <div className="mt-10 card-dark rounded-2xl p-8 text-center border border-[#c9a84c]/20">
             <h3 className="text-xl font-bold text-white mb-2">¿Listo para ir más profundo?</h3>
             <p className="text-[#b8a888] text-sm mb-5 max-w-md mx-auto">
-              Accede a la Escuela Avanzada de Profecía con más de 17 enseñanzas, mentoría grupal y acompañamiento real.
+              Accede a todas las clases de la Escuela de Profetas: más de 25 enseñanzas, de 0 a Profecía Forense, con el libro de regalo.
             </p>
             <a href="/#programas" className="btn-gold px-7 py-3 rounded-full font-bold text-sm inline-block">
-              Ver Escuela Avanzada · $777
+              Ver todas las clases · $555
             </a>
           </div>
         )}

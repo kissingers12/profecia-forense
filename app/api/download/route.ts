@@ -13,14 +13,14 @@ export async function POST(req: NextRequest) {
     return Response.json({ error: "Solicitud inválida." }, { status: 400 });
   }
 
-  // Verify user is escuela and activated
+  // Verify user is escuela/clases and activated
   const { data: user } = await supabaseAdmin
     .from("users")
     .select("plan, activated, name")
     .eq("email", email.toLowerCase())
     .maybeSingle();
 
-  if (!user || !user.activated || user.plan !== "escuela") {
+  if (!user || !user.activated || (user.plan !== "escuela" && user.plan !== "clases")) {
     return Response.json({ error: "Acceso no autorizado." }, { status: 403 });
   }
 
