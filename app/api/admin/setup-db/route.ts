@@ -19,6 +19,14 @@ const CREATE_TABLE_SQL = `
   );
 `;
 
+// La tabla users tiene un CHECK que solo aceptaba meditaciones/escuela;
+// sin esto, el registro del plan "clases" ($555) falla
+const FIX_PLAN_CONSTRAINT_SQL = `
+  ALTER TABLE users DROP CONSTRAINT IF EXISTS users_plan_check;
+  ALTER TABLE users ADD CONSTRAINT users_plan_check
+    CHECK (plan IN ('meditaciones', 'escuela', 'clases'));
+`;
+
 export async function POST(req: NextRequest) {
   if (!checkAuth(req)) return Response.json({ error: "No autorizado." }, { status: 401 });
 
@@ -39,8 +47,9 @@ export async function POST(req: NextRequest) {
   try {
     await client.connect();
     await client.query(CREATE_TABLE_SQL);
+    await client.query(FIX_PLAN_CONSTRAINT_SQL);
     await client.end();
-    return Response.json({ ok: true, message: "Tabla download_codes creada correctamente." });
+    return Response.json({ ok: true, message: "Base de datos actualizada: plan $555 habilitado." });
   } catch (err: unknown) {
     await client.end().catch(() => {});
     const msg = err instanceof Error ? err.message : String(err);
