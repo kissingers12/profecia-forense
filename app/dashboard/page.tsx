@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { LogOut, PlayCircle, BookOpen, Lock, CheckCircle, ChevronRight, Eye, KeyRound, MessageCircle, Video, Download, Gift } from "lucide-react";
 import { getSession, clearSession, saveSession, PLAN_LABELS, type UserSession } from "@/lib/auth";
+import { generoPorNombre } from "@/lib/genero";
+import { nombreDeSaludo } from "@/lib/nombre";
 
 type Lesson = {
   id: number;
@@ -596,8 +598,17 @@ export default function Dashboard() {
       <main className="max-w-7xl mx-auto px-6 pt-28 pb-16">
         {/* Welcome */}
         <div className="mb-10">
-          <p className="text-[#c9a84c] text-sm font-semibold uppercase tracking-widest mb-1">Bienvenido de vuelta</p>
-          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">Hola, {session.name.split(" ")[0]} 👋</h1>
+          <p className="text-[#c9a84c] text-sm font-semibold uppercase tracking-widest mb-1">
+            {(() => {
+              const g = generoPorNombre(session.name);
+              // Si el nombre no deja claro el género, se saluda de forma neutra
+              // para no dirigirse mal a nadie
+              return g === "f" ? "Bienvenida de vuelta"
+                : g === "m" ? "Bienvenido de vuelta"
+                : "Nos alegra verte de nuevo";
+            })()}
+          </p>
+          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">Hola, {nombreDeSaludo(session.name) || session.name.split(" ")[0]} 👋</h1>
           <div className="inline-flex items-center gap-2 bg-[#c9a84c]/10 border border-[#c9a84c]/25 rounded-full px-4 py-1.5 mt-2">
             <CheckCircle size={14} className="text-[#c9a84c]" />
             <span className="text-[#c9a84c] text-xs font-semibold">{planLabel}</span>

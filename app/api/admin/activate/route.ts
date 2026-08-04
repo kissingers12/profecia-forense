@@ -3,6 +3,7 @@ import nodemailer from "nodemailer";
 import { supabaseAdmin } from "@/lib/supabase";
 import { checkAdmin } from "@/lib/admin-auth";
 import { nombreDeSaludo } from "@/lib/nombre";
+import { generoPorNombre } from "@/lib/genero";
 
 function checkAuth(req: NextRequest): boolean {
   return checkAdmin(req);
@@ -24,6 +25,13 @@ async function sendWelcomeEmail(email: string, name: string) {
   const safeName = escapeHtml(nombreDeSaludo(name));
   const safeEmail = escapeHtml(email);
 
+  // Saludo en femenino o masculino según el nombre; neutro si no está claro
+  const g = generoPorNombre(name);
+  const bienvenida =
+    g === "f" ? "¡Bienvenida a la familia de 100×100 Cristianos!"
+    : g === "m" ? "¡Bienvenido a la familia de 100×100 Cristianos!"
+    : "¡Te damos la bienvenida a la familia de 100×100 Cristianos!";
+
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
@@ -37,6 +45,7 @@ async function sendWelcomeEmail(email: string, name: string) {
       `¡Bendiciones! 🙏\n\n` +
       `Nos alegra informarte que tu acceso ya ha sido activado. Ya puedes ingresar iniciando sesión con el correo con el que te registraste (${email}), y tendrás acceso tanto al contenido disponible ahora como a todo el contenido que se vaya liberando en el futuro.\n\n` +
       `Entra aquí: https://www.kissingersaraque.com/login\n\n` +
+      `${bienvenida}\n\n` +
       `Oramos para que este tiempo de formación sea de mucha edificación.\n\n` +
       `Si llegas a tener alguna dificultad, escríbenos y con gusto te ayudaremos.\n\n` +
       `Servicio al Estudiante · 100x100Cristianos`,
@@ -63,6 +72,10 @@ async function sendWelcomeEmail(email: string, name: string) {
             Entrar a mi formación →
           </a>
         </div>
+
+        <p style="font-size:16px;line-height:1.7;color:#c9a84c;font-weight:bold;margin:0 0 14px;text-align:center">
+          ${bienvenida}
+        </p>
 
         <p style="font-size:15px;line-height:1.7;color:#e8dcc8;margin:0 0 18px">
           Oramos para que este tiempo de formación sea de mucha edificación.

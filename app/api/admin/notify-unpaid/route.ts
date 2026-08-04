@@ -3,6 +3,7 @@ import nodemailer from "nodemailer";
 import { supabaseAdmin } from "@/lib/supabase";
 import { checkAdmin } from "@/lib/admin-auth";
 import { nombreDeSaludo } from "@/lib/nombre";
+import { generoPorNombre } from "@/lib/genero";
 
 function escapeHtml(str: string): string {
   return str
@@ -39,6 +40,12 @@ export async function POST(req: NextRequest) {
   }
 
   const nombre = nombreDeSaludo(user.name);
+  // "estás inscrito" / "estás inscrita" según el nombre; neutro si no está claro
+  const g = generoPorNombre(user.name);
+  const cierre =
+    g === "f" ? "Estaremos encantados de tenerte inscrita muy pronto."
+    : g === "m" ? "Estaremos encantados de tenerte inscrito muy pronto."
+    : "Estaremos encantados de contar contigo muy pronto.";
   const safeName = escapeHtml(nombre);
   const safeEmail = escapeHtml(user.email);
 
@@ -63,6 +70,7 @@ export async function POST(req: NextRequest) {
       `3. Elige tu criptomoneda y envía el importe exacto que te indique la pantalla.\n` +
       `4. Espera la confirmación de la red. En Bitcoin puede tardar entre 20 y 40 minutos: tu acceso se activará automáticamente.\n\n` +
       `Si tú crees que sí llegaste a enviar el dinero, respóndenos con el comprobante o el ID de la transacción de tu monedero y lo verificamos enseguida.\n\n` +
+      `${cierre}\n\n` +
       `Quedamos atentos para ayudarte en lo que necesites.\n\n` +
       `Servicio al Estudiante · 100x100Cristianos`,
     html: `
@@ -110,6 +118,10 @@ export async function POST(req: NextRequest) {
         </p>
 
         <hr style="border:none;border-top:1px solid #c9a84c22;margin:24px 0"/>
+
+        <p style="font-size:15px;line-height:1.7;color:#c9a84c;font-weight:bold;margin:0 0 18px;text-align:center">
+          ${cierre}
+        </p>
 
         <p style="font-size:13px;line-height:1.6;color:#8a7a6a;margin:0 0 6px">
           Quedamos atentos para ayudarte en lo que necesites.
