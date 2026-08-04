@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import bcrypt from "bcryptjs";
 import { supabaseAdmin } from "@/lib/supabase";
+import { allow, clientIp } from "@/lib/rate-limit";
 
 const PLAN_PRICES: Record<string, number> = {
   meditaciones: 333,
@@ -49,6 +50,26 @@ export async function POST(req: NextRequest) {
 
   if (!email || !name || !password || !plan) {
     return Response.json({ error: "Todos los campos son requeridos." }, { status: 400 });
+  }
+
+  // Freno anti-bots: evita que se creen cientos de cuentas basura
+  if (!allow("registro", clientIp(req), 5, 60 * 60_000)) {
+    return Response.json(
+      { error: "Demasiados registros desde este dispositivo. Inténtalo más tarde." },
+      { status: 429 }
+    );
+  }
+
+  if (typeof email !== "string" || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) {
+    return Response.json({ error: "El correo no es válido." }, { status: 400 });
+  }
+
+  if (typeof password !== "string" || password.length < 6) {
+    return Response.json({ error: "La contraseña debe tener al menos 6 caracteres." }, { status: 400 });
+  }
+
+  if (typeof name !== "string" || name.trim().length < 2 || name.length > 100) {
+    return Response.json({ error: "El nombre no es válido." }, { status: 400 });
   }
 
   if (plan === "escuela") {

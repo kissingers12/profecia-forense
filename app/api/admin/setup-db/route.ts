@@ -1,10 +1,9 @@
 import { NextRequest } from "next/server";
 import { Client } from "pg";
+import { checkAdmin } from "@/lib/admin-auth";
 
 function checkAuth(req: NextRequest): boolean {
-  const adminPassword = process.env.ADMIN_PASSWORD;
-  if (!adminPassword) return false;
-  return req.headers.get("x-admin-password") === adminPassword;
+  return checkAdmin(req);
 }
 
 const CREATE_TABLE_SQL = `

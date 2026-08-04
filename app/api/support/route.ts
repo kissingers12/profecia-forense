@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import { supabaseAdmin } from "@/lib/supabase";
+import { allow, clientIp } from "@/lib/rate-limit";
 
 const PLAN_LABELS: Record<string, string> = {
   meditaciones: "Meditación Profética — $333",
@@ -23,6 +24,21 @@ export async function POST(req: NextRequest) {
 
     if (!email) {
       return NextResponse.json({ ok: false, error: "Email requerido." }, { status: 400 });
+    }
+
+    // Evita que un bot llene el buzón de soporte de mensajes
+    if (
+      !allow("soporte-cuenta", String(email).toLowerCase(), 3, 60 * 60_000) ||
+      !allow("soporte-ip", clientIp(req), 10, 60 * 60_000)
+    ) {
+      return NextResponse.json(
+        { ok: false, error: "Ya recibimos tu solicitud. Te responderemos pronto." },
+        { status: 429 }
+      );
+    }
+
+    if (typeof message === "string" && message.length > 2000) {
+      return NextResponse.json({ ok: false, error: "El mensaje es demasiado largo." }, { status: 400 });
     }
 
     // Only allow registered users to send support requests

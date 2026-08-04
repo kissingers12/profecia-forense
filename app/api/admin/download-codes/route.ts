@@ -1,11 +1,10 @@
 import { NextRequest } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import crypto from "crypto";
+import { checkAdmin } from "@/lib/admin-auth";
 
 function checkAuth(req: NextRequest): boolean {
-  const adminPassword = process.env.ADMIN_PASSWORD;
-  if (!adminPassword) return false;
-  return req.headers.get("x-admin-password") === adminPassword;
+  return checkAdmin(req);
 }
 
 function getBooks() {

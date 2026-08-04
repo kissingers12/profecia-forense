@@ -1,9 +1,10 @@
 import { NextRequest } from "next/server";
 import bcrypt from "bcryptjs";
 import { supabaseAdmin } from "@/lib/supabase";
+import { checkAdmin } from "@/lib/admin-auth";
 
 function checkAuth(req: NextRequest): boolean {
-  return (req.headers.get("x-admin-password") ?? "") === process.env.ADMIN_PASSWORD;
+  return checkAdmin(req);
 }
 
 export async function POST(req: NextRequest) {
