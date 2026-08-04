@@ -46,7 +46,6 @@ export default function Hero() {
             alt="100x100Cristianos"
             fill
             priority
-            quality={95}
             className="object-cover object-center"
           />
         </div>
