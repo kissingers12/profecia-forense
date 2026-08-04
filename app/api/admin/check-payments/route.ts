@@ -10,9 +10,17 @@ export async function GET(req: NextRequest) {
   const apiKey = process.env.NOWPAYMENTS_API_KEY;
   const ipnSecret = process.env.NOWPAYMENTS_IPN_SECRET;
 
+  // Huella de la clave IPN con el mismo formato que muestra NOWPayments
+  // (4 primeros...4 últimos) para poder compararlas a simple vista sin exponerla
+  const ipnFingerprint = ipnSecret
+    ? `${ipnSecret.slice(0, 4)}...${ipnSecret.slice(-4)}`
+    : "—";
+
   const result: Record<string, unknown> = {
     NOWPAYMENTS_API_KEY: apiKey ? "configurada ✓" : "FALTA ✗",
     NOWPAYMENTS_IPN_SECRET: ipnSecret ? "configurada ✓" : "FALTA ✗",
+    claveIPN_enLaWeb: ipnFingerprint,
+    compararCon: "NOWPayments → Configuración → Pagos → Notificaciones. Deben ser IGUALES.",
     apiKeyWorks: null as boolean | null,
     apiError: null as string | null,
   };
