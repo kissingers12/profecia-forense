@@ -163,11 +163,18 @@ export default function AdminPage() {
         },
         body: JSON.stringify({ email: user.email, activated: !user.activated }),
       });
+      const data = await res.json().catch(() => ({}));
       if (res.ok) {
         setUsers((prev) =>
           prev.map((u) => u.email === user.email ? { ...u, activated: !u.activated } : u)
         );
-        showToast(user.activated ? `${user.name} desactivado` : `${user.name} activado ✓`);
+        if (user.activated) {
+          showToast(`${user.name} desactivado`);
+        } else if (data.emailSent) {
+          showToast(`${user.name} activado ✓ · correo de bienvenida enviado 📧`);
+        } else {
+          showToast(`${user.name} activado ✓ · el correo NO salió: ${data.emailError ?? "error desconocido"}`);
+        }
       }
     } catch {
       showToast("Error al actualizar.");
