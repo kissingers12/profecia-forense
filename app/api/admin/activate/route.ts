@@ -113,6 +113,14 @@ export async function POST(req: NextRequest) {
   if (willActivate && notify !== false && user) {
     try {
       emailSent = await sendWelcomeEmail(user.email, user.name ?? "");
+      if (emailSent) {
+        // Queda registrado para poder mostrar en /admin que ya se envió
+        await supabaseAdmin.from("activity_logs").insert({
+          user_email: user.email,
+          user_name: "CORREO",
+          action: "bienvenida",
+        });
+      }
       if (!emailSent) emailError = "Faltan las credenciales de correo (EMAIL_USER / EMAIL_PASS).";
     } catch (err) {
       emailError = err instanceof Error ? err.message : "No se pudo enviar el correo.";

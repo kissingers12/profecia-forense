@@ -47,7 +47,12 @@ type PaymentRow = {
   nombre: string | null;
   plan: string | null;
   activado: boolean | null;
+  avisoEnviado: string | null;
+  bienvenidaEnviada: string | null;
 };
+
+const fechaCorta = (iso: string) =>
+  new Date(iso).toLocaleString("es-ES", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" });
 
 const STABLES = ["usd", "usdc", "usdp", "usdt", "busd", "dai"];
 
@@ -216,9 +221,11 @@ export default function AdminPage() {
     setActionLoading(null);
   };
 
-  const handleNotifyUnpaid = async (email: string, nombre: string | null) => {
+  const handleNotifyUnpaid = async (email: string, nombre: string | null, yaEnviado?: string | null) => {
     const ok = window.confirm(
-      `¿Enviar a ${nombre ?? email} el aviso de que su pago no se completó?\n\nRecibirá el correo con el diseño de la web y las instrucciones para pagar.`
+      yaEnviado
+        ? `⚠️ A ${nombre ?? email} YA se le envió este aviso el ${new Date(yaEnviado).toLocaleString("es-ES")}.\n\n¿Quieres enviárselo otra vez?`
+        : `¿Enviar a ${nombre ?? email} el aviso de que su pago no se completó?\n\nRecibirá el correo con el diseño de la web y las instrucciones para pagar.`
     );
     if (!ok) return;
     setActionLoading(email);
@@ -230,6 +237,7 @@ export default function AdminPage() {
       });
       const data = await res.json();
       showToast(res.ok ? `Aviso enviado a ${email} 📧` : (data.error ?? "No se pudo enviar."));
+      if (res.ok) await fetchPayments();
     } catch {
       showToast("Error de conexión.");
     }
@@ -845,6 +853,24 @@ export default function AdminPage() {
                               Sin acceso
                             </span>
                           )}
+                          {p.avisoEnviado && (
+                            <span
+                              title={`Aviso de pago no completado enviado el ${fechaCorta(p.avisoEnviado)}`}
+                              className="shrink-0 inline-flex items-center gap-1 text-[10px] bg-blue-500/10 text-blue-300 border border-blue-500/25 rounded-full px-2 py-0.5"
+                            >
+                              <Send size={9} />
+                              Aviso enviado · {fechaCorta(p.avisoEnviado)}
+                            </span>
+                          )}
+                          {p.bienvenidaEnviada && (
+                            <span
+                              title={`Correo de bienvenida enviado el ${fechaCorta(p.bienvenidaEnviada)}`}
+                              className="shrink-0 inline-flex items-center gap-1 text-[10px] bg-[#c9a84c]/10 text-[#c9a84c] border border-[#c9a84c]/25 rounded-full px-2 py-0.5"
+                            >
+                              <Send size={9} />
+                              Bienvenida enviada
+                            </span>
+                          )}
                         </div>
                         <button
                           onClick={() => copyEmail(p.email)}
@@ -889,13 +915,19 @@ export default function AdminPage() {
                           </button>
                           {p.pagado <= 0 && (
                             <button
-                              onClick={() => handleNotifyUnpaid(p.email, p.nombre)}
+                              onClick={() => handleNotifyUnpaid(p.email, p.nombre, p.avisoEnviado)}
                               disabled={actionLoading === p.email}
-                              title="Enviarle el correo explicando que su pago no llegó a completarse"
-                              className="flex items-center justify-center gap-1.5 px-5 py-2 rounded-xl text-xs font-bold bg-white/5 text-[#c9a84c] border border-[#c9a84c]/25 hover:bg-[#c9a84c]/10 transition-all"
+                              title={p.avisoEnviado
+                                ? `Ya se le avisó el ${fechaCorta(p.avisoEnviado)}. Puedes volver a enviarlo si hace falta.`
+                                : "Enviarle el correo explicando que su pago no llegó a completarse"}
+                              className={`flex items-center justify-center gap-1.5 px-5 py-2 rounded-xl text-xs font-bold border transition-all ${
+                                p.avisoEnviado
+                                  ? "bg-transparent text-[#6a5a4a] border-white/10 hover:text-[#c9a84c] hover:border-[#c9a84c]/30"
+                                  : "bg-white/5 text-[#c9a84c] border-[#c9a84c]/25 hover:bg-[#c9a84c]/10"
+                              }`}
                             >
                               <Send size={12} />
-                              Avisar: no pagó
+                              {p.avisoEnviado ? "Reenviar aviso" : "Avisar: no pagó"}
                             </button>
                           )}
                         </div>

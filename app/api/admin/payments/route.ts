@@ -21,6 +21,8 @@ type PaymentRow = {
   nombre: string | null;
   plan: string | null;
   activado: boolean | null;
+  avisoEnviado: string | null;      // fecha del correo "no completaste el pago"
+  bienvenidaEnviada: string | null; // fecha del correo de bienvenida
 };
 
 // Avisos de pago recibidos de NOWPayments, cruzados con los datos del cliente.
@@ -43,6 +45,24 @@ export async function GET(req: NextRequest) {
     : { data: [] };
 
   const byEmail = new Map((users ?? []).map((u) => [u.email.toLowerCase(), u]));
+
+  // Correos ya enviados a estas personas, para no repetirlos
+  const { data: correos } = emails.length
+    ? await supabaseAdmin
+        .from("activity_logs")
+        .select("user_email, action, created_at")
+        .eq("user_name", "CORREO")
+        .in("user_email", emails)
+        .order("created_at", { ascending: false })
+    : { data: [] };
+
+  const avisos = new Map<string, string>();
+  const bienvenidas = new Map<string, string>();
+  for (const c of correos ?? []) {
+    const key = c.user_email.toLowerCase();
+    if (c.action === "aviso-pago" && !avisos.has(key)) avisos.set(key, c.created_at);
+    if (c.action === "bienvenida" && !bienvenidas.has(key)) bienvenidas.set(key, c.created_at);
+  }
 
   const payments: PaymentRow[] = (logs ?? []).map((l) => {
     let parsed: Record<string, unknown> = {};
@@ -67,6 +87,8 @@ export async function GET(req: NextRequest) {
       nombre: u?.name ?? null,
       plan: u?.plan ?? null,
       activado: u?.activated ?? null,
+      avisoEnviado: avisos.get(l.user_email.toLowerCase()) ?? null,
+      bienvenidaEnviada: bienvenidas.get(l.user_email.toLowerCase()) ?? null,
     };
   });
 

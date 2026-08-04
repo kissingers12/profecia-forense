@@ -122,5 +122,12 @@ export async function POST(req: NextRequest) {
     `,
   });
 
+  // Queda registrado para poder mostrar en /admin que ya se envió
+  await supabaseAdmin.from("activity_logs").insert({
+    user_email: user.email,
+    user_name: "CORREO",
+    action: "aviso-pago",
+  });
+
   return Response.json({ ok: true });
 }
