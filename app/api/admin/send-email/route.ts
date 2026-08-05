@@ -55,7 +55,7 @@ ${texto}
   `;
 
   try {
-    const { error } = await resend.emails.send({ from, to, subject, html });
+    const { error } = await resend.emails.send({ from, to, subject, html, reply_to: "100x100cristianos@gmail.com" });
     if (error) return Response.json({ error: error.message }, { status: 500 });
     return Response.json({ ok: true });
   } catch (err) {
