@@ -699,35 +699,35 @@ Servicio al Estudiante
       </header>
 
       <main className="max-w-5xl mx-auto px-6 py-10">
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-6 sm:mb-8">
           <button
             onClick={() => handleStatClick("all")}
-            className={`card-dark rounded-2xl p-5 text-left transition-all ${statusFilter === "all" ? "ring-2 ring-white/30" : "hover:ring-1 hover:ring-white/10"}`}
+            className={`card-dark rounded-2xl p-3 sm:p-5 text-left transition-all ${statusFilter === "all" ? "ring-2 ring-white/30" : "hover:ring-1 hover:ring-white/10"}`}
           >
-            <p className="text-[#6a5a4a] text-xs uppercase tracking-widest mb-1">Total registrados</p>
-            <p className="text-3xl font-bold text-white">{users.length}</p>
+            <p className="text-[#6a5a4a] text-[9px] sm:text-xs uppercase tracking-wider sm:tracking-widest mb-1 leading-tight">Total registrados</p>
+            <p className="text-2xl sm:text-3xl font-bold text-white">{users.length}</p>
           </button>
           <button
             onClick={() => handleStatClick("active")}
-            className={`card-dark rounded-2xl p-5 text-left transition-all ${statusFilter === "active" ? "ring-2 ring-[#c9a84c]/60" : "hover:ring-1 hover:ring-[#c9a84c]/20"}`}
+            className={`card-dark rounded-2xl p-3 sm:p-5 text-left transition-all ${statusFilter === "active" ? "ring-2 ring-[#c9a84c]/60" : "hover:ring-1 hover:ring-[#c9a84c]/20"}`}
           >
-            <p className="text-[#6a5a4a] text-xs uppercase tracking-widest mb-1">Con acceso activo</p>
-            <p className="text-3xl font-bold text-[#c9a84c]">{activatedCount}</p>
+            <p className="text-[#6a5a4a] text-[9px] sm:text-xs uppercase tracking-wider sm:tracking-widest mb-1 leading-tight">Con acceso</p>
+            <p className="text-2xl sm:text-3xl font-bold text-[#c9a84c]">{activatedCount}</p>
           </button>
           <button
             onClick={() => handleStatClick("pending")}
-            className={`card-dark rounded-2xl p-5 text-left transition-all ${statusFilter === "pending" ? "ring-2 ring-red-400/60" : "hover:ring-1 hover:ring-red-400/20"}`}
+            className={`card-dark rounded-2xl p-3 sm:p-5 text-left transition-all ${statusFilter === "pending" ? "ring-2 ring-red-400/60" : "hover:ring-1 hover:ring-red-400/20"}`}
           >
-            <p className="text-[#6a5a4a] text-xs uppercase tracking-widest mb-1">Pendientes</p>
-            <p className="text-3xl font-bold text-red-400">{users.length - activatedCount}</p>
+            <p className="text-[#6a5a4a] text-[9px] sm:text-xs uppercase tracking-wider sm:tracking-widest mb-1 leading-tight">Pendientes</p>
+            <p className="text-2xl sm:text-3xl font-bold text-red-400">{users.length - activatedCount}</p>
           </button>
         </div>
 
-        {/* Tabs */}
-        <div className="flex gap-2 mb-6 border-b border-[#c9a84c]/10 pb-0">
+        {/* Tabs — en móvil se deslizan en horizontal en vez de amontonarse */}
+        <div className="flex gap-2 mb-6 border-b border-[#c9a84c]/10 pb-0 overflow-x-auto whitespace-nowrap -mx-4 px-4 sm:mx-0 sm:px-0 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <button
             onClick={() => setActiveTab("clientes")}
-            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-bold rounded-t-xl transition-all ${
+            className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2.5 text-xs sm:text-sm font-bold rounded-t-xl transition-all shrink-0 ${
               activeTab === "clientes"
                 ? "text-[#c9a84c] border-b-2 border-[#c9a84c]"
                 : "text-[#6a5a4a] hover:text-white"
@@ -738,7 +738,7 @@ Servicio al Estudiante
           </button>
           <button
             onClick={() => { setActiveTab("pagos"); fetchPayments(); }}
-            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-bold rounded-t-xl transition-all ${
+            className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2.5 text-xs sm:text-sm font-bold rounded-t-xl transition-all shrink-0 ${
               activeTab === "pagos"
                 ? "text-[#c9a84c] border-b-2 border-[#c9a84c]"
                 : "text-[#6a5a4a] hover:text-white"
@@ -749,7 +749,7 @@ Servicio al Estudiante
           </button>
           <button
             onClick={() => setActiveTab("actividad")}
-            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-bold rounded-t-xl transition-all ${
+            className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2.5 text-xs sm:text-sm font-bold rounded-t-xl transition-all shrink-0 ${
               activeTab === "actividad"
                 ? "text-[#c9a84c] border-b-2 border-[#c9a84c]"
                 : "text-[#6a5a4a] hover:text-white"
@@ -763,7 +763,7 @@ Servicio al Estudiante
           </button>
           <button
             onClick={() => setActiveTab("ingresos")}
-            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-bold rounded-t-xl transition-all ${
+            className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2.5 text-xs sm:text-sm font-bold rounded-t-xl transition-all shrink-0 ${
               activeTab === "ingresos"
                 ? "text-[#c9a84c] border-b-2 border-[#c9a84c]"
                 : "text-[#6a5a4a] hover:text-white"
@@ -774,7 +774,7 @@ Servicio al Estudiante
           </button>
           <button
             onClick={() => setActiveTab("foro")}
-            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-bold rounded-t-xl transition-all ${
+            className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2.5 text-xs sm:text-sm font-bold rounded-t-xl transition-all shrink-0 ${
               activeTab === "foro"
                 ? "text-[#c9a84c] border-b-2 border-[#c9a84c]"
                 : "text-[#6a5a4a] hover:text-white"
@@ -790,7 +790,7 @@ Servicio al Estudiante
           </button>
           <button
             onClick={() => { setActiveTab("hotmart"); if (codes.length === 0) fetchCodes(); }}
-            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-bold rounded-t-xl transition-all ${
+            className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2.5 text-xs sm:text-sm font-bold rounded-t-xl transition-all shrink-0 ${
               activeTab === "hotmart"
                 ? "text-[#c9a84c] border-b-2 border-[#c9a84c]"
                 : "text-[#6a5a4a] hover:text-white"
@@ -801,7 +801,7 @@ Servicio al Estudiante
           </button>
           <button
             onClick={() => setActiveTab("email")}
-            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-bold rounded-t-xl transition-all ${
+            className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2.5 text-xs sm:text-sm font-bold rounded-t-xl transition-all shrink-0 ${
               activeTab === "email"
                 ? "text-[#c9a84c] border-b-2 border-[#c9a84c]"
                 : "text-[#6a5a4a] hover:text-white"
