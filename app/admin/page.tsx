@@ -509,6 +509,29 @@ export default function AdminPage() {
 
   const EMAIL_TEMPLATES = [
     {
+      // Tono neutro: sirve igual para hombre o mujer, no hay que tocar nada.
+      // Basta con escribir el correo del alumno y enviar.
+      id: "bienvenida",
+      nombre: "🙏 Bienvenida — acceso activado",
+      asunto: "¡Tu acceso ya está activado! 🙏",
+      body: `¡Bendiciones!
+
+Nos alegra informarte que tu acceso ya ha sido activado. Ya puedes ingresar iniciando sesión con el correo con el que te registraste, y tendrás acceso tanto al contenido disponible ahora como a todo el contenido que se vaya liberando en el futuro.
+
+Entra aquí:
+https://www.kissingersaraque.com/login
+
+Te damos la bienvenida a la familia de 100x100Cristianos.
+
+Oramos para que este tiempo de formación sea de mucha edificación.
+
+Si llegas a tener alguna dificultad, escríbenos y con gusto te ayudaremos.
+
+Con cariño y bendición,
+Servicio al Estudiante
+100x100Cristianos · kissingersaraque.com`,
+    },
+    {
       id: "paypal-donacion",
       nombre: "💳 Pago por PayPal (sin cripto)",
       asunto: "Acceso a la Escuela de Profetas — Donación por PayPal",

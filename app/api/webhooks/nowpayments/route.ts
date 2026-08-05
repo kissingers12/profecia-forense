@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import crypto from "crypto";
 import { supabaseAdmin } from "@/lib/supabase";
+import { sendWelcomeEmail } from "@/lib/emails";
 
 const PRICE_TO_PLAN: Record<number, string> = {
   333: "meditaciones",
@@ -125,7 +126,7 @@ export async function POST(req: NextRequest) {
   if (orderId && orderId.includes("@")) {
     const { data: planUser } = await supabaseAdmin
       .from("users")
-      .select("plan")
+      .select("plan, name, activated")
       .eq("email", orderId.toLowerCase())
       .maybeSingle();
 
@@ -150,6 +151,21 @@ export async function POST(req: NextRequest) {
     }
 
     await log("WEBHOOK_ACTIVATED", `email=${orderId}`);
+
+    // Correo de bienvenida solo la primera vez: NOWPayments avisa varias veces
+    // del mismo pago (confirmed, finished...) y no debe llegar repetido
+    if (planUser && !planUser.activated) {
+      try {
+        const enviado = await sendWelcomeEmail(orderId.toLowerCase(), planUser.name ?? "");
+        await log(
+          enviado ? "WEBHOOK_BIENVENIDA" : "WEBHOOK_EMAIL_ERROR",
+          enviado ? `email=${orderId}` : `sin credenciales de correo — ${orderId} activado sin aviso`
+        );
+      } catch (err) {
+        await log("WEBHOOK_EMAIL_ERROR", err instanceof Error ? err.message : String(err));
+      }
+    }
+
     return Response.json({ ok: true });
   }
 
