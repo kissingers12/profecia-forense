@@ -509,28 +509,6 @@ export default function AdminPage() {
 
   const EMAIL_TEMPLATES = [
     {
-      id: "bienvenida",
-      nombre: "🎉 Bienvenida — acceso activado",
-      asunto: "¡Bienvenida a la Escuela de Profetas!",
-      body: `Querida [NOMBRE],
-
-¡Tu acceso ha sido activado! Ya puedes entrar a la plataforma con tu correo y contraseña.
-
-Para ingresar:
-1. Ve a kissingersaraque.com
-2. Haz clic en "Iniciar sesión"
-3. Escribe tu correo: [EMAIL]
-4. Escribe tu contraseña
-
-Si tienes algún problema para entrar, responde a este correo y te ayudamos de inmediato.
-
-Estamos muy contentos de tenerte con nosotros. Que Dios te bendiga y llene de su presencia profética en cada clase.
-
-Con amor,
-Servicio al Estudiante
-100x100Cristianos · kissingersaraque.com`,
-    },
-    {
       id: "pago-pendiente",
       nombre: "⏳ Pago en espera — sin cripto",
       asunto: "Tu acceso está casi listo",
