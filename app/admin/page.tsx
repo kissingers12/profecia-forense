@@ -509,6 +509,36 @@ export default function AdminPage() {
 
   const EMAIL_TEMPLATES = [
     {
+      id: "paypal-donacion",
+      nombre: "💳 Pago por PayPal (sin cripto)",
+      asunto: "Acceso a la Escuela de Profetas — Donación por PayPal",
+      body: `Querida [NOMBRE],
+
+Gracias por tu interés en acceder a la Escuela de Profetas. Entendemos que no siempre es fácil pagar con criptomonedas, por eso tenemos una opción para ti a través de PayPal.
+
+¿QUÉ PUEDES ACCEDER?
+
+• Meditación Profética — donación de $333
+• Escuela de Profetas (todos los vídeos) — donación de $555
+
+Estos son vídeos impartidos por el Pastor Kissingers a través de YouTube, más todos los próximos que se vayan publicando.
+
+¿CÓMO HACERLO?
+
+1. Realiza tu donación por PayPal en este enlace:
+https://www.paypal.com/donate/?hosted_button_id=PTBWKZKKV3HJG
+
+2. Una vez realizado el pago, responde a este mismo correo adjuntando una captura de pantalla del comprobante e indicando el nivel que elegiste ($333 o $555)
+
+3. Nosotros te activaremos el acceso manualmente en menos de 24 horas
+
+Estamos aquí para ayudarte en cada paso. No dudes en escribirnos si tienes alguna duda.
+
+Con cariño y bendición,
+Servicio al Estudiante
+100x100Cristianos · kissingersaraque.com`,
+    },
+    {
       id: "pago-pendiente",
       nombre: "⏳ Pago en espera — sin cripto",
       asunto: "Tu acceso está casi listo",
