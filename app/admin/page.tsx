@@ -509,38 +509,6 @@ export default function AdminPage() {
 
   const EMAIL_TEMPLATES = [
     {
-      id: "escuela-profetas",
-      nombre: "📖 Escuela de Profetas (nivel agotado)",
-      asunto: "Escuela de Profetas",
-      body: `Querida [NOMBRE],
-
-Gracias por escribir y por tu perseverancia. Entendemos perfectamente tu situación y nos alegra enormemente que hayas llegado hasta aquí.
-
-Queremos ser transparentes contigo: el nivel de $777 ya está completo y no abriremos nuevas plazas en ese formato. Ha sido un proceso cerrado y exclusivo que llegó a su fin.
-
-Sin embargo, tenemos una puerta abierta especialmente para personas como tú.
-
-¿QUÉ TE OFRECEMOS?
-
-Puedes acceder a todos los vídeos de la Escuela de Profetas grabados hasta hoy — impartidos por el Pastor Kissingers a través de YouTube — más todos los próximos que se vayan publicando, a través de una donación voluntaria por PayPal.
-
-Los niveles disponibles son:
-• Meditación Profética — donación de $333
-• Escuela de Profetas completa — donación de $555
-
-¿CÓMO HACERLO?
-
-1. Realiza la donación por PayPal: [ENLACE_PAYPAL]
-2. Una vez realizado el pago, responde a este mismo correo adjuntando una captura de pantalla del comprobante
-3. Nosotros te activaremos el acceso manualmente en menos de 24 horas
-
-Tu corazón por buscar la palabra profética no ha pasado desapercibido. Estamos aquí para ayudarte.
-
-Con cariño y bendición,
-Servicio al Estudiante
-100x100Cristianos · kissingersaraque.com`,
-    },
-    {
       id: "bienvenida",
       nombre: "🎉 Bienvenida — acceso activado",
       asunto: "¡Bienvenida a la Escuela de Profetas!",
