@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { CheckCircle, XCircle, RefreshCw, Lock, Users, LogOut, LogIn, Download, Activity, Search, PlayCircle, Copy, UserPlus, DollarSign, MessageCircle, Eye, EyeOff, Trash2, Send, Pencil, KeyRound } from "lucide-react";
+import { CheckCircle, XCircle, RefreshCw, Lock, Users, LogOut, LogIn, Download, Activity, Search, PlayCircle, Copy, UserPlus, DollarSign, MessageCircle, Eye, EyeOff, Trash2, Send, Pencil, KeyRound, Mail } from "lucide-react";
 
 type User = {
   id: string;
@@ -117,7 +117,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [toast, setToast] = useState("");
-  const [activeTab, setActiveTab] = useState<"clientes" | "pagos" | "actividad" | "ingresos" | "foro" | "hotmart">("clientes");
+  const [activeTab, setActiveTab] = useState<"clientes" | "pagos" | "actividad" | "ingresos" | "foro" | "hotmart" | "email">("clientes");
   const [payments, setPayments] = useState<PaymentRow[]>([]);
   const [paymentsLoading, setPaymentsLoading] = useState(false);
   const [search, setSearch] = useState("");
@@ -138,6 +138,11 @@ export default function AdminPage() {
   const [paymentsList, setPaymentsList] = useState<PaymentEntry[]>([]);
   const [paymentsListLoading, setPaymentsListLoading] = useState(false);
   const [paymentsListError, setPaymentsListError] = useState("");
+  const [emailTo, setEmailTo] = useState("");
+  const [emailSubject, setEmailSubject] = useState("");
+  const [emailBody, setEmailBody] = useState("");
+  const [emailSending, setEmailSending] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState("");
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -502,6 +507,128 @@ export default function AdminPage() {
       )
     : logs;
 
+  const EMAIL_TEMPLATES = [
+    {
+      id: "escuela-profetas",
+      nombre: "📖 Escuela de Profetas (nivel agotado)",
+      asunto: "Escuela de Profetas",
+      body: `Querida [NOMBRE],
+
+Gracias por escribir y por tu perseverancia. Entendemos perfectamente tu situación y nos alegra enormemente que hayas llegado hasta aquí.
+
+Queremos ser transparentes contigo: el nivel de $777 ya está completo y no abriremos nuevas plazas en ese formato. Ha sido un proceso cerrado y exclusivo que llegó a su fin.
+
+Sin embargo, tenemos una puerta abierta especialmente para personas como tú.
+
+¿QUÉ TE OFRECEMOS?
+
+Puedes acceder a todos los vídeos de la Escuela de Profetas grabados hasta hoy — impartidos por el Pastor Kissingers a través de YouTube — más todos los próximos que se vayan publicando, a través de una donación voluntaria por PayPal.
+
+Los niveles disponibles son:
+• Meditación Profética — donación de $333
+• Escuela de Profetas completa — donación de $555
+
+¿CÓMO HACERLO?
+
+1. Realiza la donación por PayPal: [ENLACE_PAYPAL]
+2. Una vez realizado el pago, responde a este mismo correo adjuntando una captura de pantalla del comprobante
+3. Nosotros te activaremos el acceso manualmente en menos de 24 horas
+
+Tu corazón por buscar la palabra profética no ha pasado desapercibido. Estamos aquí para ayudarte.
+
+Con cariño y bendición,
+Servicio al Estudiante
+100x100Cristianos · kissingersaraque.com`,
+    },
+    {
+      id: "bienvenida",
+      nombre: "🎉 Bienvenida — acceso activado",
+      asunto: "¡Bienvenida a la Escuela de Profetas!",
+      body: `Querida [NOMBRE],
+
+¡Tu acceso ha sido activado! Ya puedes entrar a la plataforma con tu correo y contraseña.
+
+Para ingresar:
+1. Ve a kissingersaraque.com
+2. Haz clic en "Iniciar sesión"
+3. Escribe tu correo: [EMAIL]
+4. Escribe tu contraseña
+
+Si tienes algún problema para entrar, responde a este correo y te ayudamos de inmediato.
+
+Estamos muy contentos de tenerte con nosotros. Que Dios te bendiga y llene de su presencia profética en cada clase.
+
+Con amor,
+Servicio al Estudiante
+100x100Cristianos · kissingersaraque.com`,
+    },
+    {
+      id: "pago-pendiente",
+      nombre: "⏳ Pago en espera — sin cripto",
+      asunto: "Tu acceso está casi listo",
+      body: `Querida [NOMBRE],
+
+Hemos recibido tu solicitud de acceso. Estamos verificando tu pago, lo cual puede tardar entre 10 y 30 minutos una vez confirmado en la red.
+
+En cuanto se confirme, recibirás un correo de bienvenida con instrucciones para entrar.
+
+Si tienes alguna duda o pasado ese tiempo no recibes respuesta, escríbenos directamente a este correo y te atendemos de inmediato.
+
+Gracias por tu confianza.
+
+Con cariño,
+Servicio al Estudiante
+100x100Cristianos · kissingersaraque.com`,
+    },
+    {
+      id: "cambio-clave",
+      nombre: "🔑 Cambio de contraseña manual",
+      asunto: "Tu nueva contraseña — 100x100Cristianos",
+      body: `Hola [NOMBRE],
+
+Hemos actualizado tu contraseña de acceso a la plataforma.
+
+Tus nuevos datos de acceso son:
+• Correo: [EMAIL]
+• Contraseña: [NUEVA_CLAVE]
+
+Para entrar ve a: kissingersaraque.com → Iniciar sesión
+
+Te recomendamos cambiar la contraseña una vez dentro desde la sección de perfil.
+
+Si no solicitaste este cambio, responde a este correo de inmediato.
+
+Con cariño,
+Servicio al Estudiante
+100x100Cristianos`,
+    },
+  ];
+
+  const handleSendEmail = async () => {
+    if (!emailTo || !emailSubject || !emailBody) return;
+    setEmailSending(true);
+    try {
+      const res = await fetch("/api/admin/send-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-admin-password": password },
+        body: JSON.stringify({ to: emailTo, subject: emailSubject, body: emailBody }),
+      });
+      if (res.ok) {
+        showToast("Correo enviado ✓");
+        setEmailTo("");
+        setEmailSubject("");
+        setEmailBody("");
+        setSelectedTemplate("");
+      } else {
+        const d = await res.json();
+        showToast(d.error || "Error al enviar.");
+      }
+    } catch {
+      showToast("Error de conexión.");
+    }
+    setEmailSending(false);
+  };
+
   if (!authed) {
     return (
       <div className="min-h-screen bg-[#050510] flex items-center justify-center px-4">
@@ -672,6 +799,17 @@ export default function AdminPage() {
           >
             <KeyRound size={15} />
             Hotmart
+          </button>
+          <button
+            onClick={() => setActiveTab("email")}
+            className={`flex items-center gap-2 px-4 py-2.5 text-sm font-bold rounded-t-xl transition-all ${
+              activeTab === "email"
+                ? "text-[#c9a84c] border-b-2 border-[#c9a84c]"
+                : "text-[#6a5a4a] hover:text-white"
+            }`}
+          >
+            <Mail size={15} />
+            Email
           </button>
         </div>
 
@@ -1523,6 +1661,93 @@ export default function AdminPage() {
                 <span className="text-white font-semibold">kissingersaraque.com/libro</span>,
                 ingresa el código y descarga el libro. El código queda inactivo tras el primer uso.
               </p>
+            </div>
+          </div>
+        )}
+
+        {/* Tab: Email */}
+        {activeTab === "email" && (
+          <div className="space-y-5">
+            {/* Plantillas */}
+            <div className="card-dark rounded-2xl p-5">
+              <p className="text-[#c9a84c] text-xs font-bold uppercase tracking-widest mb-3">Plantillas de correo</p>
+              <div className="grid sm:grid-cols-2 gap-2">
+                {EMAIL_TEMPLATES.map((t) => (
+                  <button
+                    key={t.id}
+                    onClick={() => {
+                      setSelectedTemplate(t.id);
+                      setEmailSubject(t.asunto);
+                      setEmailBody(t.body);
+                    }}
+                    className={`text-left px-4 py-3 rounded-xl border text-sm transition-all ${
+                      selectedTemplate === t.id
+                        ? "border-[#c9a84c]/60 bg-[#c9a84c]/10 text-white"
+                        : "border-white/5 bg-white/[0.03] text-[#8a7a6a] hover:border-[#c9a84c]/30 hover:text-white"
+                    }`}
+                  >
+                    <p className="font-semibold">{t.nombre}</p>
+                    <p className="text-xs mt-0.5 opacity-60">Asunto: {t.asunto}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Formulario de envío */}
+            <div className="card-dark rounded-2xl p-5 space-y-4">
+              <p className="text-[#c9a84c] text-xs font-bold uppercase tracking-widest">Redactar y enviar</p>
+
+              <div>
+                <label className="block text-xs font-semibold text-[#c9a84c] uppercase tracking-widest mb-1.5">Para (correo del cliente)</label>
+                <input
+                  type="email"
+                  value={emailTo}
+                  onChange={(e) => setEmailTo(e.target.value)}
+                  placeholder="cliente@ejemplo.com"
+                  className="w-full bg-white/5 border border-[#c9a84c]/20 rounded-xl px-4 py-2.5 text-white placeholder-[#4a3a2a] text-sm focus:outline-none focus:border-[#c9a84c]/60"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-[#c9a84c] uppercase tracking-widest mb-1.5">Asunto</label>
+                <input
+                  type="text"
+                  value={emailSubject}
+                  onChange={(e) => setEmailSubject(e.target.value)}
+                  placeholder="Asunto del correo"
+                  className="w-full bg-white/5 border border-[#c9a84c]/20 rounded-xl px-4 py-2.5 text-white placeholder-[#4a3a2a] text-sm focus:outline-none focus:border-[#c9a84c]/60"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-[#c9a84c] uppercase tracking-widest mb-1.5">Mensaje</label>
+                <textarea
+                  value={emailBody}
+                  onChange={(e) => setEmailBody(e.target.value)}
+                  rows={16}
+                  placeholder="Escribe o selecciona una plantilla arriba..."
+                  className="w-full bg-white/5 border border-[#c9a84c]/20 rounded-xl px-4 py-3 text-white placeholder-[#4a3a2a] text-sm focus:outline-none focus:border-[#c9a84c]/60 resize-none font-mono leading-relaxed"
+                />
+                <p className="text-[#6a5a4a] text-xs mt-1.5">Edita el texto antes de enviar. Cambia [NOMBRE], [EMAIL], [ENLACE_PAYPAL] por los datos reales.</p>
+              </div>
+
+              <div className="flex gap-3 pt-1">
+                <button
+                  onClick={handleSendEmail}
+                  disabled={emailSending || !emailTo || !emailSubject || !emailBody}
+                  className="btn-gold px-6 py-3 rounded-xl font-bold text-sm flex items-center gap-2 disabled:opacity-50"
+                >
+                  {emailSending
+                    ? <span className="w-4 h-4 border-2 border-[#050510]/40 border-t-[#050510] rounded-full animate-spin" />
+                    : <><Send size={14} /> Enviar correo</>}
+                </button>
+                <button
+                  onClick={() => { setEmailTo(""); setEmailSubject(""); setEmailBody(""); setSelectedTemplate(""); }}
+                  className="px-4 py-3 rounded-xl text-sm text-[#6a5a4a] hover:text-white bg-white/5 border border-white/5 transition-colors"
+                >
+                  Limpiar
+                </button>
+              </div>
             </div>
           </div>
         )}
