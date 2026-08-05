@@ -527,7 +527,6 @@ Oramos para que este tiempo de formación sea de mucha edificación.
 
 Si llegas a tener alguna dificultad, escríbenos y con gusto te ayudaremos.
 
-Con cariño y bendición,
 Servicio al Estudiante
 100x100Cristianos · kissingersaraque.com`,
     },
@@ -535,9 +534,9 @@ Servicio al Estudiante
       id: "paypal-donacion",
       nombre: "💳 Pago por PayPal (sin cripto)",
       asunto: "Acceso a la Escuela de Profetas — Donación por PayPal",
-      body: `Querida [NOMBRE],
+      body: `Bendiciones [NOMBRE],
 
-Gracias por tu interés en acceder a la Escuela de Profetas. Entendemos que no siempre es fácil pagar con criptomonedas, por eso tenemos una opción para ti a través de PayPal.
+Gracias por tu interés en acceder a la Escuela de Profetas. Entendemos que no siempre es fácil pagar con criptomonedas, por eso tenemos una opción a través de PayPal.
 
 ¿QUÉ PUEDES ACCEDER?
 
@@ -557,7 +556,6 @@ https://www.paypal.com/donate/?hosted_button_id=PTBWKZKKV3HJG
 
 Estamos aquí para ayudarte en cada paso. No dudes en escribirnos si tienes alguna duda.
 
-Con cariño y bendición,
 Servicio al Estudiante
 100x100Cristianos · kissingersaraque.com`,
     },
@@ -565,7 +563,7 @@ Servicio al Estudiante
       id: "pago-pendiente",
       nombre: "⏳ Pago en espera — sin cripto",
       asunto: "Tu acceso está casi listo",
-      body: `Querida [NOMBRE],
+      body: `Bendiciones [NOMBRE],
 
 Hemos recibido tu solicitud de acceso. Estamos verificando tu pago, lo cual puede tardar entre 10 y 30 minutos una vez confirmado en la red.
 
@@ -575,7 +573,6 @@ Si tienes alguna duda o pasado ese tiempo no recibes respuesta, escríbenos dire
 
 Gracias por tu confianza.
 
-Con cariño,
 Servicio al Estudiante
 100x100Cristianos · kissingersaraque.com`,
     },
@@ -583,7 +580,7 @@ Servicio al Estudiante
       id: "cambio-clave",
       nombre: "🔑 Cambio de contraseña manual",
       asunto: "Tu nueva contraseña — 100x100Cristianos",
-      body: `Hola [NOMBRE],
+      body: `Bendiciones [NOMBRE],
 
 Hemos actualizado tu contraseña de acceso a la plataforma.
 
@@ -597,7 +594,6 @@ Te recomendamos cambiar la contraseña una vez dentro desde la sección de perfi
 
 Si no solicitaste este cambio, responde a este correo de inmediato.
 
-Con cariño,
 Servicio al Estudiante
 100x100Cristianos`,
     },
