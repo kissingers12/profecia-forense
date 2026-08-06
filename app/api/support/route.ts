@@ -127,7 +127,8 @@ export async function POST(req: NextRequest) {
       from: `"100x100Cristianos" <${process.env.EMAIL_USER}>`,
       to: "100x100cristianos@gmail.com",
       replyTo: email,
-      subject: `${adjunto ? "📎" : "⚠️"} PAGO SIN ACCESO — ${safeName || safeEmail} | ${safePlanLabel}`,
+      // El ⚠️ va siempre delante: es la señal de que hay algo urgente que revisar
+      subject: `⚠️${adjunto ? "📎 COMPROBANTE ADJUNTO —" : ""} PAGO SIN ACCESO — ${safeName || safeEmail} | ${safePlanLabel}`,
       ...(adjunto ? { attachments: [adjunto] } : {}),
       html: `
         <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#050510;color:#f0e6d3;padding:32px;border-radius:12px;border:1px solid #c9a84c33">

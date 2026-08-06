@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown, AlertTriangle, ArrowRight } from "lucide-react";
+import { ChevronDown, AlertTriangle, ArrowRight, Upload } from "lucide-react";
 
 const faqs: { q: string; a: string; destacada?: boolean; pago?: boolean }[] = [
   {
@@ -112,26 +112,34 @@ function PagoPayPal() {
               <strong className="text-[#c9a84c]">$555</strong> la Escuela de Profetas.
             </li>
             <li>
-              <span className="text-[#c9a84c] font-bold">3.</span> Escríbenos a{" "}
-              <a href="mailto:100x100cristianos@gmail.com" className="text-[#c9a84c] underline">
-                100x100cristianos@gmail.com
-              </a>{" "}
-              con la captura del comprobante e indicando el nivel que elegiste ($333 o $555).
+              <span className="text-[#c9a84c] font-bold">3.</span> Entra en tu cuenta y{" "}
+              <strong className="text-white">envíanos la captura del comprobante</strong> desde el
+              botón de abajo.
             </li>
             <li>
               <span className="text-[#c9a84c] font-bold">4.</span> Activamos tu acceso
               manualmente en menos de 24 horas.
             </li>
           </ol>
-          <a
-            href="https://www.paypal.com/donate/?hosted_button_id=PTBWKZKKV3HJG"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-5 w-full sm:w-auto inline-flex items-center justify-center gap-2 btn-gold px-7 py-3.5 rounded-xl text-sm font-bold"
-          >
-            Entiendo, ir a pagar con PayPal
-            <ArrowRight size={15} />
-          </a>
+          <div className="mt-5 flex flex-col sm:flex-row gap-3">
+            <a
+              href="https://www.paypal.com/donate/?hosted_button_id=PTBWKZKKV3HJG"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 btn-gold px-7 py-3.5 rounded-xl text-sm font-bold"
+            >
+              Entiendo, ir a pagar con PayPal
+              <ArrowRight size={15} />
+            </a>
+            {/* Lleva directo al panel donde se adjunta el comprobante */}
+            <a
+              href="/dashboard?soporte=1"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-7 py-3.5 rounded-xl text-sm font-bold border border-[#c9a84c]/45 text-[#c9a84c] hover:bg-[#c9a84c]/10 transition-all"
+            >
+              <Upload size={15} />
+              Ya pagué — enviar comprobante
+            </a>
+          </div>
         </div>
       </div>
     </div>

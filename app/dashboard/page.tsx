@@ -110,6 +110,12 @@ export default function Dashboard() {
       return;
     }
     setSession(s);
+
+    // Si llega desde "Ya pagué — enviar comprobante", se abre el panel de ayuda
+    if (typeof window !== "undefined" && new URLSearchParams(window.location.search).has("soporte")) {
+      setShowSupport(true);
+    }
+
     // Re-validate from Supabase to get fresh activated status
     fetch("/api/auth/me", {
       method: "POST",
