@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Send, CheckCircle } from "lucide-react";
+import { Send, CheckCircle, HelpCircle } from "lucide-react";
 
 const motivos = [
   "Oración",
@@ -72,6 +72,19 @@ export default function Contact() {
             Completa el formulario y un asesor se pondrá en contacto contigo
             para orientarte en el programa que mejor se adapte a tu llamado.
           </p>
+
+          {/* Desvía a las preguntas frecuentes la duda más repetida */}
+          <a
+            href="#preguntas"
+            className="inline-flex items-center gap-2 mt-6 rounded-xl border border-[#c9a84c]/35 bg-[#c9a84c]/5 px-5 py-3 text-sm text-[#c8b89a] hover:bg-[#c9a84c]/10 hover:border-[#c9a84c]/60 transition-all"
+          >
+            <HelpCircle size={16} className="text-[#c9a84c] shrink-0" />
+            <span>
+              ¿Tu duda es <span className="text-[#c9a84c] font-semibold">qué formación elegir</span>?
+              Léelo aquí antes de escribir →
+            </span>
+          </a>
+
           <div className="divider-gold max-w-xs mx-auto mt-8" />
         </div>
 

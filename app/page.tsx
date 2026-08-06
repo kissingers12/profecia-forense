@@ -28,8 +28,10 @@ export default function Home() {
         <Donations />
         <Testimonials />
         <CTA />
-        <Contact />
+        {/* Las preguntas frecuentes van ANTES del formulario: así quien duda
+            sobre qué formación elegir encuentra la respuesta sin escribir */}
         <FAQ />
+        <Contact />
       </main>
       <Footer />
     </>

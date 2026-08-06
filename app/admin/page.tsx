@@ -545,14 +545,21 @@ Gracias por tu interés en acceder a la Escuela de Profetas. Entendemos que no s
 
 Estos son vídeos impartidos por el Pastor Kissingers a través de YouTube, más todos los próximos que se vayan publicando.
 
+ANTES DE PAGAR, POR FAVOR LEE ESTO:
+
+Estas clases son exactamente las mismas que se impartieron en las membresías 4 y 5 de YouTube, reunidas desde 2023 hasta hoy. Si ya llevas tiempo en la membresía 4 o en la 5, esta escuela NO es para ti, porque sería contenido que ya has visto. Preferimos decírtelo antes de que hagas ningún pago.
+
 ¿CÓMO HACERLO?
 
-1. Realiza tu donación por PayPal en este enlace:
+1. Regístrate primero en la web creando tu cuenta con el correo que vayas a usar (este paso es imprescindible para poder darte el acceso):
+https://www.kissingersaraque.com/login
+
+2. Realiza tu donación por PayPal en este enlace:
 https://www.paypal.com/donate/?hosted_button_id=PTBWKZKKV3HJG
 
-2. Una vez realizado el pago, responde a este mismo correo adjuntando una captura de pantalla del comprobante e indicando el nivel que elegiste ($333 o $555)
+3. Responde a este mismo correo adjuntando una captura de pantalla del comprobante e indicando el nivel que elegiste ($333 o $555)
 
-3. Nosotros te activaremos el acceso manualmente en menos de 24 horas
+4. Nosotros te activaremos el acceso manualmente en menos de 24 horas
 
 Estamos aquí para ayudarte en cada paso. No dudes en escribirnos si tienes alguna duda.
 
