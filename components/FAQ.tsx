@@ -7,7 +7,7 @@ const faqs: { q: string; a: string; destacada?: boolean; pago?: boolean }[] = [
   {
     destacada: true,
     q: "¿Qué formación debo elegir?",
-    a: "Depende de dónde estés hoy. La Escuela de Profetas ($555) reúne todas las clases grabadas desde 2023 hasta hoy — alrededor de 30 enseñanzas — y está pensada especialmente para quienes llevan poco tiempo en la membresía 4 de YouTube. Si ya estás en la membresía 5, o llevas bastante tiempo en la membresía 4, este programa no es para ti, porque ya habrás visto la mayor parte del contenido. Si estás comenzando y quieres desarrollar primero tu sensibilidad espiritual, la Meditación Profética ($333) es el punto de partida.",
+    a: "Depende de dónde estés hoy. La Escuela de Profetas ($555) reúne todas las clases grabadas desde 2023 hasta hoy — alrededor de 30 enseñanzas — y está pensada especialmente para quienes llevan poco tiempo en la membresía 4 de YouTube. Si ya estás en la membresía 5, o llevas bastante tiempo en la membresía 4, este programa no es para ti, porque ya habrás visto la mayor parte del contenido. La Meditación Profética ($333) es para ti si te interesa conocer los secretos de la meditación y cómo interactuar con los ángeles mediante la meditación profética: ese nivel tiene todas las respuestas que estás buscando.",
   },
   {
     q: "¿Puedo entrar todavía a la Escuela Avanzada de Profetas ($777) con mentoría?",
@@ -23,12 +23,12 @@ const faqs: { q: string; a: string; destacada?: boolean; pago?: boolean }[] = [
   },
   {
     q: "¿Por qué se paga con criptomonedas?",
-    a: "Porque en varios países hay bloqueos que impiden pagar con tarjeta bancaria, y no queríamos dejar fuera a esos hermanos. Al pagar puedes elegir entre Bitcoin, USDT, Ethereum y más de 100 opciones. Si no puedes pagar con criptomonedas, escríbenos y te indicamos otra forma.",
+    a: "Porque en varios países hay bloqueos que impiden pagar con tarjeta bancaria, y no queríamos dejar fuera a esos hermanos. Al pagar puedes elegir entre Bitcoin, USDT, Ethereum y más de 100 opciones. Si no puedes pagar con criptomonedas, puedes hacer una donación en PayPal por el importe exacto del nivel al que quieres acceder.",
   },
   {
     destacada: true,
     q: "¿Puedo pagar con tarjeta en lugar de criptomonedas?",
-    a: "Sí, a través de PayPal. Antes de darte el enlace queremos que leas un aviso importante, para que nadie pague por un contenido que ya tiene:",
+    a: "Sí. Se hace mediante una donación en PayPal por el importe exacto del nivel que quieras: $333 la Meditación Profética o $555 la Escuela de Profetas. Antes de darte el enlace queremos que leas un aviso importante, para que nadie pague por un contenido que ya tiene:",
     pago: true,
   },
   {
@@ -41,7 +41,7 @@ const faqs: { q: string; a: string; destacada?: boolean; pago?: boolean }[] = [
   },
   {
     q: "¿Necesito experiencia previa?",
-    a: "No. Lo más importante es tener hambre espiritual y disposición para aprender. La Meditación Profética es ideal para quien comienza, y la Escuela de Profetas te lleva paso a paso desde el Nivel Básico hasta la Profecía Forense, donde se ven nombres, fechas y detalles específicos.",
+    a: "No. Lo más importante es tener hambre espiritual y disposición para aprender. La Meditación Profética es el nivel más accesible, pensado para quienes quieren comenzar a tener encuentros verdaderos con el mundo espiritual: el reino espiritual está en la mente, y los ángeles fueron descritos en la Biblia como figuras que muchos toman por imaginarias. Aquí aprenderás cómo entrar realmente al mundo espiritual. La Escuela de Profetas te lleva después paso a paso desde el Nivel Básico hasta la Profecía Forense, donde se ven nombres, fechas y detalles específicos.",
   },
 ];
 
@@ -105,7 +105,10 @@ function PagoPayPal() {
               con el correo que vayas a usar. Sin este paso no podemos darte el acceso.
             </li>
             <li>
-              <span className="text-[#c9a84c] font-bold">2.</span> Realiza tu pago por PayPal.
+              <span className="text-[#c9a84c] font-bold">2.</span> Haz una donación en PayPal por
+              el <strong className="text-white">importe exacto</strong> del nivel que quieras:{" "}
+              <strong className="text-[#c9a84c]">$333</strong> la Meditación Profética o{" "}
+              <strong className="text-[#c9a84c]">$555</strong> la Escuela de Profetas.
             </li>
             <li>
               <span className="text-[#c9a84c] font-bold">3.</span> Escríbenos a{" "}
