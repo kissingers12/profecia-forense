@@ -47,12 +47,14 @@ export default function About() {
               precisión y responsabilidad espiritual.
             </p>
             <div className="divider-gold max-w-[120px] mb-8" />
-            <a
-              href="/login?tab=register"
-              className="btn-gold px-8 py-3.5 rounded-full text-base font-bold tracking-wide inline-block"
-            >
-              Empieza hoy
-            </a>
+            <div className="flex justify-center md:justify-start">
+              <a
+                href="/login?tab=register"
+                className="btn-gold px-8 py-3.5 rounded-full text-base font-bold tracking-wide inline-block"
+              >
+                Empieza hoy
+              </a>
+            </div>
           </div>
 
           {/* Right: pillars */}
