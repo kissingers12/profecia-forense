@@ -289,9 +289,10 @@ export default function Programs() {
                   {p.title}
                 </h3>
 
-                {/* Paragraphs */}
+                {/* Presentación. En el programa agotado basta con el resumen:
+                    ocupaba tanto como los que sí se pueden comprar. */}
                 <div className="space-y-3 mb-5">
-                  {p.paragraphs.map((para, i) => (
+                  {(p.soldOut ? p.paragraphs.slice(0, 1) : p.paragraphs).map((para, i) => (
                     <p key={i} className="text-[#b8a888] text-sm leading-relaxed">
                       {para}
                     </p>
@@ -313,6 +314,16 @@ export default function Programs() {
                     <p className="text-[#b8a888] text-xs leading-relaxed">{p.gift.description}</p>
                   </div>
                 )}
+
+                {/* Todo el detalle largo va plegado: la página queda más corta
+                    y quien de verdad quiere leerlo lo abre con un clic */}
+                <details className="group/det mb-5">
+                  <summary className="cursor-pointer list-none flex items-center justify-between gap-3 rounded-xl border border-[#c9a84c]/30 bg-[#c9a84c]/5 px-4 py-3 text-sm font-bold text-[#c9a84c] hover:bg-[#c9a84c]/10 transition-all">
+                    <span>{p.soldOut ? "Ver qué incluía este programa" : "Ver todo lo que incluye"}</span>
+                    <ChevronDown size={16} className="shrink-0 transition-transform duration-200 group-open/det:rotate-180" />
+                  </summary>
+                  <div className="pt-5">
+
 
                 {/* Lo que recibirás (opcional) */}
                 {p.accessLabel && (
@@ -361,12 +372,14 @@ export default function Programs() {
                   )}
                 </div>
 
-                {/* Closing statement */}
-                {p.closing && (
-                  <p className="text-[#c9a84c] text-xs leading-relaxed italic border-l-2 border-[#c9a84c]/40 pl-3 mb-5">
-                    {p.closing}
-                  </p>
-                )}
+                    {/* Closing statement */}
+                    {p.closing && (
+                      <p className="text-[#c9a84c] text-xs leading-relaxed italic border-l-2 border-[#c9a84c]/40 pl-3">
+                        {p.closing}
+                      </p>
+                    )}
+                  </div>
+                </details>
 
                 {/* Meta */}
                 <div className="flex items-center gap-4 text-xs text-[#8a7a6a] mb-5">
