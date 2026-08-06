@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, AlertTriangle, ArrowRight } from "lucide-react";
 
-const faqs: { q: string; a: string; destacada?: boolean }[] = [
+const faqs: { q: string; a: string; destacada?: boolean; pago?: boolean }[] = [
   {
     destacada: true,
     q: "¿Qué formación debo elegir?",
@@ -28,7 +28,8 @@ const faqs: { q: string; a: string; destacada?: boolean }[] = [
   {
     destacada: true,
     q: "¿Puedo pagar con tarjeta en lugar de criptomonedas?",
-    a: "Sí, a través de PayPal. Primero regístrate aquí en la web creando tu cuenta con el correo que vayas a usar — este paso es imprescindible. Después escríbenos a 100x100cristianos@gmail.com adjuntando la captura del comprobante e indicando el nivel que elegiste ($333 o $555), y activaremos tu acceso manualmente en menos de 24 horas. MUY IMPORTANTE antes de pagar: si vienes de YouTube, ten en cuenta que estas clases son exactamente las mismas que se impartieron en las membresías 4 y 5, reunidas desde 2023 hasta hoy. Si ya llevas tiempo en la membresía 4 o en la 5, esta escuela NO es para ti, porque sería contenido que ya has visto.",
+    a: "Sí, a través de PayPal. Antes de darte el enlace queremos que leas un aviso importante, para que nadie pague por un contenido que ya tiene:",
+    pago: true,
   },
   {
     q: "Ya pagué, ¿cuándo tendré acceso?",
@@ -43,6 +44,95 @@ const faqs: { q: string; a: string; destacada?: boolean }[] = [
     a: "No. Lo más importante es tener hambre espiritual y disposición para aprender. La Meditación Profética es ideal para quien comienza, y la Escuela de Profetas te lleva paso a paso desde el Nivel Básico hasta la Profecía Forense, donde se ven nombres, fechas y detalles específicos.",
   },
 ];
+
+/**
+ * Aviso previo al pago por PayPal.
+ *
+ * El enlace de pago no se muestra de entrada: primero hay que leer que estas
+ * clases son las mismas de las membresías 4 y 5 de YouTube. Así nadie compra
+ * un contenido que ya tiene. Va aquí y no en la sección de Donaciones, para
+ * no confundir a quien solo quiere hacer una ofrenda al ministerio.
+ */
+function PagoPayPal() {
+  const [mostrar, setMostrar] = useState(false);
+
+  // Paso 1: solo un botón. Quien no piense pagar con PayPal no ve nada más.
+  if (!mostrar) {
+    return (
+      <div className="px-6 pt-4">
+        <button
+          onClick={() => setMostrar(true)}
+          className="w-full sm:w-auto inline-flex items-center justify-center gap-2 btn-gold px-6 py-3 rounded-xl text-sm font-bold"
+        >
+          Quiero pagar con PayPal
+          <ArrowRight size={15} />
+        </button>
+      </div>
+    );
+  }
+
+  // Paso 2: el aviso y, debajo, el enlace de pago
+  return (
+    <div className="px-6 pt-4">
+      <div className="rounded-xl border border-[#c9a84c]/40 bg-[#c9a84c]/[0.06] p-5">
+        <div className="flex items-center gap-2 mb-3">
+          <AlertTriangle size={16} className="text-[#c9a84c] shrink-0" />
+          <span className="text-[#c9a84c] text-xs font-bold uppercase tracking-widest">
+            Léelo antes de pagar
+          </span>
+        </div>
+        <p className="text-[#e8dcc8] text-sm leading-relaxed">
+          Estas clases son <strong className="text-white">exactamente las mismas</strong> que se
+          impartieron en las <strong className="text-white">membresías 4 y 5 de YouTube</strong>,
+          reunidas desde 2023 hasta hoy.
+        </p>
+        <p className="text-[#e8dcc8] text-sm leading-relaxed mt-3">
+          Si ya llevas tiempo en la membresía 4 o en la 5,{" "}
+          <strong className="text-[#c9a84c]">esta escuela no es para ti</strong>, porque sería
+          contenido que ya has visto. Preferimos decírtelo antes de que hagas ningún pago.
+        </p>
+
+        <div className="mt-5 border-t border-[#c9a84c]/20 pt-5">
+          <p className="text-[#c9a84c] text-xs font-bold uppercase tracking-widest mb-3">
+            Cómo hacerlo
+          </p>
+          <ol className="space-y-2.5 text-sm text-[#c8b89a]">
+            <li>
+              <span className="text-[#c9a84c] font-bold">1.</span>{" "}
+              <a href="/login?tab=register" className="text-white underline decoration-[#c9a84c]/50 hover:text-[#c9a84c]">
+                Regístrate primero aquí
+              </a>{" "}
+              con el correo que vayas a usar. Sin este paso no podemos darte el acceso.
+            </li>
+            <li>
+              <span className="text-[#c9a84c] font-bold">2.</span> Realiza tu pago por PayPal.
+            </li>
+            <li>
+              <span className="text-[#c9a84c] font-bold">3.</span> Escríbenos a{" "}
+              <a href="mailto:100x100cristianos@gmail.com" className="text-[#c9a84c] underline">
+                100x100cristianos@gmail.com
+              </a>{" "}
+              con la captura del comprobante e indicando el nivel que elegiste ($333 o $555).
+            </li>
+            <li>
+              <span className="text-[#c9a84c] font-bold">4.</span> Activamos tu acceso
+              manualmente en menos de 24 horas.
+            </li>
+          </ol>
+          <a
+            href="https://www.paypal.com/donate/?hosted_button_id=PTBWKZKKV3HJG"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-5 w-full sm:w-auto inline-flex items-center justify-center gap-2 btn-gold px-7 py-3.5 rounded-xl text-sm font-bold"
+          >
+            Entiendo, ir a pagar con PayPal
+            <ArrowRight size={15} />
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function FAQ() {
   const [open, setOpen] = useState<number | null>(0);
@@ -92,10 +182,11 @@ export default function FAQ() {
               </button>
               <div
                 className={`overflow-hidden transition-all duration-400 ease-in-out ${
-                  open === i ? "max-h-[32rem] pb-6" : "max-h-0"
+                  open === i ? (f.pago ? "max-h-[60rem] pb-6" : "max-h-[32rem] pb-6") : "max-h-0"
                 }`}
               >
                 <p className="px-6 text-[#b8a888] text-sm leading-relaxed">{f.a}</p>
+                {f.pago && <div className="mt-4"><PagoPayPal /></div>}
               </div>
             </div>
           ))}
