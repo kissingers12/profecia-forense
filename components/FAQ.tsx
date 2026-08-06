@@ -137,8 +137,46 @@ function PagoPayPal() {
   );
 }
 
-export default function FAQ() {
+/** Lista de preguntas reutilizable: se usa en la sección FAQ y en el formulario */
+export function FaqLista() {
   const [open, setOpen] = useState<number | null>(0);
+
+  return (
+    <div className="space-y-3">
+      {faqs.map((f, i) => (
+        <div key={i} className={`card-dark rounded-xl overflow-hidden ${f.destacada ? "border border-[#c9a84c]/40" : ""}`}>
+          <button
+            className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left group"
+            onClick={() => setOpen(open === i ? null : i)}
+          >
+            <span className="font-semibold text-white text-sm sm:text-base group-hover:text-[#c9a84c] transition-colors">
+              {f.destacada && (
+                <span className="block text-[#c9a84c] text-[10px] font-bold tracking-widest uppercase mb-1">
+                  Empieza por aquí
+                </span>
+              )}
+              {f.q}
+            </span>
+            <ChevronDown
+              size={20}
+              className={`shrink-0 text-[#c9a84c] transition-transform duration-300 ${open === i ? "rotate-180" : ""}`}
+            />
+          </button>
+          <div
+            className={`overflow-hidden transition-all duration-400 ease-in-out ${
+              open === i ? (f.pago ? "max-h-[60rem] pb-6" : "max-h-[32rem] pb-6") : "max-h-0"
+            }`}
+          >
+            <p className="px-6 text-[#b8a888] text-sm leading-relaxed">{f.a}</p>
+            {f.pago && <div className="mt-4"><PagoPayPal /></div>}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export default function FAQ() {
 
   return (
     <section id="preguntas" className="relative py-24 lg:py-32 overflow-hidden scroll-mt-24">
@@ -160,40 +198,7 @@ export default function FAQ() {
           <div className="divider-gold max-w-xs mx-auto mt-6" />
         </div>
 
-        {/* Accordion */}
-        <div className="space-y-3">
-          {faqs.map((f, i) => (
-            <div key={i} className={`card-dark rounded-xl overflow-hidden ${f.destacada ? "border border-[#c9a84c]/40" : ""}`}>
-              <button
-                className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left group"
-                onClick={() => setOpen(open === i ? null : i)}
-              >
-                <span className="font-semibold text-white text-sm sm:text-base group-hover:text-[#c9a84c] transition-colors">
-                  {f.destacada && (
-                    <span className="block text-[#c9a84c] text-[10px] font-bold tracking-widest uppercase mb-1">
-                      Empieza por aquí
-                    </span>
-                  )}
-                  {f.q}
-                </span>
-                <ChevronDown
-                  size={20}
-                  className={`shrink-0 text-[#c9a84c] transition-transform duration-300 ${
-                    open === i ? "rotate-180" : ""
-                  }`}
-                />
-              </button>
-              <div
-                className={`overflow-hidden transition-all duration-400 ease-in-out ${
-                  open === i ? (f.pago ? "max-h-[60rem] pb-6" : "max-h-[32rem] pb-6") : "max-h-0"
-                }`}
-              >
-                <p className="px-6 text-[#b8a888] text-sm leading-relaxed">{f.a}</p>
-                {f.pago && <div className="mt-4"><PagoPayPal /></div>}
-              </div>
-            </div>
-          ))}
-        </div>
+        <FaqLista />
       </div>
     </section>
   );

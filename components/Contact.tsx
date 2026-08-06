@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Send, CheckCircle, HelpCircle } from "lucide-react";
+import { FaqLista } from "./FAQ";
 
 const motivos = [
   "Oración",
@@ -12,6 +13,7 @@ const motivos = [
 
 export default function Contact() {
   const [submitted, setSubmitted] = useState(false);
+  const [verFormulario, setVerFormulario] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [form, setForm] = useState({
@@ -48,6 +50,11 @@ export default function Contact() {
     }
     setLoading(false);
   };
+
+  // Motivos cuya respuesta casi siempre está en las preguntas frecuentes
+  const resuelveFaq =
+    form.programa === "Pregunta sobre la formación profética" ||
+    form.programa === "Inscribirme en un programa";
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -166,37 +173,101 @@ export default function Contact() {
               </div>
             </div>
 
-            <div>
-              <label className="block text-xs font-semibold text-[#c9a84c] uppercase tracking-widest mb-2">
-                Mensaje
-              </label>
-              <textarea
-                name="mensaje"
-                value={form.mensaje}
-                onChange={handleChange}
-                rows={4}
-                placeholder="Cuéntanos sobre ti y tu llamado..."
-                className="w-full bg-white/5 border border-[#c9a84c]/20 rounded-xl px-4 py-3 text-white placeholder-[#5a4a3a] text-sm focus:outline-none focus:border-[#c9a84c]/60 transition-colors resize-none"
-              />
-            </div>
+            {/* Si la consulta es sobre la formación, primero las respuestas.
+                La mayoría resuelve su duda aquí sin tener que escribir. */}
+            {resuelveFaq ? (
+              <div className="pt-2">
+                <div className="rounded-xl border border-[#c9a84c]/40 bg-[#c9a84c]/[0.06] p-5 mb-6">
+                  <div className="flex items-center gap-2 mb-2">
+                    <HelpCircle size={16} className="text-[#c9a84c] shrink-0" />
+                    <span className="text-[#c9a84c] text-xs font-bold uppercase tracking-widest">
+                      Tu respuesta está aquí
+                    </span>
+                  </div>
+                  <p className="text-[#e8dcc8] text-sm leading-relaxed">
+                    Estas son las dudas que más nos llegan sobre las formaciones. Búscala abajo:
+                    casi siempre está resuelta y podrás avanzar sin esperar respuesta.
+                  </p>
+                </div>
 
-            {error && (
-              <p className="text-red-400 text-sm text-center">{error}</p>
+                <FaqLista />
+
+                {!verFormulario ? (
+                  <button
+                    type="button"
+                    onClick={() => setVerFormulario(true)}
+                    className="mt-6 w-full text-center text-sm text-[#8a7a6a] hover:text-[#c9a84c] transition-colors py-2"
+                  >
+                    Mi duda no está aquí, quiero escribiros →
+                  </button>
+                ) : (
+                  <div className="mt-6 space-y-5 border-t border-[#c9a84c]/15 pt-6">
+                    <div>
+                      <label className="block text-xs font-semibold text-[#c9a84c] uppercase tracking-widest mb-2">
+                        Cuéntanos tu duda
+                      </label>
+                      <textarea
+                        name="mensaje"
+                        value={form.mensaje}
+                        onChange={handleChange}
+                        rows={4}
+                        placeholder="Escríbenos aquí lo que no encontraste arriba..."
+                        className="w-full bg-white/5 border border-[#c9a84c]/20 rounded-xl px-4 py-3 text-white placeholder-[#5a4a3a] text-sm focus:outline-none focus:border-[#c9a84c]/60 transition-colors resize-none"
+                      />
+                    </div>
+                    {error && <p className="text-red-400 text-sm text-center">{error}</p>}
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="btn-gold w-full py-4 rounded-xl text-base font-bold flex items-center justify-center gap-2 disabled:opacity-60"
+                    >
+                      {loading ? (
+                        <span className="w-5 h-5 border-2 border-[#050510]/40 border-t-[#050510] rounded-full animate-spin" />
+                      ) : (
+                        <>
+                          <Send size={18} />
+                          Enviar mensaje
+                        </>
+                      )}
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <>
+                <div>
+                  <label className="block text-xs font-semibold text-[#c9a84c] uppercase tracking-widest mb-2">
+                    Mensaje
+                  </label>
+                  <textarea
+                    name="mensaje"
+                    value={form.mensaje}
+                    onChange={handleChange}
+                    rows={4}
+                    placeholder="Cuéntanos sobre ti y tu llamado..."
+                    className="w-full bg-white/5 border border-[#c9a84c]/20 rounded-xl px-4 py-3 text-white placeholder-[#5a4a3a] text-sm focus:outline-none focus:border-[#c9a84c]/60 transition-colors resize-none"
+                  />
+                </div>
+
+                {error && (
+                  <p className="text-red-400 text-sm text-center">{error}</p>
+                )}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="btn-gold w-full py-4 rounded-xl text-base font-bold flex items-center justify-center gap-2 mt-2 disabled:opacity-60"
+                >
+                  {loading ? (
+                    <span className="w-5 h-5 border-2 border-[#050510]/40 border-t-[#050510] rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      <Send size={18} />
+                      Enviar mensaje
+                    </>
+                  )}
+                </button>
+              </>
             )}
-            <button
-              type="submit"
-              disabled={loading}
-              className="btn-gold w-full py-4 rounded-xl text-base font-bold flex items-center justify-center gap-2 mt-2 disabled:opacity-60"
-            >
-              {loading ? (
-                <span className="w-5 h-5 border-2 border-[#050510]/40 border-t-[#050510] rounded-full animate-spin" />
-              ) : (
-                <>
-                  <Send size={18} />
-                  Enviar mensaje
-                </>
-              )}
-            </button>
           </form>
         )}
       </div>
