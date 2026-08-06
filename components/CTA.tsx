@@ -35,15 +35,6 @@ export default function CTA() {
           >
             Inscribirme ahora
           </a>
-          <a
-            href="https://www.youtube.com/@KissingersAraque"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="btn-outline-gold px-8 py-4 rounded-full text-base font-bold flex items-center gap-2"
-          >
-            <Play size={18} fill="currentColor" />
-            Ver video
-          </a>
         </div>
       </div>
     </section>
