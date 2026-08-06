@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
+import { limpiarMensaje, limpiarCabecera } from "@/lib/sanitizar";
 
 function escapeHtml(str: string): string {
   return str
@@ -19,11 +20,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: false, error: "Datos incompletos." }, { status: 400 });
     }
 
-    const safeName = escapeHtml(nombre || "");
+    const safeName = escapeHtml(limpiarCabecera(nombre));
     const safeEmail = escapeHtml(email || "");
-    const safePhone = escapeHtml(telefono || "");
-    const safeProg = escapeHtml(programa || "");
-    const safeMsg = escapeHtml(mensaje || "");
+    const safePhone = escapeHtml(limpiarCabecera(telefono, 40));
+    const safeProg = escapeHtml(limpiarCabecera(programa, 60));
+    // Sin enlaces: el formulario es público y es la vía típica de spam
+    const safeMsg = escapeHtml(limpiarMensaje(mensaje));
 
     const transporter = nodemailer.createTransport({
       service: "gmail",

@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import { supabaseAdmin } from "@/lib/supabase";
 import { allow, clientIp } from "@/lib/rate-limit";
+import { limpiarMensaje, limpiarCabecera } from "@/lib/sanitizar";
 
 const PLAN_LABELS: Record<string, string> = {
   meditaciones: "Meditación Profética — $333",
@@ -63,7 +64,7 @@ export async function POST(req: NextRequest) {
     // Only allow registered users to send support requests
     const { data: user } = await supabaseAdmin
       .from("users")
-      .select("id, plan, activated")
+      .select("id, name, plan, activated")
       .eq("email", email.toLowerCase())
       .maybeSingle();
 
@@ -105,9 +106,11 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const safeName = escapeHtml(name || "");
+    // El nombre real es el de la base de datos, no el que envía el navegador
+    const safeName = escapeHtml(limpiarCabecera(user.name ?? name));
     const safeEmail = escapeHtml(email || "");
-    const safeMessage = escapeHtml(message || "");
+    // El mensaje lo escribe cualquiera: se le quitan los enlaces
+    const safeMessage = escapeHtml(limpiarMensaje(message));
     const safePlanLabel = escapeHtml(PLAN_LABELS[planReal] ?? planReal ?? "Plan desconocido");
     const safeResumen = escapeHtml(resumenPago);
     const yaActivo = user.activated;

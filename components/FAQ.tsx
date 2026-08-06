@@ -61,6 +61,7 @@ function PagoPayPal() {
     return (
       <div className="px-6 pt-4">
         <button
+          type="button"
           onClick={() => setMostrar(true)}
           className="w-full sm:w-auto inline-flex items-center justify-center gap-2 btn-gold px-6 py-3 rounded-xl text-sm font-bold"
         >
@@ -146,6 +147,7 @@ export function FaqLista() {
       {faqs.map((f, i) => (
         <div key={i} className={`card-dark rounded-xl overflow-hidden ${f.destacada ? "border border-[#c9a84c]/40" : ""}`}>
           <button
+            type="button"
             className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left group"
             onClick={() => setOpen(open === i ? null : i)}
           >

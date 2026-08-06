@@ -51,6 +51,17 @@ export default function Contact() {
     setLoading(false);
   };
 
+  // El texto de ejemplo se adapta al motivo: pedir "cuéntanos tu llamado"
+  // a quien busca oración no tenía sentido
+  const ejemploMensaje =
+    form.programa === "Oración"
+      ? "Haznos saber tu petición de oración..."
+      : form.programa === "Otro"
+      ? "Cuéntanos en qué podemos ayudarte..."
+      : "Cuéntanos sobre ti y tu llamado...";
+
+  const etiquetaMensaje = form.programa === "Oración" ? "Tu petición de oración" : "Mensaje";
+
   // Motivos cuya respuesta casi siempre está en las preguntas frecuentes
   const resuelveFaq =
     form.programa === "Pregunta sobre la formación profética" ||
@@ -237,14 +248,14 @@ export default function Contact() {
               <>
                 <div>
                   <label className="block text-xs font-semibold text-[#c9a84c] uppercase tracking-widest mb-2">
-                    Mensaje
+                    {etiquetaMensaje}
                   </label>
                   <textarea
                     name="mensaje"
                     value={form.mensaje}
                     onChange={handleChange}
                     rows={4}
-                    placeholder="Cuéntanos sobre ti y tu llamado..."
+                    placeholder={ejemploMensaje}
                     className="w-full bg-white/5 border border-[#c9a84c]/20 rounded-xl px-4 py-3 text-white placeholder-[#5a4a3a] text-sm focus:outline-none focus:border-[#c9a84c]/60 transition-colors resize-none"
                   />
                 </div>
