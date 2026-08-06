@@ -6,6 +6,7 @@ import { FaqLista } from "./FAQ";
 
 const motivos = [
   "Oración",
+  "Invitaciones ministeriales",
   "Pregunta sobre la formación profética",
   "Inscribirme en un programa",
   "Otro",
@@ -22,6 +23,11 @@ export default function Contact() {
     telefono: "",
     programa: "",
     mensaje: "",
+    // Solo se usan cuando el motivo es una invitación ministerial
+    iglesia: "",
+    ciudad: "",
+    direccion: "",
+    rol: "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -38,6 +44,10 @@ export default function Contact() {
           telefono: form.telefono,
           programa: form.programa,
           mensaje: form.mensaje,
+          iglesia: form.iglesia,
+          ciudad: form.ciudad,
+          direccion: form.direccion,
+          rol: form.rol,
         }),
       });
       if (res.ok) {
@@ -54,13 +64,22 @@ export default function Contact() {
   // El texto de ejemplo se adapta al motivo: pedir "cuéntanos tu llamado"
   // a quien busca oración no tenía sentido
   const ejemploMensaje =
-    form.programa === "Oración"
+    form.programa === "Invitaciones ministeriales"
+      ? "¿Qué necesita tu congregación? ¿Qué tipo de evento tienes en mente? ¿Hay algo específico que quieras que se ministre?"
+      : form.programa === "Oración"
       ? "Haznos saber tu petición de oración..."
       : form.programa === "Otro"
       ? "Cuéntanos en qué podemos ayudarte..."
       : "Cuéntanos sobre ti y tu llamado...";
 
-  const etiquetaMensaje = form.programa === "Oración" ? "Tu petición de oración" : "Mensaje";
+  const etiquetaMensaje =
+    form.programa === "Oración"
+      ? "Tu petición de oración"
+      : form.programa === "Invitaciones ministeriales"
+      ? "¿Por qué quieres que visitemos tu iglesia?"
+      : "Mensaje";
+
+  const esInvitacion = form.programa === "Invitaciones ministeriales";
 
   // Motivos cuya respuesta casi siempre está en las preguntas frecuentes
   const resuelveFaq =
@@ -183,6 +202,92 @@ export default function Contact() {
                 </select>
               </div>
             </div>
+
+
+            {/* Invitación ministerial: presentación y datos de la iglesia */}
+            {esInvitacion && (
+              <div className="rounded-xl border border-[#c9a84c]/40 bg-[#c9a84c]/[0.06] p-5 space-y-5">
+                <div>
+                  <span className="text-[#c9a84c] text-[10px] font-bold tracking-widest uppercase">
+                    Visitas ministeriales
+                  </span>
+                  <h3 className="text-white font-bold text-xl mt-1.5 mb-2">
+                    ¿Quieres que vayamos a <span className="text-[#c9a84c]">tu iglesia</span>?
+                  </h3>
+                  <p className="text-[#e8dcc8] text-sm leading-relaxed">
+                    Si sientes que tu congregación necesita una impartición profética, una
+                    conferencia o una activación ministerial, nos encantaría conocerte.
+                    Cuéntanos sobre ti y tu iglesia.
+                  </p>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-[#c9a84c] uppercase tracking-widest mb-2">
+                    ¿Eres el pastor o un líder de la iglesia? *
+                  </label>
+                  <select
+                    name="rol"
+                    value={form.rol}
+                    onChange={handleChange}
+                    required
+                    className="w-full bg-[#0a0a20] border border-[#c9a84c]/20 rounded-xl px-4 py-3 text-[#c8b89a] text-sm focus:outline-none focus:border-[#c9a84c]/60 transition-colors"
+                  >
+                    <option value="">Selecciona tu rol...</option>
+                    <option value="Pastor / Pastora principal">Soy el Pastor / Pastora principal</option>
+                    <option value="Pastor / Pastora asociado(a)">Soy Pastor / Pastora asociado(a)</option>
+                    <option value="Líder de ministerio o célula">Soy líder de ministerio o célula</option>
+                    <option value="Anciano / Diácono">Soy anciano / Diácono</option>
+                    <option value="Coordinador(a) de eventos">Soy coordinador(a) de eventos</option>
+                    <option value="Otro rol">Otro rol</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-[#c9a84c] uppercase tracking-widest mb-2">
+                    Nombre de la iglesia *
+                  </label>
+                  <input
+                    type="text"
+                    name="iglesia"
+                    value={form.iglesia}
+                    onChange={handleChange}
+                    required
+                    placeholder="Iglesia Cristiana..."
+                    className="w-full bg-white/5 border border-[#c9a84c]/20 rounded-xl px-4 py-3 text-white placeholder-[#5a4a3a] text-sm focus:outline-none focus:border-[#c9a84c]/60 transition-colors"
+                  />
+                </div>
+
+                <div className="grid sm:grid-cols-2 gap-5">
+                  <div>
+                    <label className="block text-xs font-semibold text-[#c9a84c] uppercase tracking-widest mb-2">
+                      Ciudad y país *
+                    </label>
+                    <input
+                      type="text"
+                      name="ciudad"
+                      value={form.ciudad}
+                      onChange={handleChange}
+                      required
+                      placeholder="Bogotá, Colombia"
+                      className="w-full bg-white/5 border border-[#c9a84c]/20 rounded-xl px-4 py-3 text-white placeholder-[#5a4a3a] text-sm focus:outline-none focus:border-[#c9a84c]/60 transition-colors"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-[#c9a84c] uppercase tracking-widest mb-2">
+                      Dirección
+                    </label>
+                    <input
+                      type="text"
+                      name="direccion"
+                      value={form.direccion}
+                      onChange={handleChange}
+                      placeholder="Calle, número..."
+                      className="w-full bg-white/5 border border-[#c9a84c]/20 rounded-xl px-4 py-3 text-white placeholder-[#5a4a3a] text-sm focus:outline-none focus:border-[#c9a84c]/60 transition-colors"
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Si la consulta es sobre la formación, primero las respuestas.
                 La mayoría resuelve su duda aquí sin tener que escribir. */}

@@ -6,7 +6,6 @@ import About from "@/components/About";
 import Events from "@/components/Events";
 import Founder from "@/components/Founder";
 import Biography from "@/components/Biography";
-import Testimonials from "@/components/Testimonials";
 import CTA from "@/components/CTA";
 import Contact from "@/components/Contact";
 import FAQ from "@/components/FAQ";
@@ -26,7 +25,6 @@ export default function Home() {
         <Founder />
         <Biography />
         <Donations />
-        <Testimonials />
         <CTA />
         {/* Las preguntas frecuentes van ANTES del formulario: así quien duda
             sobre qué formación elegir encuentra la respuesta sin escribir */}

@@ -59,7 +59,7 @@ export default function Footer() {
                 ["Libro", "#libro"],
                 ["Programas", "#programas"],
                 ["Eventos", "#eventos"],
-                ["Invitaciones", "#testimonios"],
+                ["Invitaciones", "#contacto"],
                 ["Contacto", "#contacto"],
               ].map(([label, href]) => (
                 <li key={href}>

@@ -9,7 +9,7 @@ const links = [
   { label: "Libro", href: "#libro" },
   { label: "Programas", href: "#programas" },
   { label: "Eventos", href: "#eventos" },
-  { label: "Invitaciones", href: "#testimonios" },
+  { label: "Invitaciones", href: "#contacto" },
   { label: "Ofrendas", href: "#donaciones" },
   { label: "Contacto", href: "#contacto" },
 ];
