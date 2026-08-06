@@ -23,7 +23,7 @@ function escapeHtml(str: string): string {
 
 export async function POST(req: NextRequest) {
   try {
-    const { name, email, plan, message } = await req.json();
+    const { name, email, plan, message, comprobante } = await req.json();
 
     if (!email) {
       return NextResponse.json({ ok: false, error: "Email requerido." }, { status: 400 });
@@ -40,6 +40,20 @@ export async function POST(req: NextRequest) {
         { ok: false, error: "Ya recibimos tu solicitud. Te responderemos pronto." },
         { status: 429 }
       );
+    }
+
+    // La captura llega como texto (data URL). Se valida antes de adjuntarla.
+    let adjunto: { filename: string; content: Buffer; cid: string } | null = null;
+    if (typeof comprobante === "string" && comprobante.startsWith("data:image/")) {
+      const m = comprobante.match(/^data:image\/(png|jpe?g|webp|gif);base64,([A-Za-z0-9+/=]+)$/);
+      if (!m) {
+        return NextResponse.json({ ok: false, error: "La imagen no tiene un formato válido." }, { status: 400 });
+      }
+      const buffer = Buffer.from(m[2], "base64");
+      if (buffer.length > 5 * 1024 * 1024) {
+        return NextResponse.json({ ok: false, error: "La imagen es demasiado grande." }, { status: 400 });
+      }
+      adjunto = { filename: `comprobante.${m[1] === "jpeg" ? "jpg" : m[1]}`, content: buffer, cid: "comprobante" };
     }
 
     if (typeof message === "string" && message.length > 2000) {
@@ -110,7 +124,8 @@ export async function POST(req: NextRequest) {
       from: `"100x100Cristianos" <${process.env.EMAIL_USER}>`,
       to: "100x100cristianos@gmail.com",
       replyTo: email,
-      subject: `⚠️ PAGO SIN ACCESO — ${safeName || safeEmail} | ${safePlanLabel}`,
+      subject: `${adjunto ? "📎" : "⚠️"} PAGO SIN ACCESO — ${safeName || safeEmail} | ${safePlanLabel}`,
+      ...(adjunto ? { attachments: [adjunto] } : {}),
       html: `
         <div style="font-family:Arial,sans-serif;max-width:600px;margin:0 auto;background:#050510;color:#f0e6d3;padding:32px;border-radius:12px;border:1px solid #c9a84c33">
           <h2 style="color:#c9a84c;margin-bottom:8px">⚠️ Cliente con pago sin acceso</h2>
@@ -125,6 +140,11 @@ export async function POST(req: NextRequest) {
             <p style="color:#8a7a6a;font-size:12px;margin:0 0 6px">Comprobación automática en NOWPayments</p>
             <p style="margin:0;line-height:1.6;font-size:14px">${safeResumen}</p>
           </div>
+          ${adjunto ? `
+          <hr style="border-color:#c9a84c22;margin:20px 0"/>
+          <p style="color:#c9a84c;font-size:13px;font-weight:bold;margin-bottom:10px">📎 Comprobante de pago enviado por el cliente:</p>
+          <img src="cid:comprobante" alt="Comprobante de pago" style="max-width:100%;border-radius:8px;border:1px solid #c9a84c33" />
+          ` : ""}
           ${safeMessage ? `
           <hr style="border-color:#c9a84c22;margin:20px 0"/>
           <p style="color:#8a7a6a;font-size:13px;margin-bottom:8px">Mensaje del cliente:</p>

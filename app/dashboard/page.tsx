@@ -93,6 +93,8 @@ export default function Dashboard() {
   const [activationLoading, setActivationLoading] = useState(false);
   const [showSupport, setShowSupport] = useState(false);
   const [supportMessage, setSupportMessage] = useState("");
+  const [comprobante, setComprobante] = useState("");
+  const [comprobanteError, setComprobanteError] = useState("");
   const [supportLoading, setSupportLoading] = useState(false);
   const [supportSent, setSupportSent] = useState(false);
   const [supportFailed, setSupportFailed] = useState(false);
@@ -197,6 +199,34 @@ export default function Dashboard() {
     setUpgradeLoading(false);
   };
 
+  // Lee la captura del pago y la deja lista para enviarla junto al mensaje
+  const leerComprobante = (file: File | undefined | null) => {
+    setComprobanteError("");
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setComprobanteError("Ese archivo no es una imagen. Envía una captura en JPG o PNG.");
+      return;
+    }
+    if (file.size > 4 * 1024 * 1024) {
+      setComprobanteError("La imagen pesa más de 4 MB. Haz una captura más pequeña.");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => setComprobante(String(reader.result));
+    reader.onerror = () => setComprobanteError("No se pudo leer la imagen. Inténtalo de nuevo.");
+    reader.readAsDataURL(file);
+  };
+
+  const handleArchivoComprobante = (file: File | undefined) => leerComprobante(file);
+
+  const handlePasteComprobante = (e: React.ClipboardEvent) => {
+    const item = Array.from(e.clipboardData.items).find((i) => i.type.startsWith("image/"));
+    if (item) {
+      e.preventDefault();
+      leerComprobante(item.getAsFile());
+    }
+  };
+
   const handleSupport = async (e: React.FormEvent) => {
     e.preventDefault();
     setSupportLoading(true);
@@ -210,6 +240,7 @@ export default function Dashboard() {
           email: session?.email,
           plan: session?.plan,
           message: supportMessage,
+          comprobante,
         }),
       });
       if (res.ok) {
@@ -301,9 +332,30 @@ export default function Dashboard() {
               ) : (
                 <>
                   <h3 className="text-white font-bold text-lg mb-1">¿Problemas con tu acceso?</h3>
-                  <p className="text-[#8a7a6a] text-sm mb-6">
-                    Si ya realizaste tu pago y no puedes ingresar, escríbenos. Verificaremos tu pago y te activaremos manualmente.
+                  <p className="text-[#8a7a6a] text-sm mb-5">
+                    Antes de escribirnos, busca aquí tu caso: es probable que se resuelva solo.
                   </p>
+
+                  {/* Antes del formulario, la respuesta según cómo pagó */}
+                  <div className="space-y-3 mb-6">
+                    <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+                      <p className="text-white text-sm font-bold mb-1.5">Si pagaste con criptomonedas</p>
+                      <p className="text-[#b8a888] text-xs leading-relaxed">
+                        No hace falta que hagas nada. Tu acceso se activa <strong className="text-[#c9a84c]">automáticamente</strong> en
+                        cuanto la red confirma el pago: con Bitcoin suele tardar entre <strong className="text-white">20 y 40 minutos</strong>.
+                        Recibirás un correo de bienvenida en cuanto esté listo. Si ya pasó ese tiempo, escríbenos abajo.
+                      </p>
+                    </div>
+                    <div className="rounded-xl border border-[#c9a84c]/40 bg-[#c9a84c]/[0.06] p-4">
+                      <p className="text-white text-sm font-bold mb-1.5">Si pagaste con PayPal</p>
+                      <p className="text-[#e8dcc8] text-xs leading-relaxed">
+                        Este pago <strong className="text-[#c9a84c]">no se activa solo</strong>: necesitamos comprobarlo.
+                        Envíanos aquí abajo <strong className="text-white">la captura del pago</strong> y te activamos
+                        el acceso en menos de 24 horas.
+                      </p>
+                    </div>
+                  </div>
+
                   <form onSubmit={handleSupport} className="space-y-4">
                     <div>
                       <label className="block text-xs font-semibold text-[#c9a84c] uppercase tracking-widest mb-2">
@@ -328,6 +380,57 @@ export default function Dashboard() {
                         className="w-full bg-white/5 border border-[#c9a84c]/20 rounded-xl px-4 py-3 text-white placeholder-[#4a3a2a] text-sm focus:outline-none focus:border-[#c9a84c]/60 resize-none"
                       />
                     </div>
+                    {/* Comprobante: se puede elegir el archivo o pegar la captura */}
+                    <div>
+                      <label className="block text-xs font-semibold text-[#c9a84c] uppercase tracking-widest mb-2">
+                        Captura del pago{" "}
+                        <span className="text-[#4a3a2a] normal-case font-normal">
+                          (obligatoria si pagaste por PayPal)
+                        </span>
+                      </label>
+
+                      {comprobante ? (
+                        <div className="rounded-xl border border-[#c9a84c]/30 bg-white/5 p-3">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={comprobante} alt="Comprobante de pago" className="w-full max-h-56 object-contain rounded-lg" />
+                          <button
+                            type="button"
+                            onClick={() => setComprobante("")}
+                            className="mt-2 w-full text-center text-xs text-[#8a7a6a] hover:text-red-400 transition-colors"
+                          >
+                            Quitar imagen
+                          </button>
+                        </div>
+                      ) : (
+                        <div
+                          onPaste={handlePasteComprobante}
+                          className="rounded-xl border border-dashed border-[#c9a84c]/30 bg-white/[0.03] p-4 text-center"
+                        >
+                          <input
+                            type="file"
+                            accept="image/*"
+                            id="comprobante"
+                            onChange={(e) => handleArchivoComprobante(e.target.files?.[0])}
+                            className="hidden"
+                          />
+                          <label
+                            htmlFor="comprobante"
+                            className="inline-flex items-center gap-2 cursor-pointer text-sm font-bold text-[#c9a84c] border border-[#c9a84c]/40 rounded-xl px-4 py-2.5 hover:bg-[#c9a84c]/10 transition-all"
+                          >
+                            <Download size={14} className="rotate-180" />
+                            Elegir imagen
+                          </label>
+                          <p className="text-[#6a5a4a] text-[11px] mt-2.5 leading-relaxed">
+                            También puedes copiar la captura y pegarla aquí con Ctrl+V (⌘+V en Mac).
+                            <br />Formatos: JPG o PNG · máximo 4 MB
+                          </p>
+                        </div>
+                      )}
+                      {comprobanteError && (
+                        <p className="text-red-400 text-xs mt-2">{comprobanteError}</p>
+                      )}
+                    </div>
+
                     <button
                       type="submit"
                       disabled={supportLoading}
