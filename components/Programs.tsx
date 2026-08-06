@@ -90,7 +90,7 @@ const programs = [
     tag: "Acceso Completo",
     title: "Escuela de Profetas — Todas las Clases",
     paragraphs: [
-      "El contenido completo de la Escuela Avanzada — más de 25 enseñanzas — sin mentoría grupal y sin clases por Zoom, a un precio más accesible.",
+      "Más de 25 enseñanzas que reúnen todo el camino de formación profética impartido desde 2023 hasta hoy, organizadas por niveles.",
       "Aprende a tu propio ritmo, con acceso 24/7 desde cualquier dispositivo: desde desbloquear tus ojos espirituales hasta la Profecía Forense, el nivel donde se ven nombres, fechas y detalles específicos.",
     ],
     accessLabel: null,
