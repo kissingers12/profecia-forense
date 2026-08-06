@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { Eye, EyeOff, LogIn, UserPlus, ArrowLeft, ShieldCheck } from "lucide-react";
 import { saveSession } from "@/lib/auth";
+import OpcionesDePago from "@/components/OpcionesDePago";
 
 const PLANS = [
   { value: "meditaciones", label: "Meditación Profética", price: 333 },
@@ -284,18 +285,7 @@ function LoginContent() {
                 <p className="text-3xl font-bold text-white">${price} <span className="text-sm text-[#8a7a6a]">USD</span></p>
                 <p className="text-[#6a5a4a] text-xs mt-1">Pago único · Acceso 24/7</p>
               </div>
-              <a
-                href={paymentUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-gold w-full py-4 rounded-xl font-bold flex items-center justify-center gap-2 text-base"
-              >
-                Proceder al pago — ${price}
-              </a>
-              <p className="text-center text-xs text-[#6a5a4a]">
-                Elige tu criptomoneda favorita —{" "}
-                <span className="text-[#c9a84c]/70">Bitcoin, USDT, ETH y más de 100 opciones.</span>
-              </p>
+              <OpcionesDePago precio={price} enlaceCripto={paymentUrl} email={regForm.email} />
               <p className="text-[#6a5a4a] text-xs">
                 Después del pago, tu acceso se activará automáticamente en minutos.{" "}
                 <button onClick={() => { setTab("login"); setRegistered(false); }} className="text-[#c9a84c] underline">
