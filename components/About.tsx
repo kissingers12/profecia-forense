@@ -46,7 +46,7 @@ export default function About() {
               escuchar, discernir y manifestar la voz de Dios con madurez,
               precisión y responsabilidad espiritual.
             </p>
-            <div className="divider-gold max-w-[120px] mb-8" />
+            <div className="divider-gold max-w-[120px] mb-8 mx-auto md:mx-0" />
             <div className="flex justify-center md:justify-start">
               <a
                 href="/login?tab=register"
