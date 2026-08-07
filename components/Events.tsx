@@ -23,9 +23,10 @@ const events = [
       "Un programa de acompañamiento personalizado con Kissingers Araque. Cuatro semanas de formación profética profunda, práctica supervisada y activación de dones. Grupos reducidos para máximo impacto.",
     date: null,
     time: "Horarios flexibles",
-    spots: "20 cupos",
+    spots: "20 cupos · todos ocupados",
     color: "#c9a84c",
-    badge: "Próximamente",
+    badge: "Agotado",
+    agotado: true,
   },
   {
     id: 3,
@@ -78,7 +79,13 @@ export default function Events() {
                   >
                     {e.category}
                   </span>
-                  <span className="text-xs font-semibold text-[#c9a84c] bg-[#c9a84c]/10 px-3 py-1 rounded-full border border-[#c9a84c]/20">
+                  <span
+                    className={`text-xs font-semibold px-3 py-1 rounded-full border ${
+                      "agotado" in e && e.agotado
+                        ? "text-red-400 bg-red-500/10 border-red-500/30"
+                        : "text-[#c9a84c] bg-[#c9a84c]/10 border-[#c9a84c]/20"
+                    }`}
+                  >
                     {e.badge}
                   </span>
                 </div>
@@ -106,8 +113,14 @@ export default function Events() {
                   </div>
                 </div>
 
-                <div className="inline-flex items-center justify-center gap-2 w-full px-5 py-2.5 rounded-full text-sm font-semibold border border-[#c9a84c]/20 text-[#6a5a4a] cursor-default select-none">
-                  Próximamente
+                <div
+                  className={`inline-flex items-center justify-center gap-2 w-full px-5 py-2.5 rounded-full text-sm font-semibold border cursor-default select-none ${
+                    "agotado" in e && e.agotado
+                      ? "border-red-500/30 text-red-400/80"
+                      : "border-[#c9a84c]/20 text-[#6a5a4a]"
+                  }`}
+                >
+                  {"agotado" in e && e.agotado ? "Plazas agotadas" : "Próximamente"}
                 </div>
               </div>
             </div>
