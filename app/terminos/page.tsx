@@ -25,8 +25,15 @@ export default function Terminos() {
           <li>· <strong>Escuela de Profetas · Todas las Clases — $555 USD:</strong> más de 25 enseñanzas grabadas desde 2023, organizadas por niveles, más el libro «El Manual para Escuchar a Dios» de regalo.</li>
         </ul>
         <p className="mt-3">
+          Para contratar cualquiera de estas dos formaciones solo se piden{" "}
+          <strong>tu nombre y tu correo electrónico</strong>. No se solicita número de teléfono.
+        </p>
+        <p className="mt-3">
           La <strong>Escuela Avanzada de Profecía ($777)</strong>, que incluía mentoría personalizada
-          y clases por Zoom, tenía 15 plazas y está agotada. No admite nuevas inscripciones.
+          y clases por Zoom, tenía 15 plazas y está agotada: no admite nuevas inscripciones. Era la
+          única que pedía el número de WhatsApp, necesario para el grupo donde se coordinaban las
+          sesiones en directo. Quienes ya la adquirieron conservan su acceso en las condiciones en
+          que la contrataron.
         </p>
         <p className="mt-3">
           Ambos programas son <strong>de pago único y acceso permanente</strong>, disponibles 24

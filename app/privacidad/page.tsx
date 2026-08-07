@@ -21,8 +21,7 @@ export default function Privacidad() {
       <section>
         <h2>¿Qué datos recogemos?</h2>
         <ul>
-          <li>· <strong>Al registrarte:</strong> tu nombre, tu correo electrónico y una contraseña.</li>
-          <li>· <strong>Opcionalmente:</strong> tu número de WhatsApp, si decides facilitarlo.</li>
+          <li>· <strong>Al registrarte:</strong> tu nombre, tu correo electrónico y una contraseña. Nada más.</li>
           <li>· <strong>De tu formación:</strong> el programa que elegiste y qué clases has visto, para mostrarte tu progreso.</li>
           <li>· <strong>De tus pagos:</strong> el importe, la fecha y el estado. Nunca vemos ni guardamos los datos de tu tarjeta o de tu monedero.</li>
           <li>· <strong>De tu actividad:</strong> registros de acceso y de descargas, para poder ayudarte si algo falla.</li>
@@ -30,6 +29,14 @@ export default function Privacidad() {
         <p className="mt-3">
           Tu contraseña se guarda <strong>cifrada</strong>: ni nosotros podemos leerla. Si la
           olvidas, se restablece con un código enviado a tu correo.
+        </p>
+        <p className="mt-3">
+          <strong>No pedimos número de teléfono.</strong> Las formaciones disponibles hoy —
+          Meditación Profética y Escuela de Profetas — se contratan únicamente con tu nombre y tu
+          correo. El número de WhatsApp solo se solicitó, y sigue guardado, en la{" "}
+          <strong>Escuela Avanzada de Profecía</strong>, porque incluía mentoría personalizada y un
+          grupo de WhatsApp donde se coordinaban las clases en directo. Si estás en ese grupo y
+          quieres que borremos tu número, escríbenos y lo eliminamos.
         </p>
       </section>
 
