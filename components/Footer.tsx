@@ -81,6 +81,7 @@ export default function Footer() {
                 ["Política de privacidad", "/privacidad"],
                 ["Términos y condiciones", "/terminos"],
                 ["Política de cookies", "/cookies"],
+                ["Política de seguridad", "/seguridad"],
               ].map(([texto, ruta]) => (
                 <li key={ruta}>
                   {/* En pestaña aparte: quien está leyendo la web no la pierde */}
