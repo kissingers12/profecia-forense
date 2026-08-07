@@ -15,6 +15,7 @@ const motivos = [
 export default function Contact() {
   const [submitted, setSubmitted] = useState(false);
   const [verFormulario, setVerFormulario] = useState(false);
+  const [aceptaPrivacidad, setAceptaPrivacidad] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [form, setForm] = useState({
@@ -32,6 +33,10 @@ export default function Contact() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!aceptaPrivacidad) {
+      setError("Debes aceptar la política de privacidad para enviar el mensaje.");
+      return;
+    }
     setLoading(true);
     setError("");
     try {
@@ -331,6 +336,21 @@ export default function Contact() {
                         className="w-full bg-white/5 border border-[#c9a84c]/20 rounded-xl px-4 py-3 text-white placeholder-[#5a4a3a] text-sm focus:outline-none focus:border-[#c9a84c]/60 transition-colors resize-none"
                       />
                     </div>
+                    <label className="flex items-start gap-2.5 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={aceptaPrivacidad}
+                        onChange={(e) => { setAceptaPrivacidad(e.target.checked); setError(""); }}
+                        className="mt-0.5 w-4 h-4 shrink-0 accent-[#c9a84c] cursor-pointer"
+                      />
+                      <span className="text-[#8a7a6a] text-xs leading-relaxed">
+                        Acepto la{" "}
+                        <a href="/privacidad" target="_blank" rel="noopener noreferrer" className="text-[#c9a84c] underline">
+                          política de privacidad
+                        </a>{" "}
+                        y que uséis mis datos para responderme.
+                      </span>
+                    </label>
                     {error && <p className="text-red-400 text-sm text-center">{error}</p>}
                     <button
                       type="submit"
@@ -365,6 +385,21 @@ export default function Contact() {
                   />
                 </div>
 
+                <label className="flex items-start gap-2.5 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={aceptaPrivacidad}
+                    onChange={(e) => { setAceptaPrivacidad(e.target.checked); setError(""); }}
+                    className="mt-0.5 w-4 h-4 shrink-0 accent-[#c9a84c] cursor-pointer"
+                  />
+                  <span className="text-[#8a7a6a] text-xs leading-relaxed">
+                    Acepto la{" "}
+                    <a href="/privacidad" target="_blank" rel="noopener noreferrer" className="text-[#c9a84c] underline">
+                      política de privacidad
+                    </a>{" "}
+                    y que uséis mis datos para responderme.
+                  </span>
+                </label>
                 {error && (
                   <p className="text-red-400 text-sm text-center">{error}</p>
                 )}

@@ -28,6 +28,7 @@ function LoginContent() {
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
   const [regForm, setRegForm] = useState({ name: "", email: "", password: "", confirm: "", plan: defaultPlan, countryCode: "+1", phone: "" });
   const [registered, setRegistered] = useState(false);
+  const [acepta, setAcepta] = useState(false);
   const [paymentUrl, setPaymentUrl] = useState("");
   const [price, setPrice] = useState(0);
 
@@ -67,6 +68,7 @@ function LoginContent() {
     if (regForm.password !== regForm.confirm) { setError("Las contraseñas no coinciden."); return; }
     if (regForm.password.length < 6) { setError("La contraseña debe tener al menos 6 caracteres."); return; }
     if (!regForm.plan) { setError("Selecciona un programa."); return; }
+    if (!acepta) { setError("Debes aceptar los términos y la política de privacidad para continuar."); return; }
     const whatsapp = regForm.phone ? `${regForm.countryCode}${regForm.phone.replace(/\s/g, "")}` : "";
     setLoading(true);
     try {
@@ -260,6 +262,36 @@ function LoginContent() {
                   <p className="text-[#6a5a4a] text-xs mt-1.5">Te añadiremos al grupo de WhatsApp de la Escuela Avanzada</p>
                 </div>
               )}
+
+              {/* Aviso obligatorio para contenido digital: sin esto, la política
+                  de devoluciones no vincula a quien compra */}
+              <div className="rounded-xl border border-[#c9a84c]/25 bg-[#c9a84c]/[0.04] p-4 space-y-3">
+                <p className="text-[#b8a888] text-xs leading-relaxed">
+                  El acceso a las clases es <strong className="text-[#e8dcc8]">inmediato</strong> una
+                  vez confirmado el pago. Al entrar en el contenido, la devolución deja de ser
+                  completa y pasa a calcularse{" "}
+                  <strong className="text-[#e8dcc8]">en proporción a las clases que no hayas visto</strong>.
+                </p>
+                <label className="flex items-start gap-2.5 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={acepta}
+                    onChange={(e) => { setAcepta(e.target.checked); setError(""); }}
+                    className="mt-0.5 w-4 h-4 shrink-0 accent-[#c9a84c] cursor-pointer"
+                  />
+                  <span className="text-[#c8b89a] text-xs leading-relaxed">
+                    He leído y acepto los{" "}
+                    <a href="/terminos" target="_blank" rel="noopener noreferrer" className="text-[#c9a84c] underline">
+                      términos y condiciones
+                    </a>{" "}
+                    y la{" "}
+                    <a href="/privacidad" target="_blank" rel="noopener noreferrer" className="text-[#c9a84c] underline">
+                      política de privacidad
+                    </a>
+                    , y solicito el acceso inmediato al contenido.
+                  </span>
+                </label>
+              </div>
 
               {error && <p className="text-red-400 text-xs">{error}</p>}
               <button type="submit" disabled={loading} className="btn-gold w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2 mt-2">
