@@ -451,7 +451,9 @@ export default function Programs() {
 
         {/* Trust badges */}
         <div className="flex flex-wrap justify-center gap-6 mt-12 text-[#6a5a4a] text-xs">
-          {["Pago 100% seguro", "Garantía 7 días", "Acceso inmediato", "Soporte incluido"].map((b) => (
+          {/* Antes decía "Garantía 7 días", que no coincidía con la política real
+              de devoluciones (proporcional según las clases no vistas) */}
+          {["Pago 100% seguro", "Acceso permanente", "Acceso inmediato", "Soporte incluido"].map((b) => (
             <span key={b} className="flex items-center gap-1.5">
               <ShieldCheck size={13} className="text-[#c9a84c]" />
               {b}

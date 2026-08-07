@@ -77,21 +77,23 @@ export default function Footer() {
               Legal
             </h4>
             <ul className="space-y-3">
-              <li>
-                <a href="#" className="text-[#6a5a4a] text-sm hover:text-[#c9a84c] transition-colors">
-                  Política de privacidad
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-[#6a5a4a] text-sm hover:text-[#c9a84c] transition-colors">
-                  Términos y condiciones
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-[#6a5a4a] text-sm hover:text-[#c9a84c] transition-colors">
-                  Política de cookies
-                </a>
-              </li>
+              {[
+                ["Política de privacidad", "/privacidad"],
+                ["Términos y condiciones", "/terminos"],
+                ["Política de cookies", "/cookies"],
+              ].map(([texto, ruta]) => (
+                <li key={ruta}>
+                  {/* En pestaña aparte: quien está leyendo la web no la pierde */}
+                  <a
+                    href={ruta}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[#6a5a4a] text-sm hover:text-[#c9a84c] transition-colors"
+                  >
+                    {texto}
+                  </a>
+                </li>
+              ))}
             </ul>
           </div>
         </div>
