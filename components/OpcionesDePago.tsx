@@ -23,6 +23,18 @@ export default function OpcionesDePago({
 }) {
   const [via, setVia] = useState<null | "paypal">(null);
 
+  // Se avisa al panel de que esta persona se fue a pagar por PayPal, para
+  // que Kissingers sepa de quién debe esperar el comprobante
+  const registrarIntento = () => {
+    if (!email) return;
+    fetch("/api/paypal-intent", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+      keepalive: true,
+    }).catch(() => {});
+  };
+
   if (!via) {
     return (
       <div className="space-y-3">
@@ -105,6 +117,7 @@ export default function OpcionesDePago({
             href={PAYPAL}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={registrarIntento}
             className="btn-gold w-full py-3.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2"
           >
             Entiendo, ir a pagar con PayPal

@@ -320,13 +320,15 @@ export default function Dashboard() {
                 <div className="text-center space-y-4">
                   <h3 className="text-white font-bold text-lg">No pudimos enviar el mensaje</h3>
                   <p className="text-[#8a7a6a] text-sm">
-                    Hubo un problema técnico. Contáctanos directamente con tu email <span className="text-[#c9a84c]">{session.email}</span> y te activamos en minutos:
+                    Hubo un problema técnico. Vuelve a intentarlo o escríbenos desde el
+                    formulario de contacto indicando tu correo{" "}
+                    <span className="text-[#c9a84c]">{session.email}</span> y te activamos en minutos.
                   </p>
                   <a
-                    href={`mailto:100x100cristianos@gmail.com?subject=Problema%20con%20acceso&body=Mi%20email%20de%20registro%20es%3A%20${encodeURIComponent(session.email)}`}
+                    href="/#contacto"
                     className="btn-gold w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2"
                   >
-                    Enviar email →
+                    Ir al formulario de contacto →
                   </a>
                   <button
                     onClick={() => { setSupportFailed(false); }}

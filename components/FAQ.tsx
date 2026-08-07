@@ -7,7 +7,7 @@ const faqs: { q: string; a: string; destacada?: boolean; pago?: boolean }[] = [
   {
     destacada: true,
     q: "¿Qué formación debo elegir?",
-    a: "Depende de dónde estés hoy. La Escuela de Profetas ($555) reúne todas las clases grabadas desde 2023 hasta hoy — alrededor de 30 enseñanzas — y está pensada especialmente para quienes llevan poco tiempo en la membresía 4 de YouTube. Si ya estás en la membresía 5, o llevas bastante tiempo en la membresía 4, este programa no es para ti, porque ya habrás visto la mayor parte del contenido. La Meditación Profética ($333) es para ti si te interesa conocer los secretos de la meditación y cómo interactuar con los ángeles mediante la meditación profética: ese nivel tiene todas las respuestas que estás buscando.",
+    a: "Depende de dónde estés hoy. La Escuela de Profetas ($555) reúne todas las clases grabadas desde 2023 hasta hoy — más de 25 enseñanzas — y está pensada especialmente para quienes llevan poco tiempo en la membresía 4 de YouTube. Si ya estás en la membresía 5, o llevas bastante tiempo en la membresía 4, este programa no es para ti, porque ya habrás visto la mayor parte del contenido. La Meditación Profética ($333) es para ti si te interesa conocer los secretos de la meditación y cómo interactuar con los ángeles mediante la meditación profética: ese nivel tiene todas las respuestas que estás buscando.",
   },
   {
     q: "¿Puedo entrar todavía a la Escuela Avanzada de Profetas ($777) con mentoría?",
@@ -19,7 +19,7 @@ const faqs: { q: string; a: string; destacada?: boolean; pago?: boolean }[] = [
   },
   {
     q: "¿Qué incluye exactamente la Escuela de Profetas ($555)?",
-    a: "Incluye todas las clases grabadas: alrededor de 30 enseñanzas impartidas desde 2023 hasta hoy, organizadas por niveles (Nivel Básico, Nivel Intermedio, Nivel Avanzado y Profecía Forense), más el libro «El Manual para Escuchar a Dios» de regalo. Tienes acceso 24/7 y también recibirás las nuevas enseñanzas que se vayan publicando. No incluye mentoría personalizada ni clases por Zoom.",
+    a: "Incluye todas las clases grabadas: más de 25 enseñanzas impartidas desde 2023 hasta hoy, organizadas por niveles (Nivel Básico, Nivel Intermedio, Nivel Avanzado y Profecía Forense), más el libro «El Manual para Escuchar a Dios» de regalo. Tienes acceso 24/7 y también recibirás las nuevas enseñanzas que se vayan publicando. No incluye mentoría personalizada ni clases por Zoom.",
   },
   {
     q: "¿Por qué se paga con criptomonedas?",

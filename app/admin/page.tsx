@@ -37,6 +37,7 @@ type PaymentRow = {
   email: string;
   fecha: string;
   status: string;
+  tipo: "cripto" | "paypal";
   precio: number;
   pagado: number;
   requerido: number;
@@ -959,7 +960,9 @@ Servicio al Estudiante
             ) : (
               <div className="space-y-3">
                 {payments.map((p) => {
-                  let st = PAYMENT_STATUS[p.status] ?? { label: p.status, color: "text-[#8a7a6a] bg-white/5 border-white/10" };
+                  let st = p.tipo === "paypal"
+                    ? { label: "💳 SE FUE A PAGAR POR PAYPAL", color: "text-blue-300 bg-blue-500/10 border-blue-500/30" }
+                    : PAYMENT_STATUS[p.status] ?? { label: p.status, color: "text-[#8a7a6a] bg-white/5 border-white/10" };
 
                   // Comparar SIEMPRE en la misma moneda: la cripto enviada contra
                   // la cripto que se le pidió. NOWPayments marca "pago parcial"
@@ -1019,6 +1022,12 @@ Servicio al Estudiante
                           <span className="truncate">{p.email}</span>
                           <Copy size={11} className="shrink-0" />
                         </button>
+                        {p.tipo === "paypal" ? (
+                          <p className="text-[#6a5a4a] text-xs mt-1">
+                            Pulsó pagar con PayPal · queda esperar su comprobante ·{" "}
+                            {new Date(p.fecha).toLocaleString("es-ES", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}
+                          </p>
+                        ) : (
                         <p className="text-[#6a5a4a] text-xs mt-1">
                           Debía pagar <span className="text-[#c9a84c] font-bold">${p.precio}</span>
                           {p.requerido > 0 && <> (= {importe(p.requerido, p.moneda)})</>}
@@ -1027,6 +1036,7 @@ Servicio al Estudiante
                           {" · "}
                           {new Date(p.fecha).toLocaleString("es-ES", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}
                         </p>
+                        )}
                         {casiCompleto && (
                           <p className="text-green-400 text-xs mt-1">
                             Pagó el {(cubierto * 100).toFixed(1)}% — la diferencia es por comisiones de red, se considera pagado

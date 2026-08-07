@@ -108,9 +108,9 @@ export default function LibroPage() {
                   : <><KeyRound size={18} /> Acceder a mi descarga</>}
               </button>
               <p className="text-center text-xs text-[#6a5a4a]">
-                ¿No tienes código? Escríbenos a{" "}
-                <a href="mailto:100x100cristianos@gmail.com" className="text-[#c9a84c] hover:underline">
-                  100x100cristianos@gmail.com
+                ¿No tienes código?{" "}
+                <a href="/#contacto" className="text-[#c9a84c] hover:underline">
+                  Escríbenos desde aquí
                 </a>
               </p>
             </form>

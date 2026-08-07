@@ -1,10 +1,9 @@
 import { NextRequest } from "next/server";
 import crypto from "crypto";
 import { supabaseAdmin } from "@/lib/supabase";
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 import { allow, clientIp } from "@/lib/rate-limit";
 
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(req: NextRequest) {
   const { email } = await req.json();
@@ -37,8 +36,15 @@ export async function POST(req: NextRequest) {
     .update({ reset_token: code, reset_expires: expires.toISOString() })
     .eq("id", user.id);
 
-  await resend.emails.send({
-    from: process.env.RESEND_FROM_EMAIL ?? "100x100Cristianos <onboarding@resend.dev>",
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
+  });
+
+  let errorEnvio: { message: string } | null = null;
+  try {
+    await transporter.sendMail({
+    from: `"Servicio al Estudiante · 100x100Cristianos" <${process.env.EMAIL_USER}>`,
     to: email.toLowerCase(),
     subject: "Recupera tu contraseña — 100x100Cristianos",
     html: `
@@ -52,7 +58,22 @@ export async function POST(req: NextRequest) {
         <p style="color:#6a5a4a;font-size:13px;">Este código expira en <strong>15 minutos</strong>. Si no solicitaste esto, ignora este mensaje.</p>
       </div>
     `,
-  });
+    });
+  } catch (err) {
+    errorEnvio = { message: err instanceof Error ? err.message : String(err) };
+  }
 
+  // Antes el fallo se perdía en silencio: el alumno esperaba un código que
+  // nunca salía. Ahora queda anotado y se ve en /admin -> Actividad.
+  if (errorEnvio) {
+    console.error("[recuperar-contrasena]", errorEnvio.message);
+    await supabaseAdmin.from("activity_logs").insert({
+      user_email: "sistema@correo",
+      user_name: "ERROR_CORREO",
+      action: `No salió el código de recuperación para ${email.toLowerCase()}: ${errorEnvio.message}`.slice(0, 300),
+    });
+  }
+
+  // Se responde igual haya salido o no, para no revelar qué correos existen
   return Response.json({ success: true });
 }

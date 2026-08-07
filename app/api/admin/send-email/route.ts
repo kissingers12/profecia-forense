@@ -1,8 +1,6 @@
 import { NextRequest } from "next/server";
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 import { checkAdmin } from "@/lib/admin-auth";
-
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 function checkAuth(req: NextRequest): boolean {
   return checkAdmin(req);
@@ -16,7 +14,6 @@ export async function POST(req: NextRequest) {
     return Response.json({ error: "Faltan campos: to, subject, body." }, { status: 400 });
   }
 
-  const from = process.env.RESEND_FROM_EMAIL ?? "100x100Cristianos <onboarding@resend.dev>";
 
   // Se escapa el texto y luego se convierten las direcciones web en enlaces,
   // para que el alumno pueda pulsarlas en vez de tener que copiarlas
@@ -55,8 +52,17 @@ ${texto}
   `;
 
   try {
-    const { error } = await resend.emails.send({ from, to, subject, html, replyTo: "100x100cristianos@gmail.com" });
-    if (error) return Response.json({ error: error.message }, { status: 500 });
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
+    });
+    await transporter.sendMail({
+      from: `"Servicio al Estudiante · 100x100Cristianos" <${process.env.EMAIL_USER}>`,
+      to,
+      subject,
+      html,
+      replyTo: process.env.EMAIL_USER,
+    });
     return Response.json({ ok: true });
   } catch (err) {
     return Response.json({ error: String(err) }, { status: 500 });

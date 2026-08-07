@@ -5,6 +5,7 @@ const PLAN_PRICES: Record<string, number> = {
   meditaciones: 333,
   escuela: 777,
   clases: 555,
+  mentoria: 555,
 };
 
 const PLAN_LABELS: Record<string, string> = {

@@ -11,6 +11,7 @@ type PaymentRow = {
   email: string;
   fecha: string;
   status: string;
+  tipo: "cripto" | "paypal";
   precio: number;          // USD que debía pagar
   pagado: number;          // cripto que envió
   requerido: number;       // cripto que se le pidió
@@ -32,8 +33,8 @@ export async function GET(req: NextRequest) {
 
   const { data: logs, error } = await supabaseAdmin
     .from("activity_logs")
-    .select("id, user_email, action, created_at")
-    .eq("user_name", "PAGO")
+    .select("id, user_email, user_name, action, created_at")
+    .in("user_name", ["PAGO", "PAYPAL"])
     .order("created_at", { ascending: false })
     .limit(100);
 
@@ -72,7 +73,9 @@ export async function GET(req: NextRequest) {
       // registro antiguo o texto suelto — se muestra igualmente
     }
     const u = byEmail.get(l.user_email.toLowerCase());
+    const esPayPal = l.user_name === "PAYPAL";
     return {
+      tipo: (esPayPal ? "paypal" : "cripto") as "cripto" | "paypal",
       id: l.id,
       email: l.user_email,
       fecha: l.created_at,

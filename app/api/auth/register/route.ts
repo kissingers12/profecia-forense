@@ -5,7 +5,6 @@ import { allow, clientIp } from "@/lib/rate-limit";
 
 const PLAN_PRICES: Record<string, number> = {
   meditaciones: 333,
-  mentoria: 555,
   escuela: 777,
   clases: 555,
 };
