@@ -10,7 +10,7 @@ export default function Privacidad() {
   return (
     <PaginaLegal titulo="Política de privacidad" actualizado="7 de agosto de 2026">
       <section>
-        <h2>Quién trata tus datos</h2>
+        <h2>¿Quién trata tus datos?</h2>
         <p>
           El responsable de esta plataforma es <strong>Kissingers Araque</strong>, que gestiona la
           formación espiritual ofrecida en kissingersaraque.com. Puedes ponerte en contacto a través
@@ -19,7 +19,7 @@ export default function Privacidad() {
       </section>
 
       <section>
-        <h2>Qué datos recogemos</h2>
+        <h2>¿Qué datos recogemos?</h2>
         <ul>
           <li>· <strong>Al registrarte:</strong> tu nombre, tu correo electrónico y una contraseña.</li>
           <li>· <strong>Opcionalmente:</strong> tu número de WhatsApp, si decides facilitarlo.</li>
@@ -34,7 +34,7 @@ export default function Privacidad() {
       </section>
 
       <section>
-        <h2>Para qué los usamos</h2>
+        <h2>¿Para qué los usamos?</h2>
         <ul>
           <li>· Darte acceso a la formación que has adquirido y guardar tu progreso.</li>
           <li>· Enviarte los correos propios del servicio: bienvenida, acceso activado o avisos sobre tu pago.</li>
@@ -48,7 +48,7 @@ export default function Privacidad() {
       </section>
 
       <section>
-        <h2>Quién más interviene</h2>
+        <h2>¿Quién más interviene?</h2>
         <p>
           Para que la plataforma funcione nos apoyamos en estos servicios, que tratan datos por
           nuestra cuenta:
@@ -64,15 +64,16 @@ export default function Privacidad() {
       </section>
 
       <section>
-        <h2>Cuánto tiempo los guardamos</h2>
+        <h2>¿Cuánto tiempo conservamos tu información?</h2>
         <p>
-          Mientras tengas tu cuenta activa. Si nos pides que la eliminemos, borramos tus datos
+          Toda tu información personal la guardaremos durante el tiempo en el que seas usuario o
+          usuaria de la plataforma. Si nos pides que eliminemos tu cuenta, borramos tus datos
           personales, salvo los registros de pago que debamos conservar por obligación fiscal.
         </p>
       </section>
 
       <section>
-        <h2>Tus derechos</h2>
+        <h2>¿Qué derechos tienes sobre tus datos?</h2>
         <p>
           Puedes pedirnos en cualquier momento <strong>acceder</strong> a tus datos,{" "}
           <strong>corregirlos</strong>, <strong>eliminarlos</strong>, obtener una{" "}
@@ -83,7 +84,7 @@ export default function Privacidad() {
       </section>
 
       <section>
-        <h2>Seguridad</h2>
+        <h2>¿Cómo protegemos tu información?</h2>
         <p>
           Las contraseñas se guardan cifradas, la web funciona siempre bajo conexión segura (HTTPS)
           y el acceso a la administración está protegido con contraseña y con límites que frenan los
@@ -93,7 +94,7 @@ export default function Privacidad() {
       </section>
 
       <section>
-        <h2>Menores</h2>
+        <h2>¿Pueden registrarse menores de edad?</h2>
         <p>
           Esta plataforma no está dirigida a menores de 16 años. Si eres menor, necesitas la
           autorización de tu padre, madre o tutor para registrarte.
@@ -101,7 +102,7 @@ export default function Privacidad() {
       </section>
 
       <section>
-        <h2>Cambios en esta política</h2>
+        <h2>¿Puede cambiar esta política?</h2>
         <p>
           Si cambiamos algo importante, actualizaremos la fecha que aparece al principio de esta
           página. Te recomendamos revisarla de vez en cuando.

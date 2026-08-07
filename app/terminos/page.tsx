@@ -10,7 +10,7 @@ export default function Terminos() {
   return (
     <PaginaLegal titulo="Términos y condiciones" actualizado="7 de agosto de 2026">
       <section>
-        <h2>Quién presta el servicio</h2>
+        <h2>¿Quién presta el servicio?</h2>
         <p>
           <strong>Kissingers Araque</strong> ofrece a través de kissingersaraque.com formación
           espiritual en formato de clases grabadas. Al registrarte y realizar un pago aceptas estas
@@ -19,7 +19,7 @@ export default function Terminos() {
       </section>
 
       <section>
-        <h2>Qué se ofrece</h2>
+        <h2>¿Qué incluye cada formación?</h2>
         <ul>
           <li>· <strong>Meditación Profética — $333 USD:</strong> las enseñanzas de meditación profética publicadas en esa sección.</li>
           <li>· <strong>Escuela de Profetas · Todas las Clases — $555 USD:</strong> más de 25 enseñanzas grabadas desde 2023, organizadas por niveles, más el libro «El Manual para Escuchar a Dios» de regalo.</li>
@@ -37,7 +37,7 @@ export default function Terminos() {
       </section>
 
       <section>
-        <h2>Tu cuenta</h2>
+        <h2>¿Puedo compartir mi cuenta?</h2>
         <p>
           El acceso es <strong>personal e intransferible</strong>. No está permitido compartir tus
           credenciales, dar acceso a terceros ni descargar, copiar, revender o redifundir los
@@ -50,7 +50,7 @@ export default function Terminos() {
       </section>
 
       <section>
-        <h2>Pagos y activación</h2>
+        <h2>¿Cómo se paga y cuándo se activa el acceso?</h2>
         <ul>
           <li>· <strong>Con criptomonedas:</strong> el acceso se activa de forma automática al confirmarse el pago en la red. Suele tardar entre 20 y 40 minutos.</li>
           <li>· <strong>Con tarjeta, mediante donación por PayPal:</strong> debes enviarnos el comprobante desde tu cuenta. Activamos el acceso manualmente, normalmente en menos de 24 horas.</li>
@@ -62,7 +62,7 @@ export default function Terminos() {
       </section>
 
       <section>
-        <h2>Devoluciones</h2>
+        <h2>¿Puedo pedir una devolución?</h2>
         <p>
           Como se trata de contenido digital al que accedes de inmediato, la devolución funciona
           así:
@@ -80,7 +80,7 @@ export default function Terminos() {
       </section>
 
       <section>
-        <h2>Propiedad del contenido</h2>
+        <h2>¿De quién es el contenido?</h2>
         <p>
           Todas las enseñanzas, vídeos, textos, materiales y el libro son propiedad de Kissingers
           Araque y están protegidos por derechos de autor. Tu compra te da derecho a{" "}
@@ -90,7 +90,7 @@ export default function Terminos() {
       </section>
 
       <section>
-        <h2>Disponibilidad</h2>
+        <h2>¿Qué pasa si la plataforma no está disponible?</h2>
         <p>
           Trabajamos para que la plataforma esté siempre disponible, pero puede haber
           interrupciones puntuales por mantenimiento o por causas ajenas a nosotros (fallos de los
@@ -100,7 +100,7 @@ export default function Terminos() {
       </section>
 
       <section>
-        <h2>Naturaleza de la formación</h2>
+        <h2>¿Qué tipo de formación es esta?</h2>
         <p>
           El contenido tiene una finalidad de <strong>formación espiritual y crecimiento
           personal</strong>. No sustituye el consejo médico, psicológico, legal ni financiero
@@ -110,7 +110,7 @@ export default function Terminos() {
       </section>
 
       <section>
-        <h2>Cambios en estas condiciones</h2>
+        <h2>¿Pueden cambiar estas condiciones?</h2>
         <p>
           Podemos actualizarlas para reflejar cambios en los programas o en la ley. La fecha de la
           última actualización aparece al principio. Los cambios no afectan retroactivamente a las

@@ -10,7 +10,7 @@ export default function Cookies() {
   return (
     <PaginaLegal titulo="Política de cookies" actualizado="7 de agosto de 2026">
       <section>
-        <h2>En resumen</h2>
+        <h2>¿Esta web usa cookies?</h2>
         <p>
           Esta web <strong>no utiliza cookies publicitarias ni de seguimiento</strong>. No tenemos
           Google Analytics, ni píxeles de redes sociales, ni ningún sistema que siga tu navegación
@@ -19,7 +19,7 @@ export default function Cookies() {
       </section>
 
       <section>
-        <h2>Qué se guarda en tu navegador</h2>
+        <h2>¿Qué se guarda en tu navegador?</h2>
         <ul>
           <li>
             · <strong>Tu sesión.</strong> Cuando inicias sesión, tu navegador guarda localmente tus
@@ -41,7 +41,7 @@ export default function Cookies() {
       </section>
 
       <section>
-        <h2>Cómo eliminarlas</h2>
+        <h2>¿Cómo puedo eliminarlas?</h2>
         <p>
           Puedes borrar en cualquier momento lo que tu navegador guarda desde sus ajustes, en la
           sección de privacidad o de datos de navegación. Ten en cuenta que si borras los datos de
@@ -51,7 +51,7 @@ export default function Cookies() {
       </section>
 
       <section>
-        <h2>Más información</h2>
+        <h2>¿Dónde encuentro más información?</h2>
         <p>
           Para saber qué datos tratamos y con qué finalidad, consulta nuestra{" "}
           <a href="/privacidad" className="text-[#c9a84c] hover:underline">
