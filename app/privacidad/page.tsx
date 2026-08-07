@@ -12,7 +12,7 @@ export default function Privacidad() {
       <section>
         <h2>¿Quién trata tus datos?</h2>
         <p>
-          El responsable de esta plataforma es <strong>Kissingers Araque</strong>, que gestiona la
+          El responsable de esta plataforma es <strong>Greca S.L.U.</strong>, que gestiona la
           formación espiritual ofrecida en kissingersaraque.com. Puedes ponerte en contacto a través
           del formulario de contacto de la web para cualquier asunto relacionado con tus datos.
         </p>

@@ -12,9 +12,9 @@ export default function Terminos() {
       <section>
         <h2>¿Quién presta el servicio?</h2>
         <p>
-          <strong>Kissingers Araque</strong> ofrece a través de kissingersaraque.com formación
-          espiritual en formato de clases grabadas. Al registrarte y realizar un pago aceptas estas
-          condiciones.
+          <strong>Greca S.L.U.</strong> ofrece a través de kissingersaraque.com la formación
+          espiritual impartida por Kissingers Araque, en formato de clases grabadas. Al registrarte
+          y realizar un pago aceptas estas condiciones.
         </p>
       </section>
 
@@ -82,8 +82,9 @@ export default function Terminos() {
       <section>
         <h2>¿De quién es el contenido?</h2>
         <p>
-          Todas las enseñanzas, vídeos, textos, materiales y el libro son propiedad de Kissingers
-          Araque y están protegidos por derechos de autor. Tu compra te da derecho a{" "}
+          Todas las enseñanzas, vídeos, textos, materiales y el libro son obra de Kissingers Araque,
+          se explotan a través de <strong>Greca S.L.U.</strong> y están protegidos por derechos de
+          autor. Tu compra te da derecho a{" "}
           <strong>verlos y estudiarlos personalmente</strong>, no a reproducirlos, distribuirlos ni
           utilizarlos con fines comerciales.
         </p>
