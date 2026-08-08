@@ -36,6 +36,10 @@ const faqs: { q: string; a: string; destacada?: boolean; pago?: boolean }[] = [
     a: "El acceso se activa automáticamente en cuanto la red confirma tu pago. Con Bitcoin suele tardar entre 20 y 40 minutos, y recibirás un correo de bienvenida en cuanto esté listo. Si pasado ese tiempo sigues sin poder entrar, inicia sesión y pulsa «Escríbenos y te activamos manualmente»: revisaremos tu pago personalmente.",
   },
   {
+    q: "¿Puedo pedir una devolución?",
+    a: "Sí, dentro de los 7 días naturales siguientes al pago. Si fue un pago por error y no accediste al contenido, se devuelve el importe completo. Si ya viste parte de las clases, la devolución es proporcional a las que no hayas visto (el sistema registra tu progreso). Pasados esos 7 días la compra se considera firme y no procede devolución, hayas visto el contenido o no. Para solicitarla, escríbenos dentro del plazo desde el formulario de contacto con el correo de tu cuenta.",
+  },
+  {
     q: "¿El acceso caduca?",
     a: "No. El pago es único y el acceso es permanente, disponible 24/7 desde cualquier dispositivo. Además, todo el contenido nuevo que se publique en tu formación queda incluido sin coste adicional.",
   },

@@ -71,18 +71,24 @@ export default function Terminos() {
       <section>
         <h2>¿Puedo pedir una devolución?</h2>
         <p>
-          Como se trata de contenido digital al que accedes de inmediato, la devolución funciona
-          así:
+          Sí, dentro de un plazo. Como se trata de contenido digital al que accedes de inmediato,
+          dispones de <strong>7 días naturales desde la fecha del pago</strong> para solicitarla.
+          Dentro de ese plazo funciona así:
         </p>
         <ul className="mt-3">
           <li>· <strong>Pago por error</strong> (importe equivocado, pago duplicado o formación que no querías): se devuelve el importe completo, siempre que no hayas accedido al contenido.</li>
           <li>· <strong>Si ya has visto parte del contenido:</strong> la devolución es parcial y proporcional, calculada según las clases que <strong>no</strong> hayas visto. El sistema registra qué clases has visto, y ese registro es el que se utiliza para el cálculo.</li>
           <li>· <strong>Si has visto la formación completa:</strong> no procede devolución.</li>
         </ul>
+        <p className="mt-4 rounded-xl border border-[#c9a84c]/30 bg-[#c9a84c]/[0.06] p-4 text-[#e8dcc8]">
+          <strong>Transcurridos esos 7 días no procede ninguna devolución</strong>, hayas visto el
+          contenido o no. El acceso es permanente y de pago único: pasado ese plazo la compra se
+          considera firme.
+        </p>
         <p className="mt-3">
-          Para solicitarla, escríbenos desde el formulario de contacto con el correo de tu cuenta,
-          indicando el motivo. Las devoluciones se abonan por el mismo medio de pago siempre que sea
-          posible.
+          Para solicitarla, escríbenos <strong>dentro del plazo</strong> desde el formulario de
+          contacto, con el correo de tu cuenta e indicando el motivo. Cuenta la fecha en que nos
+          escribes. Las devoluciones se abonan por el mismo medio de pago siempre que sea posible.
         </p>
       </section>
 

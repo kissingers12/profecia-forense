@@ -271,6 +271,9 @@ function LoginContent() {
                   vez confirmado el pago. Al entrar en el contenido, la devolución deja de ser
                   completa y pasa a calcularse{" "}
                   <strong className="text-[#e8dcc8]">en proporción a las clases que no hayas visto</strong>.
+                  Solo puede solicitarse dentro de los{" "}
+                  <strong className="text-[#c9a84c]">7 días siguientes al pago</strong>; pasado ese
+                  plazo no procede devolución.
                 </p>
                 <label className="flex items-start gap-2.5 cursor-pointer">
                   <input
