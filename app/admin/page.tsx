@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { CheckCircle, XCircle, RefreshCw, Lock, Users, LogOut, LogIn, Download, Activity, Search, PlayCircle, Copy, UserPlus, DollarSign, MessageCircle, Eye, EyeOff, Trash2, Send, Pencil, KeyRound, Mail } from "lucide-react";
+import { CheckCircle, XCircle, RefreshCw, Lock, Users, LogOut, LogIn, Download, Activity, Search, PlayCircle, Copy, UserPlus, DollarSign, MessageCircle, Eye, EyeOff, Trash2, Send, Pencil, KeyRound, Mail, BarChart2 } from "lucide-react";
 
 type User = {
   id: string;
@@ -118,7 +118,11 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [toast, setToast] = useState("");
-  const [activeTab, setActiveTab] = useState<"clientes" | "pagos" | "actividad" | "ingresos" | "foro" | "hotmart" | "email">("clientes");
+  const [activeTab, setActiveTab] = useState<"clientes" | "pagos" | "actividad" | "ingresos" | "foro" | "hotmart" | "email" | "progreso">("clientes");
+  const [progressData, setProgressData] = useState<{ email: string; name: string; plan: string; activated: boolean; videos: { id: number; title: string; watchedAt: string }[] }[]>([]);
+  const [progressLoading, setProgressLoading] = useState(false);
+  const [progressSearch, setProgressSearch] = useState("");
+  const [progressExpanded, setProgressExpanded] = useState<string | null>(null);
   const [payments, setPayments] = useState<PaymentRow[]>([]);
   const [paymentsLoading, setPaymentsLoading] = useState(false);
   const [search, setSearch] = useState("");
@@ -607,6 +611,18 @@ Servicio al Estudiante
     },
   ];
 
+  const fetchProgress = async () => {
+    setProgressLoading(true);
+    try {
+      const res = await fetch("/api/admin/progress", { headers: { "x-admin-password": password } });
+      const data = await res.json();
+      setProgressData(data.progress ?? []);
+    } catch {
+      // ignore
+    }
+    setProgressLoading(false);
+  };
+
   const handleSendEmail = async () => {
     if (!emailTo || !emailSubject || !emailBody) return;
     setEmailSending(true);
@@ -813,6 +829,17 @@ Servicio al Estudiante
           >
             <Mail size={15} />
             Email
+          </button>
+          <button
+            onClick={() => { setActiveTab("progreso"); fetchProgress(); }}
+            className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2.5 text-xs sm:text-sm font-bold rounded-t-xl transition-all shrink-0 ${
+              activeTab === "progreso"
+                ? "text-[#c9a84c] border-b-2 border-[#c9a84c]"
+                : "text-[#6a5a4a] hover:text-white"
+            }`}
+          >
+            <BarChart2 size={15} />
+            Progreso
           </button>
         </div>
 
@@ -1761,6 +1788,100 @@ Servicio al Estudiante
                 </button>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* Tab: Progreso */}
+        {activeTab === "progreso" && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between gap-3">
+              <div className="relative flex-1">
+                <Search size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6a5a4a]" />
+                <input
+                  type="text"
+                  value={progressSearch}
+                  onChange={(e) => setProgressSearch(e.target.value)}
+                  placeholder="Buscar alumno..."
+                  className="w-full bg-white/5 border border-[#c9a84c]/20 rounded-xl pl-10 pr-4 py-3 text-white placeholder-[#4a3a2a] text-sm focus:outline-none focus:border-[#c9a84c]/60"
+                />
+              </div>
+              <button
+                onClick={fetchProgress}
+                className="p-3 rounded-xl bg-white/5 border border-white/10 text-[#6a5a4a] hover:text-white transition-colors"
+              >
+                <RefreshCw size={15} className={progressLoading ? "animate-spin" : ""} />
+              </button>
+            </div>
+
+            {progressLoading ? (
+              <div className="flex justify-center py-20">
+                <span className="w-8 h-8 border-2 border-[#c9a84c]/40 border-t-[#c9a84c] rounded-full animate-spin" />
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {progressData
+                  .filter((u) =>
+                    !progressSearch ||
+                    u.email.toLowerCase().includes(progressSearch.toLowerCase()) ||
+                    u.name.toLowerCase().includes(progressSearch.toLowerCase())
+                  )
+                  .sort((a, b) => b.videos.length - a.videos.length)
+                  .map((u) => {
+                    const isExpanded = progressExpanded === u.email;
+                    const planLabel = PLAN_LABELS[u.plan] ?? u.plan;
+                    return (
+                      <div key={u.email} className="card-dark rounded-2xl overflow-hidden border border-white/5">
+                        <button
+                          onClick={() => setProgressExpanded(isExpanded ? null : u.email)}
+                          className="w-full flex items-center gap-4 px-5 py-4 text-left hover:bg-white/[0.02] transition-colors"
+                        >
+                          <div className="flex-1 min-w-0">
+                            <p className="text-white font-semibold text-sm truncate">{u.name}</p>
+                            <p className="text-[#6a5a4a] text-xs truncate">{u.email}</p>
+                            <p className="text-[#8a7a6a] text-xs mt-0.5">{planLabel}</p>
+                          </div>
+                          <div className="text-right shrink-0">
+                            <p className="text-[#c9a84c] font-bold text-lg">{u.videos.length}</p>
+                            <p className="text-[#6a5a4a] text-xs">vídeos abiertos</p>
+                          </div>
+                          <span className="text-[#6a5a4a] text-xs ml-1">{isExpanded ? "▲" : "▼"}</span>
+                        </button>
+
+                        {isExpanded && (
+                          <div className="border-t border-white/5 px-5 py-4 space-y-2">
+                            {u.videos.length === 0 ? (
+                              <p className="text-[#6a5a4a] text-sm">No ha abierto ningún vídeo todavía.</p>
+                            ) : (
+                              u.videos.map((v, i) => (
+                                <div key={v.id} className="flex items-start gap-3 text-sm">
+                                  <span className="text-[#c9a84c] font-mono text-xs w-5 shrink-0 mt-0.5">{i + 1}</span>
+                                  <div className="flex-1">
+                                    <p className="text-[#d8c8b8]">{v.title}</p>
+                                    {v.watchedAt && (
+                                      <p className="text-[#4a3a2a] text-xs">{new Date(v.watchedAt).toLocaleString("es-ES", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}</p>
+                                    )}
+                                  </div>
+                                  <CheckCircle size={13} className="text-green-500 mt-0.5 shrink-0" />
+                                </div>
+                              ))
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+
+                {progressData.filter((u) =>
+                  !progressSearch ||
+                  u.email.toLowerCase().includes(progressSearch.toLowerCase()) ||
+                  u.name.toLowerCase().includes(progressSearch.toLowerCase())
+                ).length === 0 && (
+                  <p className="text-center text-[#6a5a4a] py-12 text-sm">
+                    {progressSearch ? "No se encontró ningún alumno." : "Ningún alumno ha abierto vídeos todavía."}
+                  </p>
+                )}
+              </div>
+            )}
           </div>
         )}
       </main>
