@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
 
   const { data: rows } = await supabaseAdmin
     .from("video_progress")
-    .select("user_email, video_id, plan, watched_at")
+    .select("user_email, video_id, plan, created_at")
     .order("user_email");
 
   const { data: users } = await supabaseAdmin
@@ -67,7 +67,7 @@ export async function GET(req: NextRequest) {
     grouped[row.user_email].videos.push({
       id: row.video_id,
       title: VIDEO_TITLES[row.video_id] ?? `Vídeo ${row.video_id}`,
-      watchedAt: row.watched_at ?? "",
+      watchedAt: row.created_at ?? "",
     });
   }
 
