@@ -49,3 +49,37 @@ export async function DELETE(req: NextRequest) {
 
   return Response.json({ success: true });
 }
+
+// Corregir el plan de un cliente antes de darle acceso.
+// Hace falta cuando alguien se registró en un programa y pagó otro.
+export async function PATCH(req: NextRequest) {
+  if (!checkAuth(req)) {
+    return Response.json({ error: "No autorizado." }, { status: 401 });
+  }
+
+  const { email, plan } = await req.json();
+  const PERMITIDOS = ["meditaciones", "clases", "escuela"];
+
+  if (!email || !PERMITIDOS.includes(plan)) {
+    return Response.json({ error: "Datos inválidos." }, { status: 400 });
+  }
+
+  const { data: user, error } = await supabaseAdmin
+    .from("users")
+    .update({ plan })
+    .eq("email", String(email).toLowerCase())
+    .select("email, plan")
+    .maybeSingle();
+
+  if (error || !user) {
+    return Response.json({ error: "No se pudo cambiar el plan." }, { status: 500 });
+  }
+
+  await supabaseAdmin.from("activity_logs").insert({
+    user_email: user.email,
+    user_name: "PLAN",
+    action: `cambiado a ${plan} desde el panel`,
+  });
+
+  return Response.json({ ok: true, plan: user.plan });
+}

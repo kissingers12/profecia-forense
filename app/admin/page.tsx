@@ -265,6 +265,32 @@ export default function AdminPage() {
     setPaymentsLoading(false);
   };
 
+  const handleCambiarPlan = async (user: User, plan: string) => {
+    if (plan === user.plan) return;
+    const ok = window.confirm(
+      `¿Cambiar el plan de ${user.name} a ${PLAN_LABELS[plan] ?? plan}?\n\nHazlo ANTES de darle acceso, para que entre al programa que pagó.`
+    );
+    if (!ok) return;
+    setActionLoading(user.email);
+    try {
+      const res = await fetch("/api/admin/users", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json", "x-admin-password": password },
+        body: JSON.stringify({ email: user.email, plan }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setUsers((prev) => prev.map((u) => (u.email === user.email ? { ...u, plan } : u)));
+        showToast(`Plan cambiado a ${PLAN_LABELS[plan] ?? plan} ✓`);
+      } else {
+        showToast(data.error ?? "No se pudo cambiar el plan.");
+      }
+    } catch {
+      showToast("Error de conexión.");
+    }
+    setActionLoading(null);
+  };
+
   const handleDeleteUser = async (user: User) => {
     const ok = window.confirm(
       `¿Eliminar el registro de ${user.name} (${user.email})?\n\nPodrá registrarse de nuevo en el futuro y elegir otro plan.`
@@ -532,6 +558,38 @@ Oramos para que este tiempo de formación sea de mucha edificación.
 
 Si llegas a tener alguna dificultad, escríbenos y con gusto te ayudaremos.
 
+Servicio al Estudiante
+100x100Cristianos · kissingersaraque.com`,
+    },
+    {
+      // Para quien dice haber pagado pero no encontramos el pago
+      id: "pedir-comprobante",
+      nombre: "🔎 Pedir comprobante del pago",
+      asunto: "Necesitamos un dato para activar tu acceso",
+      body: `¡Bendiciones!
+
+Gracias por escribirnos, y disculpa la espera.
+
+Hemos revisado tu cuenta y nos falta un dato para poder activarte el acceso correcto. Para localizar tu pago, por favor envíanos:
+
+SI PAGASTE POR PAYPAL
+• La captura del comprobante, o bien
+• La fecha exacta del pago y el nombre completo con el que aparece la donación
+
+SI PAGASTE CON CRIPTOMONEDAS
+• La fecha de la transacción
+• El ID de la transacción (el código largo que da tu monedero)
+
+Con cualquiera de esos datos lo verificamos y te activamos enseguida.
+
+Puedes responder a este mismo correo, o enviarnos la captura desde tu cuenta: inicia sesión en la web y pulsa «Escríbenos y te activamos manualmente» — allí puedes adjuntar la imagen directamente.
+
+Entra aquí:
+https://www.kissingersaraque.com/login
+
+Quedamos atentos para ayudarte.
+
+Con cariño y bendición,
 Servicio al Estudiante
 100x100Cristianos · kissingersaraque.com`,
     },
@@ -921,6 +979,19 @@ Servicio al Estudiante
                         <span className="w-4 h-4 border-2 border-current/40 border-t-current rounded-full animate-spin inline-block" />
                       ) : user.activated ? "Desactivar" : "Activar acceso"}
                     </button>
+                    {/* Corregir el plan antes de dar acceso: hay clientes que se
+                        registraron en un programa y pagaron otro */}
+                    <select
+                      value={user.plan}
+                      onChange={(e) => handleCambiarPlan(user, e.target.value)}
+                      disabled={actionLoading === user.email}
+                      title="Cambiar el programa de este cliente"
+                      className="px-3 py-2 rounded-xl text-xs font-bold bg-[#0a0a20] border border-[#c9a84c]/25 text-[#c8b89a] focus:outline-none focus:border-[#c9a84c]/60 cursor-pointer"
+                    >
+                      <option value="meditaciones">Meditación $333</option>
+                      <option value="clases">Clases $555</option>
+                      <option value="escuela">Escuela $777 (agotada)</option>
+                    </select>
                     <button
                       onClick={() => { setResetEmail(user.email); setResetPwd(""); }}
                       className="flex items-center justify-center gap-1.5 px-5 py-2 rounded-xl text-sm font-bold bg-white/5 text-[#c9a84c] border border-[#c9a84c]/20 hover:bg-[#c9a84c]/10 transition-all"
