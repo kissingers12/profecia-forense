@@ -95,6 +95,7 @@ export default function Dashboard() {
   const [supportMessage, setSupportMessage] = useState("");
   const [comprobante, setComprobante] = useState("");
   const [comprobanteError, setComprobanteError] = useState("");
+  const [comprobanteCargando, setComprobanteCargando] = useState(false);
   const [supportLoading, setSupportLoading] = useState(false);
   const [supportSent, setSupportSent] = useState(false);
   const [supportFailed, setSupportFailed] = useState(false);
@@ -205,22 +206,55 @@ export default function Dashboard() {
     setUpgradeLoading(false);
   };
 
-  // Lee la captura del pago y la deja lista para enviarla junto al mensaje
-  const leerComprobante = (file: File | undefined | null) => {
+  /**
+   * Prepara la captura del pago para enviarla.
+   *
+   * Las fotos y capturas de móvil pesan varios MB y el envío las rechazaba por
+   * tamaño, así que la imagen se reduce y comprime aquí, en el navegador, antes
+   * de salir. Una captura queda en unos cientos de KB y siempre llega.
+   */
+  const leerComprobante = async (file: File | undefined | null) => {
     setComprobanteError("");
     if (!file) return;
     if (!file.type.startsWith("image/")) {
-      setComprobanteError("Ese archivo no es una imagen. Envía una captura en JPG o PNG.");
+      setComprobanteError("Ese archivo no es una imagen. Envía una captura o una foto.");
       return;
     }
-    if (file.size > 4 * 1024 * 1024) {
-      setComprobanteError("La imagen pesa más de 4 MB. Haz una captura más pequeña.");
+    if (file.size > 25 * 1024 * 1024) {
+      setComprobanteError("La imagen es demasiado grande. Prueba con una captura de pantalla.");
       return;
     }
-    const reader = new FileReader();
-    reader.onload = () => setComprobante(String(reader.result));
-    reader.onerror = () => setComprobanteError("No se pudo leer la imagen. Inténtalo de nuevo.");
-    reader.readAsDataURL(file);
+
+    setComprobanteCargando(true);
+    try {
+      // imageOrientation evita que las fotos de móvil salgan giradas
+      const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
+      const maximo = 1600;
+      const escala = Math.min(1, maximo / Math.max(bitmap.width, bitmap.height));
+      const ancho = Math.max(1, Math.round(bitmap.width * escala));
+      const alto = Math.max(1, Math.round(bitmap.height * escala));
+
+      const lienzo = document.createElement("canvas");
+      lienzo.width = ancho;
+      lienzo.height = alto;
+      const ctx = lienzo.getContext("2d");
+      if (!ctx) throw new Error("sin contexto");
+      ctx.drawImage(bitmap, 0, 0, ancho, alto);
+      bitmap.close?.();
+
+      setComprobante(lienzo.toDataURL("image/jpeg", 0.82));
+    } catch {
+      // Navegador antiguo: se envía tal cual, siempre que quepa
+      if (file.size > 2 * 1024 * 1024) {
+        setComprobanteError("No pudimos procesar la imagen. Prueba con una captura más pequeña.");
+      } else {
+        const reader = new FileReader();
+        reader.onload = () => setComprobante(String(reader.result));
+        reader.onerror = () => setComprobanteError("No se pudo leer la imagen. Inténtalo de nuevo.");
+        reader.readAsDataURL(file);
+      }
+    }
+    setComprobanteCargando(false);
   };
 
   const handleArchivoComprobante = (file: File | undefined) => leerComprobante(file);
@@ -425,12 +459,21 @@ export default function Dashboard() {
                             htmlFor="comprobante"
                             className="inline-flex items-center gap-2 cursor-pointer text-sm font-bold text-[#c9a84c] border border-[#c9a84c]/40 rounded-xl px-4 py-2.5 hover:bg-[#c9a84c]/10 transition-all"
                           >
-                            <Download size={14} className="rotate-180" />
-                            Elegir imagen
+                            {comprobanteCargando ? (
+                              <>
+                                <span className="w-3.5 h-3.5 border-2 border-[#c9a84c]/40 border-t-[#c9a84c] rounded-full animate-spin" />
+                                Preparando imagen...
+                              </>
+                            ) : (
+                              <>
+                                <Download size={14} className="rotate-180" />
+                                Elegir imagen o hacer foto
+                              </>
+                            )}
                           </label>
                           <p className="text-[#6a5a4a] text-[11px] mt-2.5 leading-relaxed">
                             También puedes copiar la captura y pegarla aquí con Ctrl+V (⌘+V en Mac).
-                            <br />Formatos: JPG o PNG · máximo 4 MB
+                            <br />Vale cualquier captura o foto: la ajustamos automáticamente.
                           </p>
                         </div>
                       )}
