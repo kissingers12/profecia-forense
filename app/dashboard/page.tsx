@@ -78,6 +78,14 @@ const escuelaGroups: Group[] = [
       { id: 302, title: "Próximamente", duration: "", unlocked: false, vimeoId: null },
     ],
   },
+  {
+    groupTitle: "Meditación Imaginaria",
+    lessons: [
+      // Pendiente: en cuanto el vídeo esté en Vimeo, pon aquí su número
+      // y cambia unlocked a true para que los alumnos puedan verlo.
+      { id: 401, title: "Navegando en lo Invisible", duration: "", unlocked: false, vimeoId: null },
+    ],
+  },
 ];
 
 const allEscuelaLessons = escuelaGroups.flatMap((g) => g.lessons);
