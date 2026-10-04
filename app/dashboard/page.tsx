@@ -14,6 +14,8 @@ type Lesson = {
   duration: string;
   unlocked: boolean;
   vimeoId: string | null;
+  /** Alto del reproductor en % del ancho. Sin poner nada = 16:9. Las grabaciones de pantalla 4:3 usan 75. */
+  alto?: number;
 };
 
 type Group = {
@@ -81,9 +83,8 @@ const escuelaGroups: Group[] = [
   {
     groupTitle: "Meditación Imaginaria",
     lessons: [
-      // Pendiente: en cuanto el vídeo esté en Vimeo, pon aquí su número
-      // y cambia unlocked a true para que los alumnos puedan verlo.
-      { id: 401, title: "Navegando en lo Invisible", duration: "", unlocked: false, vimeoId: null },
+      { id: 401, title: "Navegando en lo Invisible", duration: "", unlocked: true, vimeoId: "1232777507", alto: 75 },
+      { id: 402, title: "Próximamente", duration: "", unlocked: false, vimeoId: null },
     ],
   },
 ];
@@ -699,7 +700,7 @@ export default function Dashboard() {
         {/* Reproductor inline — aparece justo debajo de la lección seleccionada */}
         {isActive && (
           lesson.vimeoId ? (
-            <div className="rounded-2xl overflow-hidden border border-[#c9a84c]/25 mt-2" style={{ padding: "56.25% 0 0 0", position: "relative" }}>
+            <div className="rounded-2xl overflow-hidden border border-[#c9a84c]/25 mt-2" style={{ padding: `${lesson.alto ?? 56.25}% 0 0 0`, position: "relative" }}>
               <iframe
                 src={`https://player.vimeo.com/video/${lesson.vimeoId}?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1`}
                 frameBorder="0"
