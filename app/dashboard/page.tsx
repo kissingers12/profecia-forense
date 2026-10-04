@@ -31,6 +31,7 @@ const meditacionesContent: Lesson[] = [
   { id: 5, title: "La Llave de la Ciencia", duration: "", unlocked: true, vimeoId: "1204243775" },
   { id: 6, title: "La Meditación de los profetas para salir del cuerpo", duration: "", unlocked: true, vimeoId: "1204243894" },
   { id: 7, title: "4 horas instrumental para meditar", duration: "", unlocked: true, vimeoId: "1204255913" },
+  { id: 401, title: "Navegando en lo Invisible", duration: "", unlocked: true, vimeoId: "1232777507", alto: 75 },
   { id: 8, title: "Próximamente nueva enseñanza", duration: "", unlocked: false, vimeoId: null },
 ];
 
