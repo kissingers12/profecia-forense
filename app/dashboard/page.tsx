@@ -16,12 +16,23 @@ type Lesson = {
   vimeoId: string | null;
   /** Alto del reproductor en % del ancho. Sin poner nada = 16:9. Las grabaciones de pantalla 4:3 usan 75. */
   alto?: number;
+  /** Marca la clase con la etiqueta verde «Nuevo». Quitar al subir la siguiente. */
+  nuevo?: boolean;
 };
 
 type Group = {
   groupTitle: string;
   lessons: Lesson[];
 };
+
+/** Etiqueta verde para que se vea de un vistazo cuál es la última enseñanza subida */
+function EtiquetaNuevo() {
+  return (
+    <span className="shrink-0 text-[10px] font-bold uppercase tracking-wider text-[#4ade80] bg-[#4ade80]/10 border border-[#4ade80]/40 px-2 py-0.5 rounded-full">
+      Nuevo
+    </span>
+  );
+}
 
 const meditacionesContent: Lesson[] = [
   { id: 1, title: "El Secreto de la Meditación 1", duration: "", unlocked: true, vimeoId: "1204206028" },
@@ -31,7 +42,7 @@ const meditacionesContent: Lesson[] = [
   { id: 5, title: "La Llave de la Ciencia", duration: "", unlocked: true, vimeoId: "1204243775" },
   { id: 6, title: "La Meditación de los profetas para salir del cuerpo", duration: "", unlocked: true, vimeoId: "1204243894" },
   { id: 7, title: "4 horas instrumental para meditar", duration: "", unlocked: true, vimeoId: "1204255913" },
-  { id: 401, title: "Navegando en lo Invisible", duration: "", unlocked: true, vimeoId: "1232777507", alto: 75 },
+  { id: 401, title: "Navegando en lo Invisible", duration: "", unlocked: true, vimeoId: "1232777507", alto: 75, nuevo: true },
   { id: 8, title: "Próximamente nueva enseñanza", duration: "", unlocked: false, vimeoId: null },
 ];
 
@@ -84,7 +95,7 @@ const escuelaGroups: Group[] = [
   {
     groupTitle: "Meditación Imaginaria",
     lessons: [
-      { id: 401, title: "Navegando en lo Invisible", duration: "", unlocked: true, vimeoId: "1232777507", alto: 75 },
+      { id: 401, title: "Navegando en lo Invisible", duration: "", unlocked: true, vimeoId: "1232777507", alto: 75, nuevo: true },
       { id: 402, title: "Próximamente", duration: "", unlocked: false, vimeoId: null },
     ],
   },
@@ -677,9 +688,12 @@ export default function Dashboard() {
             )}
           </div>
           <div className="flex-1 min-w-0">
-            <p className={`font-semibold text-sm truncate ${isActive ? "text-[#c9a84c]" : "text-white"}`}>
-              {lesson.title}
-            </p>
+            <div className="flex items-center gap-2 min-w-0">
+              <p className={`font-semibold text-sm truncate ${isActive ? "text-[#c9a84c]" : "text-white"}`}>
+                {lesson.title}
+              </p>
+              {lesson.nuevo && <EtiquetaNuevo />}
+            </div>
             {lesson.duration && <p className="text-[#6a5a4a] text-xs mt-0.5">{lesson.duration}</p>}
           </div>
           {lesson.unlocked ? (
@@ -940,6 +954,8 @@ export default function Dashboard() {
           <div className="space-y-4">
             {escuelaGroups.map((group, gi) => {
               const isOpen = openGroups.has(gi);
+              // Cerrada y con clase nueva dentro: avisamos en el título, que es lo único visible.
+              const marcaNueva = !isOpen && group.lessons.some((l) => l.nuevo);
               return (
                 <div key={gi} className={`rounded-2xl border transition-colors ${isOpen ? "border-[#c9a84c]/30 bg-[#c9a84c]/[0.03]" : "border-white/10"}`}>
                   <button
@@ -956,7 +972,9 @@ export default function Dashboard() {
                     <span className="text-[#c9a84c] text-xs font-bold uppercase tracking-[0.25em] flex-1">
                       {group.groupTitle}
                     </span>
-                    <span className="text-[#6a5a4a] text-xs shrink-0">
+                    {marcaNueva && <EtiquetaNuevo />}
+                    {/* En móvil no caben etiqueta y contador: manda la etiqueta */}
+                    <span className={`text-[#6a5a4a] text-xs shrink-0 ${marcaNueva ? "hidden sm:inline" : ""}`}>
                       {group.lessons.length} {group.lessons.length === 1 ? "clase" : "clases"}
                     </span>
                     <ChevronRight
