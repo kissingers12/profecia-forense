@@ -104,12 +104,18 @@ const escuelaGroups: Group[] = [
 const allEscuelaLessons = escuelaGroups.flatMap((g) => g.lessons);
 
 const clasesIndividualesData: Array<{ id: number; title: string; vimeoId: string | null; nivel: string }> = [
+  { id: 101, title: "Desbloqueando los ojos espirituales", vimeoId: "1204614170", nivel: "Basico" },
+  { id: 102, title: "Cómo recibir Espíritu de Profecía", vimeoId: "1204614262", nivel: "Basico" },
+  { id: 103, title: "Primeros pasos profetizando", vimeoId: "1204614337", nivel: "Basico" },
+  { id: 104, title: "La honra y el llamado a profetizar", vimeoId: "1204614447", nivel: "Basico" },
+  { id: 105, title: "Profecía por interpretación", vimeoId: "1204615096", nivel: "Basico" },
+  { id: 106, title: "Profecía al tocar una persona", vimeoId: "1204615280", nivel: "Basico" },
+  { id: 107, title: "Cómo ver letras y nombres en el espíritu", vimeoId: "1204615509", nivel: "Basico" },
+  { id: 108, title: "Abrir los ojos y tener visiones", vimeoId: "1204615620", nivel: "Basico" },
   { id: 1, title: "El Secreto de la Meditación 1", vimeoId: "1204206028", nivel: "Intermedio" },
   { id: 2, title: "El Secreto de la Meditación 2", vimeoId: "1204206979", nivel: "Intermedio" },
   { id: 3, title: "El Secreto de la Meditación 3", vimeoId: "1204224003", nivel: "Intermedio" },
   { id: 4, title: "El Secreto de la Meditación 4", vimeoId: "1204242854", nivel: "Intermedio" },
-  { id: 5, title: "La Llave de la Ciencia", vimeoId: "1204243775", nivel: "Intermedio" },
-  { id: 6, title: "La Meditación de los profetas para salir del cuerpo", vimeoId: "1204243894", nivel: "Intermedio" },
   { id: 7, title: "4 horas instrumental para meditar", vimeoId: "1204255913", nivel: "Intermedio" },
   { id: 201, title: "LA LLAVE DE LA CIENCIA: ESTO ACTIVA LO PROFÉTICO", vimeoId: "1204243775", nivel: "Avanzado" },
   { id: 202, title: "La Meditación de los profetas para salir del cuerpo", vimeoId: "1204243894", nivel: "Avanzado" },
@@ -118,10 +124,11 @@ const clasesIndividualesData: Array<{ id: number; title: string; vimeoId: string
   { id: 205, title: "Acto profético 3", vimeoId: "1204621410", nivel: "Avanzado" },
   { id: 206, title: "Ángeles, Fantasmas y sombras", vimeoId: "1204621581", nivel: "Avanzado" },
   { id: 207, title: "El secreto de la prosperidad", vimeoId: "1204620987", nivel: "Avanzado" },
-  { id: 208, title: "(Parte 1) esto me hizo millonario", vimeoId: "1204621966", nivel: "Avanzado" },
-  { id: 209, title: "(Parte 2) esto me hizo millonario", vimeoId: "1204621894", nivel: "Avanzado" },
+  { id: 208, title: "esto me hizo millonario (Parte 1)", vimeoId: "1204621966", nivel: "Avanzado" },
+  { id: 209, title: "esto me hizo millonario (Parte 2)", vimeoId: "1204621894", nivel: "Avanzado" },
   { id: 210, title: "Si lo crees ya eres profeta", vimeoId: "1204621749", nivel: "Avanzado" },
   { id: 301, title: "Profecía Forense 1", vimeoId: "1213817829", nivel: "Avanzado" },
+  { id: 401, title: "Meditación Imaginaria: Navegando en lo Invisible", vimeoId: "1232777507", nivel: "Avanzado" },
 ];
 
 export default function Dashboard() {
@@ -1009,8 +1016,9 @@ export default function Dashboard() {
         {isClaseIndividual ? (
           <div className="space-y-4">
             {[
-              { label: "Nivel Intermedio", gid: 100, clases: clasesIndividualesData.filter(c => c.nivel === "Intermedio") },
-              { label: "Nivel Avanzado & Profecía Forense", gid: 101, clases: clasesIndividualesData.filter(c => c.nivel === "Avanzado") },
+              { label: "Nivel Básico", gid: 102, clases: clasesIndividualesData.filter(c => c.nivel === "Basico"), bundle: { videoId: 100, price: 100, label: "Comprar las 8 clases · $100" } },
+              { label: "Nivel Intermedio", gid: 100, clases: clasesIndividualesData.filter(c => c.nivel === "Intermedio"), bundle: null },
+              { label: "Nivel Avanzado & Profecía Forense", gid: 101, clases: clasesIndividualesData.filter(c => c.nivel === "Avanzado"), bundle: null },
             ].map((group) => {
               const isOpen = openGroups.has(group.gid);
               return (
@@ -1025,77 +1033,94 @@ export default function Dashboard() {
                     <ChevronRight size={18} className={`text-[#c9a84c] shrink-0 transition-transform duration-200 ${isOpen ? "rotate-90" : ""}`} />
                   </button>
                   {isOpen && (
-                    <div className="space-y-3 px-4 pb-4">
-                      {group.clases.map((cls, i) => {
-                        const isPurchased = purchasedIds.has(cls.id);
-                        const isActive = activeLesson === cls.id;
-                        const isWatched = watchedIds.has(cls.id);
-                        return (
-                          <div key={cls.id}>
-                            <div
-                              role={isPurchased ? "button" : undefined}
-                              tabIndex={isPurchased ? 0 : undefined}
-                              onClick={() => {
-                                if (!isPurchased) return;
-                                if (!isActive) markWatched(cls.id);
-                                setActiveLesson(isActive ? null : cls.id);
-                              }}
-                              className={`card-dark rounded-xl p-4 flex items-center gap-3 transition-all ${
-                                isPurchased ? "cursor-pointer hover:border-[#c9a84c]/30" : "opacity-70 cursor-default"
-                              } ${isActive ? "border-[#c9a84c]/50 bg-[#c9a84c]/5" : ""}`}
-                            >
-                              <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold ${
-                                isWatched && !isActive ? "bg-[#c9a84c] text-[#050510]" :
-                                isActive ? "bg-[#c9a84c]/20 border border-[#c9a84c] text-[#c9a84c]" :
-                                isPurchased ? "bg-white/5 text-[#6a5a4a]" : "bg-white/5 text-[#3a2a1a]"
-                              }`}>
-                                {isWatched && !isActive ? <CheckCircle size={14} /> :
-                                 isActive ? <PlayCircle size={14} /> :
-                                 isPurchased ? String(i + 1).padStart(2, "0") : <Lock size={13} />}
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <p className={`font-semibold text-sm truncate ${isActive ? "text-[#c9a84c]" : isPurchased ? "text-white" : "text-[#5a4a3a]"}`}>
-                                  {cls.title}
-                                </p>
-                                {isPurchased && <p className="text-[#6a5a4a] text-xs mt-0.5">Acceso por 1 año</p>}
-                              </div>
-                              {isPurchased ? (
-                                <div className="shrink-0 flex items-center gap-2">
-                                  {isWatched && !isActive && (
-                                    <span className="text-[10px] font-bold text-[#c9a84c] bg-[#c9a84c]/10 border border-[#c9a84c]/30 px-2 py-0.5 rounded-full">Visto ✓</span>
-                                  )}
-                                  <Video size={14} className={`text-[#c9a84c] ${isActive ? "opacity-100" : "opacity-40"}`} />
-                                  <ChevronRight size={15} className={`text-[#6a5a4a] transition-transform ${isActive ? "rotate-90" : ""}`} />
+                    <div className="px-4 pb-4">
+                      {/* Bundle buy button for Básico when nothing purchased yet */}
+                      {group.bundle && !group.clases.some(c => purchasedIds.has(c.id)) && (
+                        <button
+                          onClick={() => handleBuyClass(group.bundle!.videoId, group.label)}
+                          disabled={buyingClassId === group.bundle.videoId}
+                          className="w-full mb-3 flex items-center justify-center gap-2 btn-gold py-3 rounded-xl text-sm font-bold"
+                        >
+                          {buyingClassId === group.bundle.videoId ? (
+                            <span className="w-4 h-4 border-2 border-[#050510]/40 border-t-[#050510] rounded-full animate-spin" />
+                          ) : (
+                            <Bitcoin size={14} />
+                          )}
+                          {group.bundle.label}
+                        </button>
+                      )}
+                      <div className="space-y-3">
+                        {group.clases.map((cls, i) => {
+                          const isPurchased = purchasedIds.has(cls.id);
+                          const isActive = activeLesson === cls.id;
+                          const isWatched = watchedIds.has(cls.id);
+                          return (
+                            <div key={cls.id}>
+                              <div
+                                role={isPurchased ? "button" : undefined}
+                                tabIndex={isPurchased ? 0 : undefined}
+                                onClick={() => {
+                                  if (!isPurchased) return;
+                                  if (!isActive) markWatched(cls.id);
+                                  setActiveLesson(isActive ? null : cls.id);
+                                }}
+                                className={`card-dark rounded-xl p-4 flex items-center gap-3 transition-all ${
+                                  isPurchased ? "cursor-pointer hover:border-[#c9a84c]/30" : "opacity-70 cursor-default"
+                                } ${isActive ? "border-[#c9a84c]/50 bg-[#c9a84c]/5" : ""}`}
+                              >
+                                <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold ${
+                                  isWatched && !isActive ? "bg-[#c9a84c] text-[#050510]" :
+                                  isActive ? "bg-[#c9a84c]/20 border border-[#c9a84c] text-[#c9a84c]" :
+                                  isPurchased ? "bg-white/5 text-[#6a5a4a]" : "bg-white/5 text-[#3a2a1a]"
+                                }`}>
+                                  {isWatched && !isActive ? <CheckCircle size={14} /> :
+                                   isActive ? <PlayCircle size={14} /> :
+                                   isPurchased ? String(i + 1).padStart(2, "0") : <Lock size={13} />}
                                 </div>
-                              ) : (
-                                <button
-                                  onClick={(e) => { e.stopPropagation(); handleBuyClass(cls.id, cls.title); }}
-                                  disabled={buyingClassId === cls.id}
-                                  className="shrink-0 flex items-center gap-1.5 text-xs font-bold text-[#c9a84c] border border-[#c9a84c]/40 bg-[#c9a84c]/5 hover:bg-[#c9a84c]/15 rounded-xl px-3 py-2 transition-all"
-                                >
-                                  {buyingClassId === cls.id ? (
-                                    <span className="w-3 h-3 border border-[#c9a84c]/40 border-t-[#c9a84c] rounded-full animate-spin" />
-                                  ) : (
-                                    <Bitcoin size={12} />
-                                  )}
-                                  $30
-                                </button>
+                                <div className="flex-1 min-w-0">
+                                  <p className={`font-semibold text-sm truncate ${isActive ? "text-[#c9a84c]" : isPurchased ? "text-white" : "text-[#5a4a3a]"}`}>
+                                    {cls.title}
+                                  </p>
+                                  {isPurchased && <p className="text-[#6a5a4a] text-xs mt-0.5">Acceso por 1 año</p>}
+                                </div>
+                                {isPurchased ? (
+                                  <div className="shrink-0 flex items-center gap-2">
+                                    {isWatched && !isActive && (
+                                      <span className="text-[10px] font-bold text-[#c9a84c] bg-[#c9a84c]/10 border border-[#c9a84c]/30 px-2 py-0.5 rounded-full">Visto ✓</span>
+                                    )}
+                                    <Video size={14} className={`text-[#c9a84c] ${isActive ? "opacity-100" : "opacity-40"}`} />
+                                    <ChevronRight size={15} className={`text-[#6a5a4a] transition-transform ${isActive ? "rotate-90" : ""}`} />
+                                  </div>
+                                ) : !group.bundle ? (
+                                  <button
+                                    onClick={(e) => { e.stopPropagation(); handleBuyClass(cls.id, cls.title); }}
+                                    disabled={buyingClassId === cls.id}
+                                    className="shrink-0 flex items-center gap-1.5 text-xs font-bold text-[#c9a84c] border border-[#c9a84c]/40 bg-[#c9a84c]/5 hover:bg-[#c9a84c]/15 rounded-xl px-3 py-2 transition-all"
+                                  >
+                                    {buyingClassId === cls.id ? (
+                                      <span className="w-3 h-3 border border-[#c9a84c]/40 border-t-[#c9a84c] rounded-full animate-spin" />
+                                    ) : (
+                                      <Bitcoin size={12} />
+                                    )}
+                                    $30
+                                  </button>
+                                ) : null}
+                              </div>
+                              {isActive && cls.vimeoId && (
+                                <div className="rounded-2xl overflow-hidden border border-[#c9a84c]/25 mt-2" style={{ padding: "56.25% 0 0 0", position: "relative" }}>
+                                  <iframe
+                                    src={`https://player.vimeo.com/video/${cls.vimeoId}?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1`}
+                                    frameBorder="0"
+                                    allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media"
+                                    style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}
+                                    title={cls.title}
+                                  />
+                                </div>
                               )}
                             </div>
-                            {isActive && cls.vimeoId && (
-                              <div className="rounded-2xl overflow-hidden border border-[#c9a84c]/25 mt-2" style={{ padding: "56.25% 0 0 0", position: "relative" }}>
-                                <iframe
-                                  src={`https://player.vimeo.com/video/${cls.vimeoId}?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1`}
-                                  frameBorder="0"
-                                  allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media"
-                                  style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}
-                                  title={cls.title}
-                                />
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
+                          );
+                        })}
+                      </div>
                     </div>
                   )}
                 </div>
