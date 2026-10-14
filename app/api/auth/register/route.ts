@@ -23,9 +23,13 @@ const FALLBACK_URLS: Record<string, string> = {
   escuela: "https://nowpayments.io/payment/?iid=5100234736&paymentId=5746183612",
 };
 
-async function createNowPaymentsInvoice(email: string, plan: string, videoId?: number): Promise<string | null> {
+const BUNDLE_PRICES: Record<number, number> = { 100: 100 };
+
+async function createNowPaymentsInvoice(email: string, plan: string, videoId?: number): Promise<{ url: string | null; price: number }> {
   const apiKey = process.env.NOWPAYMENTS_API_KEY;
-  if (!apiKey) return null;
+  const basePrice = PLAN_PRICES[plan] ?? 30;
+  const price = (videoId !== undefined && BUNDLE_PRICES[videoId]) ? BUNDLE_PRICES[videoId] : basePrice;
+  if (!apiKey) return { url: null, price };
 
   const orderId = videoId ? `${email}:clase:${videoId}` : email;
 
@@ -34,7 +38,7 @@ async function createNowPaymentsInvoice(email: string, plan: string, videoId?: n
       method: "POST",
       headers: { "x-api-key": apiKey, "Content-Type": "application/json" },
       body: JSON.stringify({
-        price_amount: PLAN_PRICES[plan],
+        price_amount: price,
         price_currency: "usd",
         order_id: orderId,
         order_description: PLAN_LABELS[plan],
@@ -44,9 +48,9 @@ async function createNowPaymentsInvoice(email: string, plan: string, videoId?: n
       }),
     });
     const data = await res.json();
-    return data.invoice_url ?? null;
+    return { url: data.invoice_url ?? null, price };
   } catch {
-    return null;
+    return { url: null, price };
   }
 }
 
@@ -126,12 +130,12 @@ export async function POST(req: NextRequest) {
   }).then(() => {});
 
   // Create unique payment per user so webhook knows who paid
-  const invoiceUrl = await createNowPaymentsInvoice(email.toLowerCase(), plan, plan === "clase_individual" ? videoId : undefined);
+  const { url: invoiceUrl, price: invoicePrice } = await createNowPaymentsInvoice(email.toLowerCase(), plan, plan === "clase_individual" ? videoId : undefined);
 
   return Response.json({
     success: true,
     user: { id: user.id, email: user.email, name: user.name, plan: user.plan, activated: false },
     paymentUrl: invoiceUrl ?? FALLBACK_URLS[plan],
-    price: PLAN_PRICES[plan],
+    price: invoicePrice,
   });
 }

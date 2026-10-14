@@ -139,17 +139,23 @@ export async function POST(req: NextRequest) {
       .update({ activated: true })
       .eq("email", emailPart.toLowerCase());
 
+    // Bundles: videoId 100 unlocks all 8 basic classes (101-108)
+    //          videoId 208 unlocks both parts (208 and 209)
+    const BUNDLE_IDS: Record<number, number[]> = {
+      100: [101, 102, 103, 104, 105, 106, 107, 108],
+      208: [208, 209],
+    };
+    const idsToInsert = BUNDLE_IDS[videoId] ?? [videoId];
+
+    const rows = idsToInsert.map((vid) => ({ user_email: emailPart.toLowerCase(), video_id: vid }));
     const { error: cpError } = await supabaseAdmin
       .from("class_purchases")
-      .upsert(
-        { user_email: emailPart.toLowerCase(), video_id: videoId },
-        { onConflict: "user_email,video_id" }
-      );
+      .upsert(rows, { onConflict: "user_email,video_id" });
 
     if (cpError) {
       await log("WEBHOOK_CLASE_DB_ERROR", cpError.message);
     } else {
-      await log("WEBHOOK_CLASE_ACTIVATED", `email=${emailPart} video=${videoId}`);
+      await log("WEBHOOK_CLASE_ACTIVATED", `email=${emailPart} videos=${idsToInsert.join(",")}`);
     }
 
     return Response.json({ ok: true });
