@@ -2,52 +2,7 @@
 
 import { useState } from "react";
 import { ChevronDown, AlertTriangle, ArrowRight, Upload } from "lucide-react";
-
-const faqs: { q: string; a: string; destacada?: boolean; pago?: boolean }[] = [
-  {
-    destacada: true,
-    q: "¿Qué formación debo elegir?",
-    a: "Depende de dónde estés hoy. La Escuela de Profetas ($555) reúne todas las clases grabadas desde 2023 hasta hoy — más de 25 enseñanzas — y está pensada especialmente para quienes llevan poco tiempo en la membresía 4 de YouTube. Si ya estás en la membresía 5, o llevas bastante tiempo en la membresía 4, este programa no es para ti, porque ya habrás visto la mayor parte del contenido. La Meditación Profética ($333) es para ti si te interesa conocer los secretos de la meditación y cómo interactuar con los ángeles mediante la meditación profética: ese nivel tiene todas las respuestas que estás buscando.",
-  },
-  {
-    q: "¿Puedo entrar todavía a la Escuela Avanzada de Profetas ($777) con mentoría?",
-    a: "No. Esa formación incluía mentoría personalizada y clases grupales por Zoom, y solo se abrieron 15 plazas, que ocuparon las primeras 15 personas inscritas. Al cerrarse, se abrió en su lugar la Escuela de Profetas ($555), con el mismo contenido de clases pero sin las mentorías en vivo.",
-  },
-  {
-    q: "¿Volverán a abrir las mentorías en vivo?",
-    a: "Por el momento no. El profeta Kissingers no abrirá de nuevo esa opción, ya que la mentoría personalizada demanda mucho tiempo. Si en el futuro se abren nuevas plazas, lo anunciaremos y avisaremos sin falta a quienes estén registrados.",
-  },
-  {
-    q: "¿Qué incluye exactamente la Escuela de Profetas ($555)?",
-    a: "Incluye todas las clases grabadas: más de 25 enseñanzas impartidas desde 2023 hasta hoy, organizadas por niveles (Nivel Básico, Nivel Intermedio, Nivel Avanzado y Profecía Forense), más el libro «El Manual para Escuchar a Dios» de regalo. Tienes acceso 24/7 y también recibirás las nuevas enseñanzas que se vayan publicando. No incluye mentoría personalizada ni clases por Zoom.",
-  },
-  {
-    q: "¿Por qué se paga con criptomonedas?",
-    a: "Porque en varios países hay bloqueos que impiden pagar con tarjeta bancaria, y no queríamos dejar fuera a esos hermanos. Al pagar puedes elegir entre Bitcoin, USDT, Ethereum y más de 100 opciones. Si no puedes pagar con criptomonedas, puedes hacer una donación en PayPal por el importe exacto del nivel al que quieres acceder.",
-  },
-  {
-    destacada: true,
-    q: "¿Puedo pagar con tarjeta en lugar de criptomonedas?",
-    a: "Sí. Se hace mediante una donación en PayPal por el importe exacto del nivel que quieras: $333 la Meditación Profética o $555 la Escuela de Profetas. Antes de darte el enlace queremos que leas un aviso importante, para que nadie pague por un contenido que ya tiene:",
-    pago: true,
-  },
-  {
-    q: "Ya pagué, ¿cuándo tendré acceso?",
-    a: "El acceso se activa automáticamente en cuanto la red confirma tu pago. Con Bitcoin suele tardar entre 20 y 40 minutos, y recibirás un correo de bienvenida en cuanto esté listo. Si pasado ese tiempo sigues sin poder entrar, inicia sesión y pulsa «Escríbenos y te activamos manualmente»: revisaremos tu pago personalmente.",
-  },
-  {
-    q: "¿Puedo pedir una devolución?",
-    a: "Sí, dentro de los 7 días naturales siguientes al pago. Si fue un pago por error y no accediste al contenido, se devuelve el importe completo. Si ya viste parte de las clases, la devolución es proporcional a las que no hayas visto (el sistema registra tu progreso). Pasados esos 7 días la compra se considera firme y no procede devolución, hayas visto el contenido o no. Para solicitarla, escríbenos dentro del plazo desde el formulario de contacto con el correo de tu cuenta.",
-  },
-  {
-    q: "¿El acceso caduca?",
-    a: "No. El pago es único y el acceso es permanente, disponible 24/7 desde cualquier dispositivo. Además, todo el contenido nuevo que se publique en tu formación queda incluido sin coste adicional.",
-  },
-  {
-    q: "¿Necesito experiencia previa?",
-    a: "No. Lo más importante es tener hambre espiritual y disposición para aprender. La Meditación Profética es el nivel más accesible, pensado para quienes quieren comenzar a tener encuentros verdaderos con el mundo espiritual: el reino espiritual está en la mente, y los ángeles fueron descritos en la Biblia como figuras que muchos toman por imaginarias. Aquí aprenderás cómo entrar realmente al mundo espiritual. La Escuela de Profetas te lleva después paso a paso desde el Nivel Básico hasta la Profecía Forense, donde se ven nombres, fechas y detalles específicos.",
-  },
-];
+import { useLanguage } from "@/lib/i18n";
 
 /**
  * Aviso previo al pago por PayPal.
@@ -153,6 +108,20 @@ function PagoPayPal() {
 /** Lista de preguntas reutilizable: se usa en la sección FAQ y en el formulario */
 export function FaqLista() {
   const [open, setOpen] = useState<number | null>(0);
+  const { t } = useLanguage();
+
+  const faqs: { q: string; a: string; destacada?: boolean; pago?: boolean }[] = [
+    { destacada: true, q: t("faq_q0"), a: t("faq_a0") },
+    { q: t("faq_q1"), a: t("faq_a1") },
+    { q: t("faq_q2"), a: t("faq_a2") },
+    { q: t("faq_q3"), a: t("faq_a3") },
+    { q: t("faq_q4"), a: t("faq_a4") },
+    { destacada: true, q: t("faq_q5"), a: t("faq_a5"), pago: true },
+    { q: t("faq_q6"), a: t("faq_a6") },
+    { q: t("faq_q7"), a: t("faq_a7") },
+    { q: t("faq_q8"), a: t("faq_a8") },
+    { q: t("faq_q9"), a: t("faq_a9") },
+  ];
 
   return (
     <div className="space-y-3">
@@ -166,7 +135,7 @@ export function FaqLista() {
             <span className="font-semibold text-white text-sm sm:text-base group-hover:text-[#c9a84c] transition-colors">
               {f.destacada && (
                 <span className="block text-[#c9a84c] text-[10px] font-bold tracking-widest uppercase mb-1">
-                  Empieza por aquí
+                  {t("faq_start")}
                 </span>
               )}
               {f.q}
@@ -191,6 +160,7 @@ export function FaqLista() {
 }
 
 export default function FAQ() {
+  const { t } = useLanguage();
 
   return (
     <section id="preguntas" className="relative py-24 lg:py-32 overflow-hidden scroll-mt-24">
@@ -200,14 +170,13 @@ export default function FAQ() {
         {/* Header */}
         <div className="text-center mb-14">
           <span className="inline-block text-[#c9a84c] text-xs font-bold tracking-[0.3em] uppercase mb-4">
-            FAQ
+            {t("faq_badge")}
           </span>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 leading-tight">
-            Preguntas <span className="text-[#c9a84c]">frecuentes</span>
+            {t("faq_title_pre")} <span className="text-[#c9a84c]">{t("faq_title_hl")}</span>
           </h2>
           <p className="text-[#b8a888] max-w-xl mx-auto text-sm sm:text-base">
-            Antes de escribirnos, revisa estas respuestas: aquí resolvemos las dudas
-            más habituales sobre <span className="text-[#c9a84c]">qué formación elegir</span>.
+            {t("faq_subtitle")} <span className="text-[#c9a84c]">{t("faq_subtitle_hl")}</span>.
           </p>
           <div className="divider-gold max-w-xs mx-auto mt-6" />
         </div>

@@ -1,29 +1,29 @@
 "use client";
 
 import { Flame, Eye, Mic } from "lucide-react";
-
-const pillars = [
-  {
-    icon: <Flame size={24} className="text-[#c9a84c]" />,
-    title: "Activación Profética",
-    description:
-      "Desbloqueamos el potencial profético latente en cada creyente mediante procesos de activación dirigida y práctica continua.",
-  },
-  {
-    icon: <Eye size={24} className="text-[#c9a84c]" />,
-    title: "Discernimiento Espiritual",
-    description:
-      "Entrenamos la capacidad de distinguir voces, visiones y percepciones espirituales con madurez, precisión y responsabilidad.",
-  },
-  {
-    icon: <Mic size={24} className="text-[#c9a84c]" />,
-    title: "Formación de Videntes",
-    description:
-      "Un camino de formación integral para aquellos llamados a operar en el don de visión y revelación profética.",
-  },
-];
+import { useLanguage } from "@/lib/i18n";
 
 export default function About() {
+  const { t } = useLanguage();
+
+  const pillars = [
+    {
+      icon: <Flame size={24} className="text-[#c9a84c]" />,
+      title: t("about_p1_title"),
+      description: t("about_p1_desc"),
+    },
+    {
+      icon: <Eye size={24} className="text-[#c9a84c]" />,
+      title: t("about_p2_title"),
+      description: t("about_p2_desc"),
+    },
+    {
+      icon: <Mic size={24} className="text-[#c9a84c]" />,
+      title: t("about_p3_title"),
+      description: t("about_p3_desc"),
+    },
+  ];
+
   return (
     <section id="nosotros" className="relative py-24 lg:py-32 overflow-hidden section-bg-alt">
       {/* Orbs */}
@@ -34,17 +34,16 @@ export default function About() {
           {/* Left: text */}
           <div>
             <span className="inline-block text-[#c9a84c] text-xs font-bold tracking-[0.3em] uppercase mb-4">
-              Quiénes somos
+              {t("about_badge")}
             </span>
             <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight mb-6">
-              Somos un{" "}
-              <span className="text-[#c9a84c]">Instituto Profético Global</span>
+              {t("about_title_pre")}{" "}
+              <span className="text-[#c9a84c]">{t("about_title_hl")}</span>
             </h2>
             <p className="text-[#b8a888] text-base lg:text-lg leading-relaxed mb-8">
-              Hemos formado a más de{" "}
-              <strong className="text-white">10.000 personas</strong> llamadas a
-              escuchar, discernir y manifestar la voz de Dios con madurez,
-              precisión y responsabilidad espiritual.
+              {t("about_desc_pre")}{" "}
+              <strong className="text-white">{t("about_count")}</strong>{" "}
+              {t("about_desc_post")}
             </p>
             <div className="divider-gold max-w-[120px] mb-8 mx-auto md:mx-0" />
             <div className="flex justify-center md:justify-start">
@@ -52,7 +51,7 @@ export default function About() {
                 href="/login?tab=register"
                 className="btn-gold px-8 py-3.5 rounded-full text-base font-bold tracking-wide inline-block"
               >
-                Empieza hoy
+                {t("about_cta")}
               </a>
             </div>
           </div>

@@ -2,12 +2,14 @@
 
 import Image from "next/image";
 import { Clock, Smartphone, Package, ShoppingCart } from "lucide-react";
+import { useLanguage } from "@/lib/i18n";
 
 const HOTMART_URL = "https://go.hotmart.com/S106604225M";
 const LAUNCH_DATE = new Date("2026-07-04T00:00:00");
 
 export default function Book() {
   const launched = new Date() >= LAUNCH_DATE;
+  const { t } = useLanguage();
 
   return (
     <section id="libro" className="relative min-h-screen flex items-center overflow-hidden">
@@ -53,30 +55,28 @@ export default function Book() {
           <div className="flex flex-col gap-7 order-2 lg:order-1">
             <div className="fade-up-1">
               <span className="inline-block text-[#c9a84c] text-xs font-bold tracking-[0.35em] uppercase">
-                El manual de un Profeta
+                {t("book_badge")}
               </span>
             </div>
 
             <div className="fade-up-2">
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-white leading-[1.1]">
-                El libro que{" "}
-                <span className="text-[#c9a84c]">lo cambiará</span>
-                <br />para siempre
+                {t("book_title1")}{" "}
+                <span className="text-[#c9a84c]">{t("book_title_hl")}</span>
+                <br />{t("book_title2")}
               </h1>
             </div>
 
             <div className="fade-up-3">
               <p className="text-[#b8a888] text-lg lg:text-xl leading-relaxed italic border-l-4 border-[#c9a84c]/50 pl-5">
-                "No todo el mundo está listo para lo que encontrará en estas páginas."
+                {t("book_quote")}
               </p>
             </div>
 
             <div className="fade-up-4">
               <p className="text-[#b8a888] text-base leading-relaxed">
-                Este libro contiene revelaciones reservadas para los que buscan con hambre genuina
-                los misterios de Dios. Si tiene hambre real, si en su interior algo le dice que hay
-                más, mucho más de lo que le han enseñado, entonces{" "}
-                <strong className="text-[#c9a84c]">lo que está a punto de descubrir en este libro lo va a cambiar todo para siempre.</strong>
+                {t("book_desc")}{" "}
+                <strong className="text-[#c9a84c]">{t("book_desc_hl")}</strong>
               </p>
             </div>
 
@@ -90,8 +90,8 @@ export default function Book() {
                     <Smartphone size={15} className="text-[#c9a84c]" />
                   </div>
                   <div>
-                    <p className="text-white text-xs font-bold">Edición Digital</p>
-                    <p className="text-[#8a7a6a] text-[10px]">PDF · ePub</p>
+                    <p className="text-white text-xs font-bold">{t("book_digital")}</p>
+                    <p className="text-[#8a7a6a] text-[10px]">{t("book_digital_sub")}</p>
                   </div>
                 </div>
                 <div>
@@ -99,13 +99,13 @@ export default function Book() {
                     <span className="text-2xl font-bold text-white">$47</span>
                     <span className="text-[#8a7a6a] text-xs">USD</span>
                   </div>
-                  <p className="text-[#8a7a6a] text-[10px]">Pago único · Acceso inmediato</p>
+                  <p className="text-[#8a7a6a] text-[10px]">{t("book_digital_access")}</p>
                 </div>
                 {!launched && (
                   <div className="bg-[#c9a84c]/10 border border-[#c9a84c]/20 rounded-lg px-3 py-2">
                     <p className="text-[#c9a84c] text-[10px] font-bold flex items-center gap-1.5">
                       <Clock size={10} />
-                      Disponible el 16 de julio
+                      {t("book_soon_date")}
                     </p>
                   </div>
                 )}
@@ -117,12 +117,12 @@ export default function Book() {
                     className="btn-gold w-full py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 mt-auto"
                   >
                     <ShoppingCart size={13} />
-                    Comprar ahora — $47
+                    {t("book_buy")}
                   </a>
                 ) : (
                   <button disabled className="w-full py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 bg-[#c9a84c]/20 text-[#c9a84c]/60 border border-[#c9a84c]/20 cursor-not-allowed mt-auto">
                     <Clock size={13} />
-                    Disponible el 16 de julio
+                    {t("book_soon_date")}
                   </button>
                 )}
               </div>
@@ -134,22 +134,22 @@ export default function Book() {
                     <Package size={15} className="text-[#8a7a6a]" />
                   </div>
                   <div>
-                    <p className="text-white text-xs font-bold">Tapa Dura · Físico</p>
-                    <p className="text-[#8a7a6a] text-[10px]">Impreso · Envío a tu puerta</p>
+                    <p className="text-white text-xs font-bold">{t("book_physical")}</p>
+                    <p className="text-[#8a7a6a] text-[10px]">{t("book_physical_sub")}</p>
                   </div>
                 </div>
                 <div>
-                  <p className="text-[#8a7a6a] text-xs mb-1">Precio por confirmar</p>
-                  <p className="text-white text-sm font-bold">Próximamente en Amazon</p>
+                  <p className="text-[#8a7a6a] text-xs mb-1">{t("book_price_tbc")}</p>
+                  <p className="text-white text-sm font-bold">{t("book_amazon")}</p>
                 </div>
                 <div className="bg-white/5 border border-white/10 rounded-lg px-3 py-2">
                   <p className="text-[#8a7a6a] text-[10px] font-bold flex items-center gap-1.5">
                     <Clock size={10} />
-                    Disponible próximamente
+                    {t("book_soon")}
                   </p>
                 </div>
                 <button disabled className="w-full py-3 rounded-xl text-xs font-bold flex items-center justify-center gap-2 bg-white/5 text-[#6a5a4a] border border-white/10 cursor-not-allowed mt-auto">
-                  Próximamente en Amazon
+                  {t("book_amazon")}
                 </button>
               </div>
 

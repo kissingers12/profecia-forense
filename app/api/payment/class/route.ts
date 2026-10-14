@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 
-const BUNDLE_PRICES: Record<number, number> = { 100: 100 };
+const BUNDLE_PRICES: Record<number, number> = { 100: 120 };
+const INDIVIDUAL_PRICES: Record<number, number> = { 201: 40, 206: 40, 301: 40, 401: 40 };
 
 export async function POST(req: NextRequest) {
   const { email, videoId, videoTitle } = await req.json();
@@ -12,7 +13,7 @@ export async function POST(req: NextRequest) {
   if (!apiKey) return Response.json({ error: "Servidor no configurado." }, { status: 500 });
 
   const orderId = `${email.toLowerCase()}:clase:${videoId}`;
-  const price = BUNDLE_PRICES[videoId] ?? 30;
+  const price = BUNDLE_PRICES[videoId] ?? INDIVIDUAL_PRICES[videoId] ?? 30;
 
   try {
     const res = await fetch("https://api.nowpayments.io/v1/invoice", {
