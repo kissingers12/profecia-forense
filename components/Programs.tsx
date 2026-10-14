@@ -194,12 +194,43 @@ const programs = [
 ];
 
 function ClasesCard() {
-  const [open, setOpen] = useState(false);
   const [nivel, setNivel] = useState<"basico" | "intermedio" | "avanzado" | null>(null);
   const toggleNivel = (n: "basico" | "intermedio" | "avanzado") =>
     setNivel(nivel === n ? null : n);
   const buyHref = (id: number, title: string) =>
     `/login?tab=register&plan=clase_individual&video=${id}&vtitle=${encodeURIComponent(title)}`;
+
+  const nivelData = [
+    {
+      key: "basico" as const,
+      label: "Nivel Básico",
+      sub: `${clasesBasico.length} clases · paquete $100`,
+      classes: clasesBasico,
+      cta: (
+        <a
+          href={buyHref(100, "Nivel Básico — Escuela de Profetas (8 clases)")}
+          className="w-full btn-gold py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2"
+        >
+          <Bitcoin size={12} />
+          Comprar las 8 clases · $100
+        </a>
+      ),
+    },
+    {
+      key: "intermedio" as const,
+      label: "Nivel Intermedio",
+      sub: `${clasesIntermedio.length} enseñanzas · $30 c/u`,
+      classes: clasesIntermedio,
+      cta: null,
+    },
+    {
+      key: "avanzado" as const,
+      label: "Nivel Avanzado",
+      sub: `${clasesAvanzado.length} enseñanzas · $30 c/u`,
+      classes: clasesAvanzado,
+      cta: null,
+    },
+  ];
 
   return (
     <div className="card-dark card-hover rounded-2xl overflow-hidden group flex flex-col">
@@ -226,101 +257,47 @@ function ClasesCard() {
           Intermedio y Avanzado <span className="text-[#c9a84c] font-bold">$30 c/u</span>.
         </p>
 
-        {open && (
-          <div className="space-y-2 mb-5 flex-1">
-            {/* Básico */}
-            <div className="rounded-xl border border-[#c9a84c]/15 overflow-hidden">
+        {/* Niveles — siempre visibles, se expanden al tocar */}
+        <div className="space-y-2 mb-5 flex-1">
+          {nivelData.map(({ key, label, sub, classes, cta }) => (
+            <div key={key} className="rounded-xl border border-[#c9a84c]/15 overflow-hidden">
               <button
-                onClick={() => toggleNivel("basico")}
+                onClick={() => toggleNivel(key)}
                 className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-white/[0.02] transition-colors"
               >
                 <div className="text-left">
-                  <p className="text-white font-bold text-sm">Nivel Básico</p>
-                  <p className="text-[#8a7a6a] text-xs mt-0.5">{clasesBasico.length} clases · paquete $100</p>
+                  <p className="text-white font-bold text-sm">{label}</p>
+                  <p className="text-[#8a7a6a] text-xs mt-0.5">{sub}</p>
                 </div>
-                <ChevronDown size={16} className={`text-[#c9a84c] transition-transform duration-200 ${nivel === "basico" ? "rotate-180" : ""}`} />
+                <ChevronDown size={16} className={`text-[#c9a84c] transition-transform duration-200 ${nivel === key ? "rotate-180" : ""}`} />
               </button>
-              {nivel === "basico" && (
+
+              {nivel === key && (
                 <div className="border-t border-[#c9a84c]/10">
                   <div className="divide-y divide-white/5">
-                    {clasesBasico.map((c, i) => (
+                    {classes.map((c, i) => (
                       <div key={c.id} className="flex items-center gap-3 px-4 py-3">
                         <span className="text-[#6a5a4a] text-xs font-bold w-4 shrink-0">{String(i + 1).padStart(2, "0")}</span>
                         <Lock size={11} className="text-[#4a3a2a] shrink-0" />
                         <p className="flex-1 text-[#c8b89a] text-xs leading-snug">{c.title}</p>
+                        {!cta && (
+                          <a href={buyHref(c.id, c.title)} className="shrink-0 btn-gold px-3 py-1.5 rounded-full text-[11px] font-bold whitespace-nowrap">
+                            $30
+                          </a>
+                        )}
                       </div>
                     ))}
                   </div>
-                  <div className="px-4 py-3 border-t border-[#c9a84c]/10">
-                    <a
-                      href={buyHref(100, "Nivel Básico — Escuela de Profetas (8 clases)")}
-                      className="w-full btn-gold py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2"
-                    >
-                      <Bitcoin size={12} />
-                      Comprar las 8 clases · $100
-                    </a>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Intermedio */}
-            <div className="rounded-xl border border-[#c9a84c]/15 overflow-hidden">
-              <button
-                onClick={() => toggleNivel("intermedio")}
-                className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-white/[0.02] transition-colors"
-              >
-                <div className="text-left">
-                  <p className="text-white font-bold text-sm">Nivel Intermedio</p>
-                  <p className="text-[#8a7a6a] text-xs mt-0.5">{clasesIntermedio.length} enseñanzas · $30 c/u</p>
-                </div>
-                <ChevronDown size={16} className={`text-[#c9a84c] transition-transform duration-200 ${nivel === "intermedio" ? "rotate-180" : ""}`} />
-              </button>
-              {nivel === "intermedio" && (
-                <div className="border-t border-[#c9a84c]/10 divide-y divide-white/5">
-                  {clasesIntermedio.map((c, i) => (
-                    <div key={c.id} className="flex items-center gap-3 px-4 py-3">
-                      <span className="text-[#6a5a4a] text-xs font-bold w-4 shrink-0">{String(i + 1).padStart(2, "0")}</span>
-                      <Lock size={11} className="text-[#4a3a2a] shrink-0" />
-                      <p className="flex-1 text-[#c8b89a] text-xs leading-snug">{c.title}</p>
-                      <a href={buyHref(c.id, c.title)} className="shrink-0 btn-gold px-3 py-1.5 rounded-full text-[11px] font-bold whitespace-nowrap">
-                        $30
-                      </a>
+                  {cta && (
+                    <div className="px-4 py-3 border-t border-[#c9a84c]/10">
+                      {cta}
                     </div>
-                  ))}
+                  )}
                 </div>
               )}
             </div>
-
-            {/* Avanzado */}
-            <div className="rounded-xl border border-[#c9a84c]/15 overflow-hidden">
-              <button
-                onClick={() => toggleNivel("avanzado")}
-                className="w-full flex items-center justify-between px-4 py-3.5 hover:bg-white/[0.02] transition-colors"
-              >
-                <div className="text-left">
-                  <p className="text-white font-bold text-sm">Nivel Avanzado</p>
-                  <p className="text-[#8a7a6a] text-xs mt-0.5">{clasesAvanzado.length} enseñanzas · $30 c/u</p>
-                </div>
-                <ChevronDown size={16} className={`text-[#c9a84c] transition-transform duration-200 ${nivel === "avanzado" ? "rotate-180" : ""}`} />
-              </button>
-              {nivel === "avanzado" && (
-                <div className="border-t border-[#c9a84c]/10 divide-y divide-white/5">
-                  {clasesAvanzado.map((c, i) => (
-                    <div key={c.id} className="flex items-center gap-3 px-4 py-3">
-                      <span className="text-[#6a5a4a] text-xs font-bold w-4 shrink-0">{String(i + 1).padStart(2, "0")}</span>
-                      <Lock size={11} className="text-[#4a3a2a] shrink-0" />
-                      <p className="flex-1 text-[#c8b89a] text-xs leading-snug">{c.title}</p>
-                      <a href={buyHref(c.id, c.title)} className="shrink-0 btn-gold px-3 py-1.5 rounded-full text-[11px] font-bold whitespace-nowrap">
-                        $30
-                      </a>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        )}
+          ))}
+        </div>
 
         <div className="mt-auto pt-5 border-t border-[#c9a84c]/15">
           <div className="flex items-baseline gap-1 mb-1">
@@ -330,12 +307,13 @@ function ClasesCard() {
           <span className="text-[#6a5a4a] text-xs">Básico desde $100 · Acceso 24/7 por 1 año</span>
         </div>
 
-        <button
-          onClick={() => setOpen(!open)}
+        <a
+          href="/login?tab=register&plan=clase_individual"
           className="btn-gold w-full py-3.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 mt-4 group"
         >
-          {open ? "Ocultar clases" : "Ver todas las clases →"}
-        </button>
+          Elegir clases
+          <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+        </a>
         <p className="text-center text-xs text-[#6a5a4a] mt-2 flex items-center justify-center gap-1">
           <Bitcoin size={11} className="text-[#c9a84c]" />
           Solo criptomonedas — Bitcoin, USDT, ETH y más.
