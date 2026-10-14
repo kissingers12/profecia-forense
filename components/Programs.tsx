@@ -1,7 +1,31 @@
 "use client";
 
 import { useState } from "react";
-import { BookOpen, Eye, ArrowRight, Tag, ShieldCheck, Gift, GraduationCap, ChevronDown } from "lucide-react";
+import { BookOpen, Eye, ArrowRight, Tag, ShieldCheck, Gift, GraduationCap, ChevronDown, Lock, Bitcoin } from "lucide-react";
+
+const clasesIntermedio = [
+  { id: 1, title: "El Secreto de la Meditación 1" },
+  { id: 2, title: "El Secreto de la Meditación 2" },
+  { id: 3, title: "El Secreto de la Meditación 3" },
+  { id: 4, title: "El Secreto de la Meditación 4" },
+  { id: 5, title: "La Llave de la Ciencia" },
+  { id: 6, title: "La Meditación de los profetas para salir del cuerpo" },
+  { id: 7, title: "4 horas instrumental para meditar" },
+];
+
+const clasesAvanzado = [
+  { id: 201, title: "LA LLAVE DE LA CIENCIA: ESTO ACTIVA LO PROFÉTICO" },
+  { id: 202, title: "La Meditación de los profetas para salir del cuerpo" },
+  { id: 203, title: "Actos Proféticos 1" },
+  { id: 204, title: "Actos Proféticos 2" },
+  { id: 205, title: "Acto profético 3" },
+  { id: 206, title: "Ángeles, Fantasmas y sombras" },
+  { id: 207, title: "El secreto de la prosperidad" },
+  { id: 208, title: "(Parte 1) esto me hizo millonario" },
+  { id: 209, title: "(Parte 2) esto me hizo millonario" },
+  { id: 210, title: "Si lo crees ya eres profeta" },
+  { id: 301, title: "Profecía Forense 1" },
+];
 
 type CurriculumItem = { title: string; detail: string };
 type CurriculumLevel = { level: string; count: string; items: CurriculumItem[] };
@@ -160,6 +184,104 @@ const programs = [
   },
 ];
 
+function ClasesIndividuales() {
+  const [expandedLevel, setExpandedLevel] = useState<"intermedio" | "avanzado" | null>(null);
+  const toggle = (level: "intermedio" | "avanzado") =>
+    setExpandedLevel(expandedLevel === level ? null : level);
+  const buyHref = (id: number, title: string) =>
+    `/login?tab=register&plan=clase_individual&video=${id}&vtitle=${encodeURIComponent(title)}`;
+
+  return (
+    <div className="max-w-3xl mx-auto mt-16">
+      <div className="text-center mb-10">
+        <span className="inline-block text-[#c9a84c] text-xs font-bold tracking-[0.3em] uppercase mb-3">
+          Acceso flexible
+        </span>
+        <h3 className="text-2xl sm:text-3xl font-bold text-white mb-3">
+          Clases <span className="text-[#c9a84c]">por enseñanza</span>
+        </h3>
+        <p className="text-[#b8a888] text-sm max-w-xl mx-auto">
+          Si no puedes pagar el programa completo, elige la enseñanza que más necesitas y accede solo a esa.
+          Cada clase tiene un precio único de <span className="text-[#c9a84c] font-bold">$30 USD</span>.
+        </p>
+      </div>
+
+      <div className="space-y-4">
+        {/* Nivel Intermedio */}
+        <div className="card-dark rounded-2xl overflow-hidden border border-[#c9a84c]/15">
+          <button
+            onClick={() => toggle("intermedio")}
+            className="w-full flex items-center justify-between px-6 py-5 hover:bg-white/2 transition-colors"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center shrink-0">
+                <BookOpen size={18} className="text-purple-400" />
+              </div>
+              <div className="text-left">
+                <p className="text-white font-bold text-base">Nivel Intermedio</p>
+                <p className="text-[#8a7a6a] text-xs mt-0.5">{clasesIntermedio.length} enseñanzas · $30 c/u</p>
+              </div>
+            </div>
+            <ChevronDown size={20} className={`text-[#c9a84c] transition-transform duration-200 ${expandedLevel === "intermedio" ? "rotate-180" : ""}`} />
+          </button>
+          {expandedLevel === "intermedio" && (
+            <div className="border-t border-[#c9a84c]/10 divide-y divide-white/5">
+              {clasesIntermedio.map((c, i) => (
+                <div key={c.id} className="flex items-center gap-4 px-6 py-4">
+                  <span className="text-[#6a5a4a] text-xs font-bold w-5 shrink-0">{String(i + 1).padStart(2, "0")}</span>
+                  <Lock size={13} className="text-[#4a3a2a] shrink-0" />
+                  <p className="flex-1 text-[#c8b89a] text-sm leading-snug">{c.title}</p>
+                  <a href={buyHref(c.id, c.title)} className="shrink-0 btn-gold px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap">
+                    Comprar · $30
+                  </a>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Nivel Avanzado */}
+        <div className="card-dark rounded-2xl overflow-hidden border border-[#c9a84c]/15">
+          <button
+            onClick={() => toggle("avanzado")}
+            className="w-full flex items-center justify-between px-6 py-5 hover:bg-white/2 transition-colors"
+          >
+            <div className="flex items-center gap-4">
+              <div className="w-10 h-10 rounded-xl bg-[#c9a84c]/10 border border-[#c9a84c]/20 flex items-center justify-center shrink-0">
+                <Eye size={18} className="text-[#c9a84c]" />
+              </div>
+              <div className="text-left">
+                <p className="text-white font-bold text-base">Nivel Avanzado</p>
+                <p className="text-[#8a7a6a] text-xs mt-0.5">{clasesAvanzado.length} enseñanzas · $30 c/u</p>
+              </div>
+            </div>
+            <ChevronDown size={20} className={`text-[#c9a84c] transition-transform duration-200 ${expandedLevel === "avanzado" ? "rotate-180" : ""}`} />
+          </button>
+          {expandedLevel === "avanzado" && (
+            <div className="border-t border-[#c9a84c]/10 divide-y divide-white/5">
+              {clasesAvanzado.map((c, i) => (
+                <div key={c.id} className="flex items-center gap-4 px-6 py-4">
+                  <span className="text-[#6a5a4a] text-xs font-bold w-5 shrink-0">{String(i + 1).padStart(2, "0")}</span>
+                  <Lock size={13} className="text-[#4a3a2a] shrink-0" />
+                  <p className="flex-1 text-[#c8b89a] text-sm leading-snug">{c.title}</p>
+                  <a href={buyHref(c.id, c.title)} className="shrink-0 btn-gold px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap">
+                    Comprar · $30
+                  </a>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="mt-6 flex items-center justify-center gap-2 text-[#6a5a4a] text-xs">
+        <Bitcoin size={13} className="text-[#c9a84c]" />
+        <span>Pago solo con criptomonedas — Bitcoin, USDT, ETH y más de 100 opciones.</span>
+      </div>
+    </div>
+  );
+}
+
 function Curriculum({ levels }: { levels: CurriculumLevel[] }) {
   const [openLevel, setOpenLevel] = useState<number | null>(null);
   const [openItems, setOpenItems] = useState<Set<string>>(new Set());
@@ -254,9 +376,9 @@ export default function Programs() {
           <div className="divider-gold max-w-xs mx-auto mt-8" />
         </div>
 
-        {/* Cards */}
+        {/* Cards — solo programas NO agotados */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto items-start">
-          {programs.map((p) => (
+          {programs.filter((p) => !p.soldOut).map((p) => (
             <div key={p.id} className="card-dark card-hover rounded-2xl overflow-hidden group flex flex-col">
               {/* Top gradient bar */}
               <div
@@ -449,11 +571,12 @@ export default function Programs() {
           ))}
         </div>
 
+        {/* Sección: Clases por enseñanza — $30 c/u */}
+        <ClasesIndividuales />
+
         {/* Trust badges */}
         <div className="flex flex-wrap justify-center gap-6 mt-12 text-[#6a5a4a] text-xs">
-          {/* Antes decía "Garantía 7 días", que no coincidía con la política real
-              de devoluciones (proporcional según las clases no vistas) */}
-          {["Pago 100% seguro", "Acceso permanente", "Acceso inmediato", "Soporte incluido"].map((b) => (
+          {["Pago 100% seguro", "Garantía 14 días", "Acceso por 1 año", "Soporte incluido"].map((b) => (
             <span key={b} className="flex items-center gap-1.5">
               <ShieldCheck size={13} className="text-[#c9a84c]" />
               {b}
