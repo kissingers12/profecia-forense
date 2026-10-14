@@ -60,11 +60,10 @@ export default function Terminos() {
         <h2>¿Cómo se paga y cuándo se activa el acceso?</h2>
         <ul>
           <li>· <strong>Con criptomonedas:</strong> el acceso se activa de forma automática al confirmarse el pago en la red. Suele tardar entre 20 y 40 minutos.</li>
-          <li>· <strong>Con tarjeta, mediante donación por PayPal:</strong> debes enviarnos el comprobante desde tu cuenta. Activamos el acceso manualmente, normalmente en menos de 24 horas.</li>
         </ul>
         <p className="mt-3">
           Los precios están expresados en dólares estadounidenses (USD). Las comisiones de red o de
-          conversión que aplique tu monedero o PayPal corren por tu cuenta.
+          conversión que aplique tu monedero corren por tu cuenta.
         </p>
       </section>
 
