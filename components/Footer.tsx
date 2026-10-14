@@ -1,8 +1,12 @@
+"use client";
+
 import Image from "next/image";
 import { PlayCircle } from "lucide-react";
+import { useLanguage } from "@/lib/i18n";
 
 export default function Footer() {
   const year = new Date().getFullYear();
+  const { t } = useLanguage();
 
   return (
     <footer className="relative border-t border-[#c9a84c]/15 bg-[#030308]">
@@ -19,8 +23,7 @@ export default function Footer() {
               </span>
             </div>
             <p className="text-[#6a5a4a] text-sm leading-relaxed">
-              Instituto Profético Global fundado por Kissingers Araque.
-              Formando líderes, videntes e intercesores para impactar el mundo.
+              {t("footer_desc")}
             </p>
             <div className="flex flex-col gap-2 mt-4">
               <a
@@ -51,16 +54,16 @@ export default function Footer() {
           {/* Links */}
           <div>
             <h4 className="text-white font-bold text-sm uppercase tracking-widest mb-5">
-              Navegación
+              {t("footer_nav")}
             </h4>
             <ul className="space-y-3">
               {[
-                ["Inicio", "#inicio"],
-                ["Libro", "#libro"],
-                ["Programas", "#programas"],
-                ["Eventos", "#eventos"],
-                ["Invitaciones", "#contacto"],
-                ["Contacto", "#contacto"],
+                [t("nav_inicio"), "#inicio"],
+                [t("nav_libro"), "#libro"],
+                [t("nav_programas"), "#programas"],
+                [t("nav_eventos"), "#eventos"],
+                [t("nav_invitaciones"), "#contacto"],
+                [t("nav_contacto"), "#contacto"],
               ].map(([label, href]) => (
                 <li key={href}>
                   <a href={href} className="text-[#6a5a4a] text-sm hover:text-[#c9a84c] transition-colors">
@@ -74,14 +77,14 @@ export default function Footer() {
           {/* Legal */}
           <div>
             <h4 className="text-white font-bold text-sm uppercase tracking-widest mb-5">
-              Legal
+              {t("footer_legal")}
             </h4>
             <ul className="space-y-3">
               {[
-                ["Política de privacidad", "/privacidad"],
-                ["Términos y condiciones", "/terminos"],
-                ["Política de cookies", "/cookies"],
-                ["Política de seguridad", "/seguridad"],
+                [t("footer_privacy"), "/privacidad"],
+                [t("footer_terms"), "/terminos"],
+                [t("footer_cookies"), "/cookies"],
+                [t("footer_security"), "/seguridad"],
               ].map(([texto, ruta]) => (
                 <li key={ruta}>
                   {/* En pestaña aparte: quien está leyendo la web no la pierde */}
@@ -103,9 +106,9 @@ export default function Footer() {
 
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-[#4a3a2a] text-xs">
           <p>
-            © {year} 100x100Cristianos · Kissingers Araque. Todos los derechos reservados.
+            © {year} 100x100Cristianos · Kissingers Araque. {t("footer_rights")}
           </p>
-          <p>Diseñado con propósito y excelencia.</p>
+          <p>{t("footer_designed")}</p>
         </div>
       </div>
     </footer>

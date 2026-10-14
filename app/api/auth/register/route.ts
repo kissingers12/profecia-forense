@@ -23,12 +23,17 @@ const FALLBACK_URLS: Record<string, string> = {
   escuela: "https://nowpayments.io/payment/?iid=5100234736&paymentId=5746183612",
 };
 
-const BUNDLE_PRICES: Record<number, number> = { 100: 100 };
+const BUNDLE_PRICES: Record<number, number> = { 100: 120 };
+const INDIVIDUAL_PRICES: Record<number, number> = { 201: 40, 206: 40, 301: 40, 401: 40 };
 
 async function createNowPaymentsInvoice(email: string, plan: string, videoId?: number): Promise<{ url: string | null; price: number }> {
   const apiKey = process.env.NOWPAYMENTS_API_KEY;
   const basePrice = PLAN_PRICES[plan] ?? 30;
-  const price = (videoId !== undefined && BUNDLE_PRICES[videoId]) ? BUNDLE_PRICES[videoId] : basePrice;
+  const price = (videoId !== undefined && BUNDLE_PRICES[videoId])
+    ? BUNDLE_PRICES[videoId]
+    : (videoId !== undefined && INDIVIDUAL_PRICES[videoId])
+      ? INDIVIDUAL_PRICES[videoId]
+      : basePrice;
   if (!apiKey) return { url: null, price };
 
   const orderId = videoId ? `${email}:clase:${videoId}` : email;

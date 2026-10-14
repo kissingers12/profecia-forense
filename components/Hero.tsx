@@ -3,11 +3,13 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { ChevronDown } from "lucide-react";
+import { useLanguage } from "@/lib/i18n";
 
 export default function Hero() {
   const imageRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
   const [textVisible, setTextVisible] = useState(false);
+  const { t } = useLanguage();
 
   // Parallax on the image
   useEffect(() => {
@@ -61,14 +63,14 @@ export default function Hero() {
         <div className="absolute top-28 left-1/2 -translate-x-1/2 z-10">
           <div className="inline-flex items-center gap-2 border border-[#c9a84c]/50 bg-[#050510]/60 backdrop-blur-md rounded-full px-5 py-2 text-[#c9a84c] text-xs font-semibold tracking-[0.2em] uppercase">
             <span className="w-1.5 h-1.5 rounded-full bg-[#c9a84c] animate-pulse" />
-            Instituto Profético Global
+            {t("hero_badge")}
           </div>
         </div>
 
         {/* Bottom scroll hint */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2">
           <span className="text-[#c9a84c]/60 text-xs tracking-widest uppercase">
-            Descubre más
+            {t("hero_scroll")}
           </span>
           <ChevronDown
             size={26}
@@ -103,35 +105,29 @@ export default function Hero() {
         >
           {/* Main title */}
           <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold leading-tight text-white mb-8 tracking-tight">
-            El ser profeta comienza{" "}
-            <span className="text-[#c9a84c] glow-text">en tu mente</span>,{" "}
-            no en el espíritu.
+            {t("hero_title_pre")}{" "}
+            <span className="text-[#c9a84c] glow-text">{t("hero_title_hl")}</span>,{" "}
+            {t("hero_title_post")}
           </h1>
 
           {/* Quote */}
           <blockquote className="max-w-3xl mx-auto text-sm sm:text-base lg:text-lg text-[#c8b89a] leading-relaxed mb-8 italic border-l-2 border-[#c9a84c]/50 pl-5 text-left">
-            El Espíritu no necesita desarrollarse; viene de Dios. Es una parte
-            de Dios que está en ti. Tu espíritu no necesita abrir los ojos. Dios
-            no te dio un espíritu ciego.
+            {t("hero_quote_p1")}
             <br /><br />
-            Por eso dice la Biblia que Jesús crecía en sabiduría y estatura.
-            Jesús en el espíritu era Dios, pero su alma no lo sabía todavía.
-            Tuvo que ir aprendiendo. Tuvo que ir alineando su alma con lo que
-            su espíritu ya era.
+            {t("hero_quote_p2")}
             <br /><br />
-            Entonces{" "}
+            {t("hero_quote_then")}{" "}
             <span className="text-[#c9a84c] not-italic font-semibold">
-              tu alma debe convertirse en profeta
+              {t("hero_quote_hl")}
             </span>
-            , porque el espíritu ya lo es. Ser profeta no comienza porque tú
-            lo declares. Comienza cuando piensas y te crees que eres profeta.
+            {t("hero_quote_end")}
           </blockquote>
 
           {/* Subtitle */}
           <p className="max-w-2xl mx-auto text-base sm:text-lg text-[#b8a888] leading-relaxed mb-10">
-            Una plataforma de formación espiritual diseñada para{" "}
-            <strong className="text-white">activar, entrenar y equipar</strong>{" "}
-            líderes, videntes e intercesores en el lenguaje profético de Dios.
+            {t("hero_subtitle")}{" "}
+            <strong className="text-white">{t("hero_subtitle_hl")}</strong>{" "}
+            {t("hero_subtitle_end")}
           </p>
 
           {/* CTAs */}
@@ -140,22 +136,22 @@ export default function Hero() {
               href="#programas"
               className="btn-gold px-8 py-3.5 rounded-full text-base font-bold tracking-wide shadow-lg animate-pulse-glow"
             >
-              Unirme ahora
+              {t("hero_cta_join")}
             </a>
             <a
               href="/login"
               className="btn-outline-gold px-8 py-3.5 rounded-full text-base font-bold tracking-wide"
             >
-              Iniciar sesión
+              {t("hero_cta_login")}
             </a>
           </div>
 
           {/* Stats */}
           <div className="grid grid-cols-3 gap-6 max-w-lg mx-auto">
             {[
-              { value: "10K+", label: "Formados" },
-              { value: "15+", label: "Países" },
-              { value: "8+", label: "Años" },
+              { value: "10K+", label: t("hero_stat1") },
+              { value: "15+", label: t("hero_stat2") },
+              { value: "8+", label: t("hero_stat3") },
             ].map((s) => (
               <div key={s.label} className="text-center">
                 <div className="text-2xl sm:text-3xl font-bold text-[#c9a84c]">{s.value}</div>

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { BookOpen, Eye, ArrowRight, Tag, ShieldCheck, Gift, GraduationCap, ChevronDown, Lock, Bitcoin } from "lucide-react";
+import { useLanguage } from "@/lib/i18n";
 
 const clasesBasico = [
   { id: 101, title: "Desbloqueando los ojos espirituales" },
@@ -193,18 +194,21 @@ const programs = [
   },
 ];
 
+const INDIVIDUAL_PRICES_40 = new Set([201, 206, 301, 401]);
+
 function ClasesCard() {
   const [nivel, setNivel] = useState<"basico" | "intermedio" | "avanzado" | null>(null);
   const toggleNivel = (n: "basico" | "intermedio" | "avanzado") =>
     setNivel(nivel === n ? null : n);
   const buyHref = (id: number, title: string) =>
     `/login?tab=register&plan=clase_individual&video=${id}&vtitle=${encodeURIComponent(title)}`;
+  const { t } = useLanguage();
 
   const nivelData = [
     {
       key: "basico" as const,
-      label: "Nivel Básico",
-      sub: `${clasesBasico.length} clases · paquete $100`,
+      label: t("clases_basico"),
+      sub: `${clasesBasico.length} ${t("clases_basico_count")} $120`,
       classes: clasesBasico,
       cta: (
         <a
@@ -212,21 +216,21 @@ function ClasesCard() {
           className="w-full btn-gold py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2"
         >
           <Bitcoin size={12} />
-          Comprar las 8 clases · $100
+          {t("clases_buy_basico")}
         </a>
       ),
     },
     {
       key: "intermedio" as const,
-      label: "Nivel Intermedio",
-      sub: `${clasesIntermedio.length} enseñanzas · $30 c/u`,
+      label: t("clases_intermedio"),
+      sub: `${clasesIntermedio.length} ${t("clases_ensenanzas")} · $30 c/u`,
       classes: clasesIntermedio,
       cta: null,
     },
     {
       key: "avanzado" as const,
-      label: "Nivel Avanzado",
-      sub: `${clasesAvanzado.length} enseñanzas · $30 c/u`,
+      label: t("clases_avanzado"),
+      sub: `${clasesAvanzado.length} ${t("clases_ensenanzas")} · $30–$40 c/u`,
       classes: clasesAvanzado,
       cta: null,
     },
@@ -240,7 +244,7 @@ function ClasesCard() {
         {/* Tag + Icon */}
         <div className="flex items-center justify-between mb-5">
           <span className="text-xs font-bold tracking-[0.2em] uppercase px-3 py-1 rounded-full border border-[#c9a84c]/40 bg-[#c9a84c]/10 text-[#c9a84c]">
-            A la carta
+            {t("clases_tag")}
           </span>
           <div className="w-12 h-12 rounded-xl bg-[#c9a84c]/10 border border-[#c9a84c]/20 flex items-center justify-center">
             <BookOpen size={28} className="text-[#c9a84c]" />
@@ -248,13 +252,13 @@ function ClasesCard() {
         </div>
 
         <h3 className="text-xl lg:text-2xl font-bold text-white mb-4 leading-snug">
-          Clases por Enseñanza
+          {t("clases_title")}
         </h3>
 
         <p className="text-[#b8a888] text-sm leading-relaxed mb-5">
-          Si no puedes pagar el programa completo, elige las enseñanzas que más necesitas.
-          Nivel Básico <span className="text-[#c9a84c] font-bold">$100</span> (8 clases),
-          Intermedio y Avanzado <span className="text-[#c9a84c] font-bold">$30 c/u</span>.
+          {t("clases_desc_pre")} <span className="text-[#c9a84c] font-bold">$120</span>{" "}
+          {t("clases_desc_mid")} <span className="text-[#c9a84c] font-bold">$30</span>{" "}
+          {t("clases_desc_end")}.
         </p>
 
         {/* Niveles — siempre visibles, se expanden al tocar */}
@@ -282,7 +286,7 @@ function ClasesCard() {
                         <p className="flex-1 text-[#c8b89a] text-xs leading-snug">{c.title}</p>
                         {!cta && (
                           <a href={buyHref(c.id, c.title)} className="shrink-0 btn-gold px-3 py-1.5 rounded-full text-[11px] font-bold whitespace-nowrap">
-                            $30
+                            {INDIVIDUAL_PRICES_40.has(c.id) ? "$40" : "$30"}
                           </a>
                         )}
                       </div>
@@ -302,21 +306,21 @@ function ClasesCard() {
         <div className="mt-auto pt-5 border-t border-[#c9a84c]/15">
           <div className="flex items-baseline gap-1 mb-1">
             <span className="text-3xl font-bold text-white">$30</span>
-            <span className="text-[#8a7a6a] text-sm">USD por clase</span>
+            <span className="text-[#8a7a6a] text-sm">{t("clases_precio_label")}</span>
           </div>
-          <span className="text-[#6a5a4a] text-xs">Básico desde $100 · Acceso 24/7 por 1 año</span>
+          <span className="text-[#6a5a4a] text-xs">{t("clases_precio_sub")}</span>
         </div>
 
         <a
           href="/login?tab=register&plan=clase_individual"
           className="btn-gold w-full py-3.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 mt-4 group"
         >
-          Elegir clases
+          {t("clases_cta")}
           <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
         </a>
         <p className="text-center text-xs text-[#6a5a4a] mt-2 flex items-center justify-center gap-1">
           <Bitcoin size={11} className="text-[#c9a84c]" />
-          Solo criptomonedas — Bitcoin, USDT, ETH y más.
+          {t("clases_crypto")}
         </p>
       </div>
     </div>
@@ -395,6 +399,8 @@ function Curriculum({ levels }: { levels: CurriculumLevel[] }) {
 }
 
 export default function Programs() {
+  const { t } = useLanguage();
+
   return (
     <section id="programas" className="relative py-24 lg:py-32 overflow-hidden">
       <div className="absolute inset-0 gradient-bg" />
@@ -404,21 +410,21 @@ export default function Programs() {
         {/* Header */}
         <div className="text-center mb-16">
           <span className="inline-block text-[#c9a84c] text-xs font-bold tracking-[0.3em] uppercase mb-4">
-            Formación Espiritual
+            {t("programs_badge")}
           </span>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-5 leading-tight">
-            Meditaciones proféticas,{" "}
-            <span className="text-[#c9a84c]">formación y entrenamientos</span>
+            {t("programs_title1")}{" "}
+            <span className="text-[#c9a84c]">{t("programs_title2")}</span>
           </h2>
           <p className="max-w-2xl mx-auto text-[#b8a888] text-base lg:text-lg">
-            Programas diseñados para llevar tu vida profética al siguiente nivel
-            con metodología, profundidad y acompañamiento real.
+            {t("programs_subtitle")}
           </p>
           <div className="divider-gold max-w-xs mx-auto mt-8" />
         </div>
 
-        {/* Cards — programas activos + clases a la carta */}
+        {/* Cards — Clases first, then active programs */}
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto items-start">
+          <ClasesCard />
           {programs.filter((p) => !p.soldOut).map((p) => (
             <div key={p.id} className="card-dark card-hover rounded-2xl overflow-hidden group flex flex-col">
               {/* Top gradient bar */}
@@ -482,7 +488,7 @@ export default function Programs() {
                     y quien de verdad quiere leerlo lo abre con un clic */}
                 <details className="group/det mb-5">
                   <summary className="cursor-pointer list-none flex items-center justify-between gap-3 rounded-xl border border-[#c9a84c]/30 bg-[#c9a84c]/5 px-4 py-3 text-sm font-bold text-[#c9a84c] hover:bg-[#c9a84c]/10 transition-all">
-                    <span>{p.soldOut ? "Ver qué incluía este programa" : "Ver todo lo que incluye"}</span>
+                    <span>{p.soldOut ? t("prog_see_sold") : t("prog_see_all")}</span>
                     <ChevronDown size={16} className="shrink-0 transition-transform duration-200 group-open/det:rotate-180" />
                   </summary>
                   <div className="pt-5">
@@ -572,7 +578,7 @@ export default function Programs() {
                     <span className="text-[#8a7a6a] text-sm">USD</span>
                   </div>
                   <span className="text-[#6a5a4a] text-xs">
-                    {p.soldOut ? "Sin plazas disponibles" : "Pago único · Acceso 24/7"}
+                    {p.soldOut ? t("prog_no_spots") : t("prog_payment")}
                   </span>
                 </div>
 
@@ -580,10 +586,10 @@ export default function Programs() {
                 {p.soldOut ? (
                   <>
                     <div className="w-full py-3.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 mt-auto bg-white/5 border border-white/10 text-[#8a7a6a] cursor-not-allowed select-none">
-                      Agotado
+                      {t("prog_sold_out_btn")}
                     </div>
                     <p className="text-center text-xs text-[#6a5a4a] mt-2">
-                      Este programa no acepta nuevas inscripciones por el momento.
+                      {t("prog_sold_out_msg")}
                     </p>
                   </>
                 ) : (
@@ -592,12 +598,11 @@ export default function Programs() {
                       href={`/login?tab=register&plan=${p.planValue}`}
                       className="btn-gold w-full py-3.5 rounded-xl text-sm font-bold flex items-center justify-center gap-2 mt-auto group"
                     >
-                      Inscribirme · ${p.price}
+                      {t("prog_join")} · ${p.price}
                       <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
                     </a>
                     <p className="text-center text-xs text-[#6a5a4a] mt-2">
-                      Elige tu criptomoneda favorita al pagar —{" "}
-                      <span className="text-[#c9a84c]/70">Bitcoin, USDT, ETH y más de 100 opciones.</span>
+                      {t("prog_crypto_note")}
                     </p>
                   </>
                 )}
@@ -605,17 +610,21 @@ export default function Programs() {
                   href="/login"
                   className="text-center text-xs text-[#8a7a6a] hover:text-[#c9a84c] mt-2 transition-colors block"
                 >
-                  ¿Ya tienes cuenta? Inicia sesión →
+                  {t("prog_already_member")}
                 </a>
               </div>
             </div>
           ))}
-          <ClasesCard />
         </div>
 
         {/* Trust badges */}
         <div className="flex flex-wrap justify-center gap-6 mt-12 text-[#6a5a4a] text-xs">
-          {["Pago 100% seguro", "Garantía 14 días", "Acceso por 1 año", "Soporte incluido"].map((b) => (
+          {([
+            t("programs_trust1"),
+            t("programs_trust2"),
+            t("programs_trust3"),
+            t("programs_trust4"),
+          ]).map((b) => (
             <span key={b} className="flex items-center gap-1.5">
               <ShieldCheck size={13} className="text-[#c9a84c]" />
               {b}

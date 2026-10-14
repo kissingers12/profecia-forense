@@ -1,8 +1,10 @@
 "use client";
 
-import { Play } from "lucide-react";
+import { useLanguage } from "@/lib/i18n";
 
 export default function CTA() {
+  const { t } = useLanguage();
+
   return (
     <section className="relative py-24 lg:py-32 overflow-hidden">
       <div className="absolute inset-0 gradient-bg" />
@@ -18,22 +20,22 @@ export default function CTA() {
 
       <div className="relative z-10 max-w-4xl mx-auto px-6 lg:px-8 text-center">
         <span className="inline-block text-[#c9a84c] text-xs font-bold tracking-[0.3em] uppercase mb-6">
-          Únete hoy
+          {t("cta_badge")}
         </span>
         <h2 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-white leading-tight mb-6">
-          Descubre cómo crecer{" "}
-          <span className="text-[#c9a84c]">espiritualmente</span> sin bloqueos
+          {t("cta_title1")}{" "}
+          <span className="text-[#c9a84c]">{t("cta_title_hl")}</span>{" "}
+          {t("cta_title2")}
         </h2>
         <p className="text-[#b8a888] text-base lg:text-xl leading-relaxed mb-10 max-w-2xl mx-auto">
-          Únete a una comunidad diseñada para activar tu propósito, fortalecer
-          tu discernimiento y llevar tu llamado a otro nivel.
+          {t("cta_desc")}
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
           <a
             href="#contacto"
             className="btn-gold px-8 py-4 rounded-full text-base font-bold tracking-wide shadow-xl animate-pulse-glow"
           >
-            Inscribirme ahora
+            {t("cta_btn")}
           </a>
         </div>
       </div>
