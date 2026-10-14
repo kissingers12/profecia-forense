@@ -123,6 +123,38 @@ export async function POST(req: NextRequest) {
     return Response.json({ ok: true, skipped: true });
   }
 
+  // Handle individual class purchase (order_id format: "email:clase:videoId")
+  if (orderId && orderId.includes(":clase:")) {
+    const parts = orderId.split(":clase:");
+    const emailPart = parts[0];
+    const videoId = parseInt(parts[1] ?? "", 10);
+
+    if (!emailPart || isNaN(videoId)) {
+      await log("WEBHOOK_CLASE_ERROR", `invalid format: ${orderId}`);
+      return Response.json({ ok: true });
+    }
+
+    await supabaseAdmin
+      .from("users")
+      .update({ activated: true })
+      .eq("email", emailPart.toLowerCase());
+
+    const { error: cpError } = await supabaseAdmin
+      .from("class_purchases")
+      .upsert(
+        { user_email: emailPart.toLowerCase(), video_id: videoId },
+        { onConflict: "user_email,video_id" }
+      );
+
+    if (cpError) {
+      await log("WEBHOOK_CLASE_DB_ERROR", cpError.message);
+    } else {
+      await log("WEBHOOK_CLASE_ACTIVATED", `email=${emailPart} video=${videoId}`);
+    }
+
+    return Response.json({ ok: true });
+  }
+
   if (orderId && orderId.includes("@")) {
     const { data: planUser } = await supabaseAdmin
       .from("users")

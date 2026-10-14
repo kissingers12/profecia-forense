@@ -19,6 +19,8 @@ function LoginContent() {
   // El plan "escuela" está agotado — los enlaces antiguos se redirigen al plan de todas las clases
   const rawPlan = params.get("plan") ?? "";
   const defaultPlan = rawPlan === "escuela" ? "clases" : rawPlan;
+  const defaultVideoId = params.get("video") ? parseInt(params.get("video")!, 10) : null;
+  const defaultVTitle = params.get("vtitle") ?? "";
 
   const [tab, setTab] = useState<"login" | "register">(defaultTab as "login" | "register");
   const [showPwd, setShowPwd] = useState(false);
@@ -26,7 +28,7 @@ function LoginContent() {
   const [loading, setLoading] = useState(false);
 
   const [loginForm, setLoginForm] = useState({ email: "", password: "" });
-  const [regForm, setRegForm] = useState({ name: "", email: "", password: "", confirm: "", plan: defaultPlan, countryCode: "+1", phone: "" });
+  const [regForm, setRegForm] = useState({ name: "", email: "", password: "", confirm: "", plan: defaultPlan, countryCode: "+1", phone: "", videoId: defaultVideoId });
   const [registered, setRegistered] = useState(false);
   const [acepta, setAcepta] = useState(false);
   const [paymentUrl, setPaymentUrl] = useState("");
@@ -75,7 +77,7 @@ function LoginContent() {
       const res = await fetch("/api/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: regForm.email, name: regForm.name, password: regForm.password, plan: regForm.plan, whatsapp }),
+        body: JSON.stringify({ email: regForm.email, name: regForm.name, password: regForm.password, plan: regForm.plan, whatsapp, videoId: regForm.videoId }),
       });
       const data = await res.json();
       if (!res.ok) {
@@ -186,16 +188,24 @@ function LoginContent() {
                     className="w-full bg-white/5 border border-[#c9a84c]/20 rounded-xl px-4 py-3 text-white placeholder-[#4a3a2a] text-sm focus:outline-none focus:border-[#c9a84c]/60" />
                 </div>
               </div>
-              <div>
-                <label className="block text-xs font-semibold text-[#c9a84c] uppercase tracking-widest mb-2">Programa</label>
-                <select name="plan" value={regForm.plan} onChange={handleRegChange} required
-                  className="w-full bg-[#0a0a20] border border-[#c9a84c]/20 rounded-xl px-4 py-3 text-[#c8b89a] text-sm focus:outline-none focus:border-[#c9a84c]/60">
-                  <option value="">Seleccionar programa...</option>
-                  {PLANS.map((p) => (
-                    <option key={p.value} value={p.value}>{p.label} — ${p.price}</option>
-                  ))}
-                </select>
-              </div>
+              {regForm.plan === "clase_individual" && regForm.videoId ? (
+                <div className="rounded-xl border border-[#c9a84c]/40 bg-[#c9a84c]/8 px-4 py-3">
+                  <p className="text-[#c9a84c] text-[10px] font-bold uppercase tracking-widest mb-1">Clase seleccionada</p>
+                  <p className="text-white text-sm font-semibold leading-snug">{defaultVTitle || `Clase #${regForm.videoId}`}</p>
+                  <p className="text-[#8a7a6a] text-xs mt-1">$30 USD · Acceso por 1 año · Solo cripto</p>
+                </div>
+              ) : (
+                <div>
+                  <label className="block text-xs font-semibold text-[#c9a84c] uppercase tracking-widest mb-2">Programa</label>
+                  <select name="plan" value={regForm.plan} onChange={handleRegChange} required
+                    className="w-full bg-[#0a0a20] border border-[#c9a84c]/20 rounded-xl px-4 py-3 text-[#c8b89a] text-sm focus:outline-none focus:border-[#c9a84c]/60">
+                    <option value="">Seleccionar programa...</option>
+                    {PLANS.map((p) => (
+                      <option key={p.value} value={p.value}>{p.label} — ${p.price}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
               {regForm.plan === "escuela" && (
                 <div>

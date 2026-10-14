@@ -7,6 +7,7 @@ const PLAN_PRICES: Record<string, number> = {
   meditaciones: 333,
   escuela: 777,
   clases: 555,
+  clase_individual: 30,
 };
 
 const PLAN_LABELS: Record<string, string> = {
@@ -14,6 +15,7 @@ const PLAN_LABELS: Record<string, string> = {
   mentoria: "Mentoría Profética - 100x100Cristianos",
   escuela: "Escuela Avanzada de Profecía - 100x100Cristianos",
   clases: "Escuela de Profetas Todas las Clases - 100x100Cristianos",
+  clase_individual: "Clase Individual - 100x100Cristianos",
 };
 
 const FALLBACK_URLS: Record<string, string> = {
@@ -21,9 +23,11 @@ const FALLBACK_URLS: Record<string, string> = {
   escuela: "https://nowpayments.io/payment/?iid=5100234736&paymentId=5746183612",
 };
 
-async function createNowPaymentsInvoice(email: string, plan: string): Promise<string | null> {
+async function createNowPaymentsInvoice(email: string, plan: string, videoId?: number): Promise<string | null> {
   const apiKey = process.env.NOWPAYMENTS_API_KEY;
   if (!apiKey) return null;
+
+  const orderId = videoId ? `${email}:clase:${videoId}` : email;
 
   try {
     const res = await fetch("https://api.nowpayments.io/v1/invoice", {
@@ -32,7 +36,7 @@ async function createNowPaymentsInvoice(email: string, plan: string): Promise<st
       body: JSON.stringify({
         price_amount: PLAN_PRICES[plan],
         price_currency: "usd",
-        order_id: email,
+        order_id: orderId,
         order_description: PLAN_LABELS[plan],
         ipn_callback_url: "https://www.kissingersaraque.com/api/webhooks/nowpayments",
         success_url: "https://www.kissingersaraque.com/dashboard",
@@ -47,7 +51,7 @@ async function createNowPaymentsInvoice(email: string, plan: string): Promise<st
 }
 
 export async function POST(req: NextRequest) {
-  const { email, name, password, plan, whatsapp } = await req.json();
+  const { email, name, password, plan, whatsapp, videoId } = await req.json();
 
   if (!email || !name || !password || !plan) {
     return Response.json({ error: "Todos los campos son requeridos." }, { status: 400 });
@@ -75,6 +79,10 @@ export async function POST(req: NextRequest) {
 
   if (plan === "escuela") {
     return Response.json({ error: "Las plazas de la Escuela Avanzada están agotadas por el momento." }, { status: 400 });
+  }
+
+  if (plan === "clase_individual" && !videoId) {
+    return Response.json({ error: "Selecciona una clase para continuar." }, { status: 400 });
   }
 
   if (!PLAN_PRICES[plan]) {
@@ -118,7 +126,7 @@ export async function POST(req: NextRequest) {
   }).then(() => {});
 
   // Create unique payment per user so webhook knows who paid
-  const invoiceUrl = await createNowPaymentsInvoice(email.toLowerCase(), plan);
+  const invoiceUrl = await createNowPaymentsInvoice(email.toLowerCase(), plan, plan === "clase_individual" ? videoId : undefined);
 
   return Response.json({
     success: true,
