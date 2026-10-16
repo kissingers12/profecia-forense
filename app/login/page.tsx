@@ -12,6 +12,14 @@ const PLANS = [
   { value: "clases", label: "Escuela de Profetas — Todas las Clases", price: 555 },
 ];
 
+const BUNDLE_PRICES: Record<number, number> = { 100: 120 };
+const INDIVIDUAL_PRICES_40 = new Set([201, 206, 301, 401]);
+function clasePrecio(videoId: number | null): number {
+  if (videoId === null) return 30;
+  if (BUNDLE_PRICES[videoId]) return BUNDLE_PRICES[videoId];
+  return INDIVIDUAL_PRICES_40.has(videoId) ? 40 : 30;
+}
+
 function LoginContent() {
   const router = useRouter();
   const params = useSearchParams();
@@ -192,7 +200,7 @@ function LoginContent() {
                 <div className="rounded-xl border border-[#c9a84c]/40 bg-[#c9a84c]/8 px-4 py-3">
                   <p className="text-[#c9a84c] text-[10px] font-bold uppercase tracking-widest mb-1">Clase seleccionada</p>
                   <p className="text-white text-sm font-semibold leading-snug">{defaultVTitle || `Clase #${regForm.videoId}`}</p>
-                  <p className="text-[#8a7a6a] text-xs mt-1">$30 USD · Acceso por 1 año · Solo cripto</p>
+                  <p className="text-[#8a7a6a] text-xs mt-1">${clasePrecio(regForm.videoId)} USD · Acceso por 1 año · Solo cripto</p>
                 </div>
               ) : (
                 <div>
@@ -282,7 +290,7 @@ function LoginContent() {
                   completa y pasa a calcularse{" "}
                   <strong className="text-[#e8dcc8]">en proporción a las clases que no hayas visto</strong>.
                   Solo puede solicitarse dentro de los{" "}
-                  <strong className="text-[#c9a84c]">7 días siguientes al pago</strong>; pasado ese
+                  <strong className="text-[#c9a84c]">14 días siguientes al pago</strong>; pasado ese
                   plazo no procede devolución.
                 </p>
                 <label className="flex items-start gap-2.5 cursor-pointer">

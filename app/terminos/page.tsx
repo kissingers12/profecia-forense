@@ -71,7 +71,7 @@ export default function Terminos() {
         <h2>¿Puedo pedir una devolución?</h2>
         <p>
           Sí, dentro de un plazo. Como se trata de contenido digital al que accedes de inmediato,
-          dispones de <strong>7 días naturales desde la fecha del pago</strong> para solicitarla.
+          dispones de <strong>14 días naturales desde la fecha del pago</strong> para solicitarla.
           Dentro de ese plazo funciona así:
         </p>
         <ul className="mt-3">
@@ -80,7 +80,7 @@ export default function Terminos() {
           <li>· <strong>Si has visto la formación completa:</strong> no procede devolución.</li>
         </ul>
         <p className="mt-4 rounded-xl border border-[#c9a84c]/30 bg-[#c9a84c]/[0.06] p-4 text-[#e8dcc8]">
-          <strong>Transcurridos esos 7 días no procede ninguna devolución</strong>, hayas visto el
+          <strong>Transcurridos esos 14 días no procede ninguna devolución</strong>, hayas visto el
           contenido o no. El acceso es permanente y de pago único: pasado ese plazo la compra se
           considera firme.
         </p>

@@ -154,6 +154,7 @@ export default function Dashboard() {
   const [upgradeError, setUpgradeError] = useState("");
   const [purchasedIds, setPurchasedIds] = useState<Set<number>>(new Set());
   const [buyingClassId, setBuyingClassId] = useState<number | null>(null);
+  const [buyClassError, setBuyClassError] = useState("");
 
   useEffect(() => {
     const s = getSession();
@@ -263,8 +264,11 @@ export default function Dashboard() {
     setUpgradeLoading(false);
   };
 
+  const INDIVIDUAL_PRICES_40 = new Set([201, 206, 301, 401]);
+
   const handleBuyClass = async (videoId: number, videoTitle: string) => {
     setBuyingClassId(videoId);
+    setBuyClassError("");
     try {
       const res = await fetch("/api/payment/class", {
         method: "POST",
@@ -272,8 +276,14 @@ export default function Dashboard() {
         body: JSON.stringify({ email: session?.email, videoId, videoTitle }),
       });
       const data = await res.json();
-      if (data.paymentUrl) window.open(data.paymentUrl, "_blank");
-    } catch {}
+      if (data.paymentUrl) {
+        window.open(data.paymentUrl, "_blank");
+      } else {
+        setBuyClassError("No se pudo generar el enlace de pago. Inténtalo de nuevo en unos minutos o escríbenos.");
+      }
+    } catch {
+      setBuyClassError("Error de conexión. Verifica tu internet e inténtalo de nuevo.");
+    }
     setBuyingClassId(null);
   };
 
@@ -1016,7 +1026,7 @@ export default function Dashboard() {
         {isClaseIndividual ? (
           <div className="space-y-4">
             {[
-              { label: "Nivel Básico", gid: 102, clases: clasesIndividualesData.filter(c => c.nivel === "Basico"), bundle: { videoId: 100, price: 100, label: "Comprar las 8 clases · $100" } },
+              { label: "Nivel Básico", gid: 102, clases: clasesIndividualesData.filter(c => c.nivel === "Basico"), bundle: { videoId: 100, price: 120, label: "Comprar las 8 clases · $120" } },
               { label: "Nivel Intermedio", gid: 100, clases: clasesIndividualesData.filter(c => c.nivel === "Intermedio"), bundle: null },
               { label: "Nivel Avanzado & Profecía Forense", gid: 101, clases: clasesIndividualesData.filter(c => c.nivel === "Avanzado"), bundle: null },
             ].map((group) => {
@@ -1102,7 +1112,7 @@ export default function Dashboard() {
                                     ) : (
                                       <Bitcoin size={12} />
                                     )}
-                                    $30
+                                    {INDIVIDUAL_PRICES_40.has(cls.id) ? "$40" : "$30"}
                                   </button>
                                 ) : null}
                               </div>
@@ -1126,6 +1136,11 @@ export default function Dashboard() {
                 </div>
               );
             })}
+            {buyClassError && (
+              <div className="mt-2 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-red-400 text-sm">
+                {buyClassError}
+              </div>
+            )}
           </div>
         ) : hasAllClasses ? (
           <div className="space-y-4">
