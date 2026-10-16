@@ -802,6 +802,113 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-[#050510]">
+      {/* Support modal (clase_individual: clase no desbloqueada) */}
+      {showSupport && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/70 backdrop-blur-sm">
+          <div className="w-full max-w-md card-dark rounded-2xl p-8">
+            {supportSent ? (
+              <div className="text-center space-y-4">
+                <div className="w-14 h-14 rounded-full bg-[#c9a84c]/10 border border-[#c9a84c]/30 flex items-center justify-center mx-auto">
+                  <CheckCircle size={28} className="text-[#c9a84c]" />
+                </div>
+                <h3 className="text-white font-bold text-lg">Mensaje enviado</h3>
+                <p className="text-[#8a7a6a] text-sm">
+                  Recibimos tu solicitud. Te contactaremos a <span className="text-[#c9a84c]">{session.email}</span> en las próximas horas para verificar tu pago y darte acceso.
+                </p>
+                <button
+                  onClick={() => { setShowSupport(false); setSupportSent(false); setSupportMessage(""); }}
+                  className="btn-gold w-full py-3 rounded-xl font-bold mt-2"
+                >
+                  Cerrar
+                </button>
+              </div>
+            ) : supportFailed ? (
+              <div className="text-center space-y-4">
+                <h3 className="text-white font-bold text-lg">No pudimos enviar el mensaje</h3>
+                <p className="text-[#8a7a6a] text-sm">
+                  Hubo un problema técnico. Vuelve a intentarlo o escríbenos desde el formulario de contacto indicando tu correo{" "}
+                  <span className="text-[#c9a84c]">{session.email}</span>.
+                </p>
+                <a href="/#contacto" className="btn-gold w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2">
+                  Ir al formulario de contacto →
+                </a>
+                <button
+                  onClick={() => { setSupportFailed(false); }}
+                  className="w-full text-center text-xs text-[#6a5a4a] hover:text-[#c9a84c] transition-colors"
+                >
+                  Intentar de nuevo
+                </button>
+              </div>
+            ) : (
+              <>
+                <h3 className="text-white font-bold text-lg mb-1">¿Tu clase no se desbloqueó?</h3>
+                <p className="text-[#8a7a6a] text-sm mb-5">
+                  El acceso se activa automáticamente, pero si ya pasaron 40 minutos y la clase no aparece, cuéntanos y lo resolvemos.
+                </p>
+                <form onSubmit={handleSupport} className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-[#c9a84c] uppercase tracking-widest mb-2">
+                      Tu email
+                    </label>
+                    <input
+                      type="text"
+                      value={session.email}
+                      readOnly
+                      className="w-full bg-white/5 border border-[#c9a84c]/20 rounded-xl px-4 py-3 text-[#c9a84c] text-sm cursor-default"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-[#c9a84c] uppercase tracking-widest mb-2">
+                      ¿Qué clase compraste? <span className="text-[#4a3a2a] normal-case font-normal">(opcional)</span>
+                    </label>
+                    <textarea
+                      value={supportMessage}
+                      onChange={(e) => setSupportMessage(e.target.value)}
+                      placeholder="Ej: Pagué la clase 'Profecía Forense 1' y no aparece desbloqueada..."
+                      rows={3}
+                      className="w-full bg-white/5 border border-[#c9a84c]/20 rounded-xl px-4 py-3 text-white placeholder-[#4a3a2a] text-sm focus:outline-none focus:border-[#c9a84c]/60 resize-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-[#c9a84c] uppercase tracking-widest mb-2">
+                      Captura del pago <span className="text-[#4a3a2a] normal-case font-normal">(recomendado)</span>
+                    </label>
+                    {comprobante ? (
+                      <div className="rounded-xl border border-[#c9a84c]/30 bg-white/5 p-3">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={comprobante} alt="Comprobante de pago" className="w-full max-h-56 object-contain rounded-lg" />
+                        <button type="button" onClick={() => setComprobante("")} className="mt-2 w-full text-center text-xs text-[#8a7a6a] hover:text-red-400 transition-colors">
+                          Quitar imagen
+                        </button>
+                      </div>
+                    ) : (
+                      <div onPaste={handlePasteComprobante} className="rounded-xl border border-dashed border-[#c9a84c]/30 bg-white/[0.03] p-4 text-center">
+                        <input type="file" accept="image/*" id="comprobante2" onChange={(e) => handleArchivoComprobante(e.target.files?.[0])} className="hidden" />
+                        <label htmlFor="comprobante2" className="inline-flex items-center gap-2 cursor-pointer text-sm font-bold text-[#c9a84c] border border-[#c9a84c]/40 rounded-xl px-4 py-2.5 hover:bg-[#c9a84c]/10 transition-all">
+                          {comprobanteCargando ? (
+                            <><span className="w-3.5 h-3.5 border-2 border-[#c9a84c]/40 border-t-[#c9a84c] rounded-full animate-spin" />Preparando imagen...</>
+                          ) : (
+                            <><Download size={14} className="rotate-180" />Elegir imagen o hacer foto</>
+                          )}
+                        </label>
+                        <p className="text-[#6a5a4a] text-[11px] mt-2.5">Ctrl+V (⌘+V) para pegar directamente.</p>
+                      </div>
+                    )}
+                    {comprobanteError && <p className="text-red-400 text-xs mt-2">{comprobanteError}</p>}
+                  </div>
+                  <button type="submit" disabled={supportLoading} className="btn-gold w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2">
+                    {supportLoading ? <span className="w-4 h-4 border-2 border-[#050510]/40 border-t-[#050510] rounded-full animate-spin" /> : "Enviar solicitud de ayuda"}
+                  </button>
+                  <button type="button" onClick={() => setShowSupport(false)} className="w-full text-center text-xs text-[#6a5a4a] hover:text-[#c9a84c] transition-colors">
+                    Cancelar
+                  </button>
+                </form>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Top bar */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-[#050510]/95 backdrop-blur-md border-b border-[#c9a84c]/20">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -1169,6 +1276,16 @@ export default function Dashboard() {
                   );
                 })}
               </div>
+            </div>
+
+            {/* Aviso si una clase pagada no se desbloqueó */}
+            <div className="text-center pt-2">
+              <button
+                onClick={() => { setSupportSent(false); setSupportFailed(false); setSupportMessage(""); setShowSupport(true); }}
+                className="text-[#6a5a4a] text-xs hover:text-[#c9a84c] transition-colors"
+              >
+                ¿Pagaste una clase y no se desbloqueó? Avísanos
+              </button>
             </div>
           </div>
         ) : hasAllClasses ? (
