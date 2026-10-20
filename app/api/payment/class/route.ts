@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 
 const BUNDLE_PRICES: Record<number, number> = { 100: 120 };
-const INDIVIDUAL_PRICES: Record<number, number> = { 201: 40, 206: 40, 301: 40, 401: 40, 402: 40 };
+const INDIVIDUAL_PRICES: Record<number, number> = { 201: 40, 202: 40, 203: 40, 204: 40, 205: 40, 206: 40, 207: 40, 208: 40, 209: 40, 210: 40, 301: 40, 401: 40, 402: 40 };
 
 export async function POST(req: NextRequest) {
   const { email, videoId, videoTitle } = await req.json();
