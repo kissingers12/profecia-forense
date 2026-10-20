@@ -267,7 +267,7 @@ export default function Dashboard() {
     setUpgradeLoading(false);
   };
 
-  const INDIVIDUAL_PRICES_40 = new Set([201, 206, 301, 401]);
+  const INDIVIDUAL_PRICES_40 = new Set([201, 206, 301, 401, 402]);
 
   const handleBuyClass = async (videoId: number, videoTitle: string) => {
     setBuyingClassId(videoId);
