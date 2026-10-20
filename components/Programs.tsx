@@ -35,6 +35,7 @@ const clasesAvanzado = [
   { id: 210, title: "Si lo crees ya eres profeta" },
   { id: 301, title: "Profecía Forense 1" },
   { id: 401, title: "Meditación Imaginaria: Navegando en lo Invisible" },
+  { id: 402, title: "Este es mi SECRETO para hacer millones... Entrar en meditación antes que llegue" },
 ];
 
 type CurriculumItem = { title: string; detail: string };
