@@ -42,7 +42,8 @@ const meditacionesContent: Lesson[] = [
   { id: 5, title: "La Llave de la Ciencia", duration: "", unlocked: true, vimeoId: "1204243775" },
   { id: 6, title: "La Meditación de los profetas para salir del cuerpo", duration: "", unlocked: true, vimeoId: "1204243894" },
   { id: 7, title: "4 horas instrumental para meditar", duration: "", unlocked: true, vimeoId: "1204255913" },
-  { id: 401, title: "Navegando en lo Invisible", duration: "", unlocked: true, vimeoId: "1232777507", alto: 75, nuevo: true },
+  { id: 401, title: "Navegando en lo Invisible", duration: "", unlocked: true, vimeoId: "1232777507", alto: 75 },
+  { id: 402, title: "Este es mi SECRETO para hacer millones... Entrar en meditación antes que llegue", duration: "", unlocked: true, vimeoId: "1237664905", nuevo: true },
   { id: 8, title: "Próximamente nueva enseñanza", duration: "", unlocked: false, vimeoId: null },
 ];
 
@@ -95,8 +96,9 @@ const escuelaGroups: Group[] = [
   {
     groupTitle: "Meditación Imaginaria",
     lessons: [
-      { id: 401, title: "Navegando en lo Invisible", duration: "", unlocked: true, vimeoId: "1232777507", alto: 75, nuevo: true },
-      { id: 402, title: "Próximamente", duration: "", unlocked: false, vimeoId: null },
+      { id: 401, title: "Navegando en lo Invisible", duration: "", unlocked: true, vimeoId: "1232777507", alto: 75 },
+      { id: 402, title: "Este es mi SECRETO para hacer millones... Entrar en meditación antes que llegue", duration: "", unlocked: true, vimeoId: "1237664905", nuevo: true },
+      { id: 403, title: "Próximamente", duration: "", unlocked: false, vimeoId: null },
     ],
   },
 ];
@@ -129,6 +131,7 @@ const clasesIndividualesData: Array<{ id: number; title: string; vimeoId: string
   { id: 210, title: "Si lo crees ya eres profeta", vimeoId: "1204621749", nivel: "Avanzado" },
   { id: 301, title: "Profecía Forense 1", vimeoId: "1213817829", nivel: "Avanzado" },
   { id: 401, title: "Meditación Imaginaria: Navegando en lo Invisible", vimeoId: "1232777507", nivel: "Avanzado" },
+  { id: 402, title: "Este es mi SECRETO para hacer millones... Entrar en meditación antes que llegue", vimeoId: "1237664905", nivel: "Avanzado" },
 ];
 
 export default function Dashboard() {
