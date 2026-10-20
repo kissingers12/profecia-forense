@@ -203,7 +203,7 @@ const programs = [
   },
 ];
 
-const INDIVIDUAL_PRICES_40 = new Set([201, 206, 301, 401, 402]);
+const INDIVIDUAL_PRICES_40 = new Set([201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 301, 401, 402]);
 
 function ClasesCard() {
   const [nivel, setNivel] = useState<"basico" | "intermedio" | "avanzado" | null>(null);
