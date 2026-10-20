@@ -84,6 +84,14 @@ const curriculumClases: CurriculumLevel[] = [
       { title: "Precisión y detalles específicos", detail: "El nivel más alto: ver nombres, fechas y datos \"ocultos\". Cada nuevo video de esta serie queda incluido automáticamente en tu acceso." },
     ],
   },
+  {
+    level: "Meditación Imaginaria",
+    count: "2 clases",
+    items: [
+      { title: "Navegando en lo Invisible", detail: "Meditación guiada para entrar en lo espiritual y activar la visión interna." },
+      { title: "Este es mi SECRETO para hacer millones... Entrar en meditación antes que llegue", detail: "El hábito profético que precede a la prosperidad y cómo activarlo antes de cada oportunidad." },
+    ],
+  },
 ];
 
 const programs = [
@@ -195,7 +203,7 @@ const programs = [
   },
 ];
 
-const INDIVIDUAL_PRICES_40 = new Set([201, 206, 301, 401]);
+const INDIVIDUAL_PRICES_40 = new Set([201, 206, 301, 401, 402]);
 
 function ClasesCard() {
   const [nivel, setNivel] = useState<"basico" | "intermedio" | "avanzado" | null>(null);
