@@ -43,6 +43,7 @@ const meditacionesContent: Lesson[] = [
   { id: 6, title: "La Meditación de los profetas para salir del cuerpo", duration: "", unlocked: true, vimeoId: "1204243894" },
   { id: 7, title: "4 horas instrumental para meditar", duration: "", unlocked: true, vimeoId: "1204255913" },
   { id: 401, title: "Navegando en lo Invisible", duration: "", unlocked: true, vimeoId: "1232777507", alto: 75, nuevo: true },
+  { id: 402, title: "Este es mi SECRETO para hacer millones... Entrar en meditación antes que llegue", duration: "", unlocked: true, vimeoId: "1237664905", nuevo: true },
   { id: 8, title: "Próximamente nueva enseñanza", duration: "", unlocked: false, vimeoId: null },
 ];
 
@@ -96,7 +97,8 @@ const escuelaGroups: Group[] = [
     groupTitle: "Meditación Imaginaria",
     lessons: [
       { id: 401, title: "Navegando en lo Invisible", duration: "", unlocked: true, vimeoId: "1232777507", alto: 75, nuevo: true },
-      { id: 402, title: "Próximamente", duration: "", unlocked: false, vimeoId: null },
+      { id: 402, title: "Este es mi SECRETO para hacer millones... Entrar en meditación antes que llegue", duration: "", unlocked: true, vimeoId: "1237664905", nuevo: true },
+      { id: 403, title: "Próximamente", duration: "", unlocked: false, vimeoId: null },
     ],
   },
 ];
@@ -129,6 +131,7 @@ const clasesIndividualesData: Array<{ id: number; title: string; vimeoId: string
   { id: 210, title: "Si lo crees ya eres profeta", vimeoId: "1204621749", nivel: "Avanzado" },
   { id: 301, title: "Profecía Forense 1", vimeoId: "1213817829", nivel: "Avanzado" },
   { id: 401, title: "Meditación Imaginaria: Navegando en lo Invisible", vimeoId: "1232777507", nivel: "Avanzado" },
+  { id: 402, title: "Este es mi SECRETO para hacer millones... Entrar en meditación antes que llegue", vimeoId: "1237664905", nivel: "Avanzado" },
 ];
 
 export default function Dashboard() {
@@ -154,6 +157,7 @@ export default function Dashboard() {
   const [upgradeError, setUpgradeError] = useState("");
   const [purchasedIds, setPurchasedIds] = useState<Set<number>>(new Set());
   const [buyingClassId, setBuyingClassId] = useState<number | null>(null);
+  const [buyClassError, setBuyClassError] = useState("");
 
   useEffect(() => {
     const s = getSession();
@@ -263,8 +267,11 @@ export default function Dashboard() {
     setUpgradeLoading(false);
   };
 
+  const INDIVIDUAL_PRICES_40 = new Set([201, 206, 301, 401, 402]);
+
   const handleBuyClass = async (videoId: number, videoTitle: string) => {
     setBuyingClassId(videoId);
+    setBuyClassError("");
     try {
       const res = await fetch("/api/payment/class", {
         method: "POST",
@@ -272,8 +279,14 @@ export default function Dashboard() {
         body: JSON.stringify({ email: session?.email, videoId, videoTitle }),
       });
       const data = await res.json();
-      if (data.paymentUrl) window.open(data.paymentUrl, "_blank");
-    } catch {}
+      if (data.paymentUrl) {
+        window.open(data.paymentUrl, "_blank");
+      } else {
+        setBuyClassError("No se pudo generar el enlace de pago. Inténtalo de nuevo en unos minutos o escríbenos.");
+      }
+    } catch {
+      setBuyClassError("Error de conexión. Verifica tu internet e inténtalo de nuevo.");
+    }
     setBuyingClassId(null);
   };
 
@@ -792,6 +805,113 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-[#050510]">
+      {/* Support modal (clase_individual: clase no desbloqueada) */}
+      {showSupport && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/70 backdrop-blur-sm">
+          <div className="w-full max-w-md card-dark rounded-2xl p-8">
+            {supportSent ? (
+              <div className="text-center space-y-4">
+                <div className="w-14 h-14 rounded-full bg-[#c9a84c]/10 border border-[#c9a84c]/30 flex items-center justify-center mx-auto">
+                  <CheckCircle size={28} className="text-[#c9a84c]" />
+                </div>
+                <h3 className="text-white font-bold text-lg">Mensaje enviado</h3>
+                <p className="text-[#8a7a6a] text-sm">
+                  Recibimos tu solicitud. Te contactaremos a <span className="text-[#c9a84c]">{session.email}</span> en las próximas horas para verificar tu pago y darte acceso.
+                </p>
+                <button
+                  onClick={() => { setShowSupport(false); setSupportSent(false); setSupportMessage(""); }}
+                  className="btn-gold w-full py-3 rounded-xl font-bold mt-2"
+                >
+                  Cerrar
+                </button>
+              </div>
+            ) : supportFailed ? (
+              <div className="text-center space-y-4">
+                <h3 className="text-white font-bold text-lg">No pudimos enviar el mensaje</h3>
+                <p className="text-[#8a7a6a] text-sm">
+                  Hubo un problema técnico. Vuelve a intentarlo o escríbenos desde el formulario de contacto indicando tu correo{" "}
+                  <span className="text-[#c9a84c]">{session.email}</span>.
+                </p>
+                <a href="/#contacto" className="btn-gold w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2">
+                  Ir al formulario de contacto →
+                </a>
+                <button
+                  onClick={() => { setSupportFailed(false); }}
+                  className="w-full text-center text-xs text-[#6a5a4a] hover:text-[#c9a84c] transition-colors"
+                >
+                  Intentar de nuevo
+                </button>
+              </div>
+            ) : (
+              <>
+                <h3 className="text-white font-bold text-lg mb-1">¿Tu clase no se desbloqueó?</h3>
+                <p className="text-[#8a7a6a] text-sm mb-5">
+                  El acceso se activa automáticamente, pero si ya pasaron 40 minutos y la clase no aparece, cuéntanos y lo resolvemos.
+                </p>
+                <form onSubmit={handleSupport} className="space-y-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-[#c9a84c] uppercase tracking-widest mb-2">
+                      Tu email
+                    </label>
+                    <input
+                      type="text"
+                      value={session.email}
+                      readOnly
+                      className="w-full bg-white/5 border border-[#c9a84c]/20 rounded-xl px-4 py-3 text-[#c9a84c] text-sm cursor-default"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-[#c9a84c] uppercase tracking-widest mb-2">
+                      ¿Qué clase compraste? <span className="text-[#4a3a2a] normal-case font-normal">(opcional)</span>
+                    </label>
+                    <textarea
+                      value={supportMessage}
+                      onChange={(e) => setSupportMessage(e.target.value)}
+                      placeholder="Ej: Pagué la clase 'Profecía Forense 1' y no aparece desbloqueada..."
+                      rows={3}
+                      className="w-full bg-white/5 border border-[#c9a84c]/20 rounded-xl px-4 py-3 text-white placeholder-[#4a3a2a] text-sm focus:outline-none focus:border-[#c9a84c]/60 resize-none"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-[#c9a84c] uppercase tracking-widest mb-2">
+                      Captura del pago <span className="text-[#4a3a2a] normal-case font-normal">(recomendado)</span>
+                    </label>
+                    {comprobante ? (
+                      <div className="rounded-xl border border-[#c9a84c]/30 bg-white/5 p-3">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={comprobante} alt="Comprobante de pago" className="w-full max-h-56 object-contain rounded-lg" />
+                        <button type="button" onClick={() => setComprobante("")} className="mt-2 w-full text-center text-xs text-[#8a7a6a] hover:text-red-400 transition-colors">
+                          Quitar imagen
+                        </button>
+                      </div>
+                    ) : (
+                      <div onPaste={handlePasteComprobante} className="rounded-xl border border-dashed border-[#c9a84c]/30 bg-white/[0.03] p-4 text-center">
+                        <input type="file" accept="image/*" id="comprobante2" onChange={(e) => handleArchivoComprobante(e.target.files?.[0])} className="hidden" />
+                        <label htmlFor="comprobante2" className="inline-flex items-center gap-2 cursor-pointer text-sm font-bold text-[#c9a84c] border border-[#c9a84c]/40 rounded-xl px-4 py-2.5 hover:bg-[#c9a84c]/10 transition-all">
+                          {comprobanteCargando ? (
+                            <><span className="w-3.5 h-3.5 border-2 border-[#c9a84c]/40 border-t-[#c9a84c] rounded-full animate-spin" />Preparando imagen...</>
+                          ) : (
+                            <><Download size={14} className="rotate-180" />Elegir imagen o hacer foto</>
+                          )}
+                        </label>
+                        <p className="text-[#6a5a4a] text-[11px] mt-2.5">Ctrl+V (⌘+V) para pegar directamente.</p>
+                      </div>
+                    )}
+                    {comprobanteError && <p className="text-red-400 text-xs mt-2">{comprobanteError}</p>}
+                  </div>
+                  <button type="submit" disabled={supportLoading} className="btn-gold w-full py-3.5 rounded-xl font-bold flex items-center justify-center gap-2">
+                    {supportLoading ? <span className="w-4 h-4 border-2 border-[#050510]/40 border-t-[#050510] rounded-full animate-spin" /> : "Enviar solicitud de ayuda"}
+                  </button>
+                  <button type="button" onClick={() => setShowSupport(false)} className="w-full text-center text-xs text-[#6a5a4a] hover:text-[#c9a84c] transition-colors">
+                    Cancelar
+                  </button>
+                </form>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Top bar */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-[#050510]/95 backdrop-blur-md border-b border-[#c9a84c]/20">
         <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -1010,122 +1130,166 @@ export default function Dashboard() {
         {/* Content list */}
         <h2 className="text-xl font-bold text-white mb-5 flex items-center gap-2">
           <BookOpen size={20} className="text-[#c9a84c]" />
-          {isClaseIndividual ? "Clases por Enseñanza" : "Contenido de tu programa"}
+          {"Contenido de tu programa"}
         </h2>
 
         {isClaseIndividual ? (
-          <div className="space-y-4">
-            {[
-              { label: "Nivel Básico", gid: 102, clases: clasesIndividualesData.filter(c => c.nivel === "Basico"), bundle: { videoId: 100, price: 100, label: "Comprar las 8 clases · $100" } },
-              { label: "Nivel Intermedio", gid: 100, clases: clasesIndividualesData.filter(c => c.nivel === "Intermedio"), bundle: null },
-              { label: "Nivel Avanzado & Profecía Forense", gid: 101, clases: clasesIndividualesData.filter(c => c.nivel === "Avanzado"), bundle: null },
-            ].map((group) => {
-              const isOpen = openGroups.has(group.gid);
-              return (
-                <div key={group.gid} className={`rounded-2xl border transition-colors ${isOpen ? "border-[#c9a84c]/30 bg-[#c9a84c]/[0.03]" : "border-white/10"}`}>
-                  <button
-                    onClick={() => setOpenGroups(prev => { const next = new Set(prev); if (next.has(group.gid)) next.delete(group.gid); else next.add(group.gid); return next; })}
-                    className="w-full flex items-center gap-3 p-5 text-left cursor-pointer"
-                  >
-                    <span className="w-6 h-px bg-[#c9a84c]/40 shrink-0" />
-                    <span className="text-[#c9a84c] text-xs font-bold uppercase tracking-[0.25em] flex-1">{group.label}</span>
-                    <span className="text-[#6a5a4a] text-xs shrink-0">{group.clases.length} clases</span>
-                    <ChevronRight size={18} className={`text-[#c9a84c] shrink-0 transition-transform duration-200 ${isOpen ? "rotate-90" : ""}`} />
-                  </button>
-                  {isOpen && (
-                    <div className="px-4 pb-4">
-                      {/* Bundle buy button for Básico when nothing purchased yet */}
-                      {group.bundle && !group.clases.some(c => purchasedIds.has(c.id)) && (
-                        <button
-                          onClick={() => handleBuyClass(group.bundle!.videoId, group.label)}
-                          disabled={buyingClassId === group.bundle.videoId}
-                          className="w-full mb-3 flex items-center justify-center gap-2 btn-gold py-3 rounded-xl text-sm font-bold"
-                        >
-                          {buyingClassId === group.bundle.videoId ? (
-                            <span className="w-4 h-4 border-2 border-[#050510]/40 border-t-[#050510] rounded-full animate-spin" />
-                          ) : (
-                            <Bitcoin size={14} />
-                          )}
-                          {group.bundle.label}
-                        </button>
-                      )}
-                      <div className="space-y-3">
-                        {group.clases.map((cls, i) => {
-                          const isPurchased = purchasedIds.has(cls.id);
-                          const isActive = activeLesson === cls.id;
-                          const isWatched = watchedIds.has(cls.id);
-                          return (
-                            <div key={cls.id}>
-                              <div
-                                role={isPurchased ? "button" : undefined}
-                                tabIndex={isPurchased ? 0 : undefined}
-                                onClick={() => {
-                                  if (!isPurchased) return;
-                                  if (!isActive) markWatched(cls.id);
-                                  setActiveLesson(isActive ? null : cls.id);
-                                }}
-                                className={`card-dark rounded-xl p-4 flex items-center gap-3 transition-all ${
-                                  isPurchased ? "cursor-pointer hover:border-[#c9a84c]/30" : "opacity-70 cursor-default"
-                                } ${isActive ? "border-[#c9a84c]/50 bg-[#c9a84c]/5" : ""}`}
-                              >
-                                <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 text-xs font-bold ${
-                                  isWatched && !isActive ? "bg-[#c9a84c] text-[#050510]" :
-                                  isActive ? "bg-[#c9a84c]/20 border border-[#c9a84c] text-[#c9a84c]" :
-                                  isPurchased ? "bg-white/5 text-[#6a5a4a]" : "bg-white/5 text-[#3a2a1a]"
-                                }`}>
-                                  {isWatched && !isActive ? <CheckCircle size={14} /> :
-                                   isActive ? <PlayCircle size={14} /> :
-                                   isPurchased ? String(i + 1).padStart(2, "0") : <Lock size={13} />}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <p className={`font-semibold text-sm truncate ${isActive ? "text-[#c9a84c]" : isPurchased ? "text-white" : "text-[#5a4a3a]"}`}>
-                                    {cls.title}
-                                  </p>
-                                  {isPurchased && <p className="text-[#6a5a4a] text-xs mt-0.5">Acceso por 1 año</p>}
-                                </div>
-                                {isPurchased ? (
-                                  <div className="shrink-0 flex items-center gap-2">
-                                    {isWatched && !isActive && (
-                                      <span className="text-[10px] font-bold text-[#c9a84c] bg-[#c9a84c]/10 border border-[#c9a84c]/30 px-2 py-0.5 rounded-full">Visto ✓</span>
-                                    )}
-                                    <Video size={14} className={`text-[#c9a84c] ${isActive ? "opacity-100" : "opacity-40"}`} />
-                                    <ChevronRight size={15} className={`text-[#6a5a4a] transition-transform ${isActive ? "rotate-90" : ""}`} />
-                                  </div>
-                                ) : !group.bundle ? (
-                                  <button
-                                    onClick={(e) => { e.stopPropagation(); handleBuyClass(cls.id, cls.title); }}
-                                    disabled={buyingClassId === cls.id}
-                                    className="shrink-0 flex items-center gap-1.5 text-xs font-bold text-[#c9a84c] border border-[#c9a84c]/40 bg-[#c9a84c]/5 hover:bg-[#c9a84c]/15 rounded-xl px-3 py-2 transition-all"
-                                  >
-                                    {buyingClassId === cls.id ? (
-                                      <span className="w-3 h-3 border border-[#c9a84c]/40 border-t-[#c9a84c] rounded-full animate-spin" />
-                                    ) : (
-                                      <Bitcoin size={12} />
-                                    )}
-                                    $30
-                                  </button>
-                                ) : null}
-                              </div>
-                              {isActive && cls.vimeoId && (
-                                <div className="rounded-2xl overflow-hidden border border-[#c9a84c]/25 mt-2" style={{ padding: "56.25% 0 0 0", position: "relative" }}>
-                                  <iframe
-                                    src={`https://player.vimeo.com/video/${cls.vimeoId}?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1`}
-                                    frameBorder="0"
-                                    allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media"
-                                    style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}
-                                    title={cls.title}
-                                  />
-                                </div>
-                              )}
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
+          <div className="space-y-10">
+            {/* ── SECCIÓN 1: Tus clases ── */}
+            <div>
+              <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                <PlayCircle size={18} className="text-[#c9a84c]" />
+                Tus clases
+              </h3>
+              {unlockedLessons.length === 0 ? (
+                <div className="rounded-2xl border border-white/10 p-8 text-center">
+                  <Lock size={32} className="text-[#4a3a2a] mx-auto mb-3" />
+                  <p className="text-[#6a5a4a] text-sm">Aún no has desbloqueado ninguna clase.</p>
+                  <p className="text-[#4a3a2a] text-xs mt-1">Desbloquea tu primera clase en la sección de abajo.</p>
                 </div>
-              );
-            })}
+              ) : (
+                <div className="space-y-3">
+                  {unlockedLessons.map((lesson, i) => {
+                    const isActive = activeLesson === lesson.id;
+                    const isWatched = watchedIds.has(lesson.id);
+                    return (
+                      <div key={lesson.id}>
+                        <button
+                          onClick={() => {
+                            if (!isActive) markWatched(lesson.id);
+                            setActiveLesson(isActive ? null : lesson.id);
+                          }}
+                          className={`w-full card-dark rounded-xl p-5 flex items-center gap-4 text-left transition-all duration-200 group hover:border-[#c9a84c]/30 cursor-pointer ${
+                            isActive ? "border-[#c9a84c]/50 bg-[#c9a84c]/5" : ""
+                          }`}
+                        >
+                          <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 text-sm font-bold transition-colors ${
+                            isWatched && !isActive ? "bg-[#c9a84c] text-[#050510]" :
+                            isActive ? "bg-[#c9a84c]/20 border border-[#c9a84c] text-[#c9a84c]" :
+                            "bg-white/5 text-[#6a5a4a]"
+                          }`}>
+                            {isWatched && !isActive ? <CheckCircle size={16} /> :
+                             isActive ? <PlayCircle size={16} /> :
+                             String(i + 1).padStart(2, "0")}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <p className={`font-semibold text-sm truncate ${isActive ? "text-[#c9a84c]" : "text-white"}`}>
+                              {lesson.title}
+                            </p>
+                            <p className="text-[#6a5a4a] text-xs mt-0.5">Acceso por 1 año</p>
+                          </div>
+                          <div className="flex items-center gap-2 shrink-0">
+                            {isWatched && !isActive && (
+                              <span className="text-[10px] font-bold text-[#c9a84c] bg-[#c9a84c]/10 border border-[#c9a84c]/30 px-2 py-0.5 rounded-full">Visto ✓</span>
+                            )}
+                            {isActive && <span className="w-2 h-2 rounded-full bg-[#c9a84c] animate-pulse" />}
+                            {!isWatched && <Video size={15} className={`text-[#c9a84c] transition-opacity ${isActive ? "opacity-100" : "opacity-40 group-hover:opacity-100"}`} />}
+                            <ChevronRight size={16} className={`text-[#6a5a4a] transition-transform duration-200 ${isActive ? "rotate-90" : ""}`} />
+                          </div>
+                        </button>
+                        {isActive && lesson.vimeoId && (
+                          <div className="rounded-2xl overflow-hidden border border-[#c9a84c]/25 mt-2" style={{ padding: "56.25% 0 0 0", position: "relative" }}>
+                            <iframe
+                              src={`https://player.vimeo.com/video/${lesson.vimeoId}?badge=0&autopause=0&player_id=0&app_id=58479&autoplay=1`}
+                              frameBorder="0"
+                              allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media"
+                              style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%" }}
+                              title={lesson.title}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {/* ── SECCIÓN 2: Desbloquear más clases ── */}
+            <div>
+              <h3 className="text-lg font-bold text-white mb-1 flex items-center gap-2">
+                <Bitcoin size={18} className="text-[#c9a84c]" />
+                Desbloquear más clases
+              </h3>
+              <p className="text-[#6a5a4a] text-xs mb-5">Pago único · Acceso por 1 año · Solo cripto</p>
+              {buyClassError && (
+                <div className="mb-4 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-red-400 text-sm">
+                  {buyClassError}
+                </div>
+              )}
+              <div className="space-y-4">
+                {[
+                  { label: "Nivel Básico", gid: 102, clases: clasesIndividualesData.filter(c => c.nivel === "Basico"), bundle: { videoId: 100, label: "Comprar las 8 clases básicas · $120" } },
+                  { label: "Nivel Intermedio", gid: 100, clases: clasesIndividualesData.filter(c => c.nivel === "Intermedio"), bundle: null },
+                  { label: "Nivel Avanzado & Profecía Forense", gid: 101, clases: clasesIndividualesData.filter(c => c.nivel === "Avanzado"), bundle: null },
+                ].map((group) => {
+                  const unpurchased = group.clases.filter(c => !purchasedIds.has(c.id));
+                  if (unpurchased.length === 0) return null;
+                  const isOpen = openGroups.has(group.gid);
+                  return (
+                    <div key={group.gid} className={`rounded-2xl border transition-colors ${isOpen ? "border-[#c9a84c]/30 bg-[#c9a84c]/[0.03]" : "border-white/10"}`}>
+                      <button
+                        onClick={() => setOpenGroups(prev => { const next = new Set(prev); if (next.has(group.gid)) next.delete(group.gid); else next.add(group.gid); return next; })}
+                        className="w-full flex items-center gap-3 p-5 text-left cursor-pointer"
+                      >
+                        <span className="w-6 h-px bg-[#c9a84c]/40 shrink-0" />
+                        <span className="text-[#c9a84c] text-xs font-bold uppercase tracking-[0.25em] flex-1">{group.label}</span>
+                        <span className="text-[#6a5a4a] text-xs shrink-0">{unpurchased.length} clases</span>
+                        <ChevronRight size={18} className={`text-[#c9a84c] shrink-0 transition-transform duration-200 ${isOpen ? "rotate-90" : ""}`} />
+                      </button>
+                      {isOpen && (
+                        <div className="px-4 pb-4">
+                          {group.bundle && (
+                            <button
+                              onClick={() => handleBuyClass(group.bundle!.videoId, group.label)}
+                              disabled={buyingClassId === group.bundle.videoId}
+                              className="w-full mb-3 flex items-center justify-center gap-2 btn-gold py-3 rounded-xl text-sm font-bold"
+                            >
+                              {buyingClassId === group.bundle.videoId ? (
+                                <span className="w-4 h-4 border-2 border-[#050510]/40 border-t-[#050510] rounded-full animate-spin" />
+                              ) : (
+                                <Bitcoin size={14} />
+                              )}
+                              {group.bundle.label}
+                            </button>
+                          )}
+                          <div className="space-y-2">
+                            {unpurchased.map((cls) => (
+                              <div key={cls.id} className="card-dark rounded-xl p-4 flex items-center gap-3">
+                                <Lock size={15} className="text-[#4a3a2a] shrink-0" />
+                                <p className="text-[#9a8a7a] text-sm flex-1 min-w-0 truncate">{cls.title}</p>
+                                <button
+                                  onClick={() => handleBuyClass(cls.id, cls.title)}
+                                  disabled={buyingClassId === cls.id}
+                                  className="shrink-0 flex items-center gap-1.5 text-xs font-bold text-[#c9a84c] border border-[#c9a84c]/40 bg-[#c9a84c]/5 hover:bg-[#c9a84c]/15 rounded-xl px-3 py-2 transition-all"
+                                >
+                                  {buyingClassId === cls.id ? (
+                                    <span className="w-3 h-3 border border-[#c9a84c]/40 border-t-[#c9a84c] rounded-full animate-spin" />
+                                  ) : (
+                                    <Bitcoin size={12} />
+                                  )}
+                                  {INDIVIDUAL_PRICES_40.has(cls.id) ? "$40" : "$30"}
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Aviso si una clase pagada no se desbloqueó */}
+            <div className="text-center pt-2">
+              <button
+                onClick={() => { setSupportSent(false); setSupportFailed(false); setSupportMessage(""); setShowSupport(true); }}
+                className="text-[#6a5a4a] text-xs hover:text-[#c9a84c] transition-colors"
+              >
+                ¿Pagaste una clase y no se desbloqueó? Avísanos
+              </button>
+            </div>
           </div>
         ) : hasAllClasses ? (
           <div className="space-y-4">
@@ -1179,18 +1343,6 @@ export default function Dashboard() {
           </div>
         )}
 
-        {/* Upgrade CTA for clase_individual users */}
-        {isClaseIndividual && (
-          <div className="mt-10 card-dark rounded-2xl p-8 text-center border border-[#c9a84c]/20">
-            <h3 className="text-xl font-bold text-white mb-2">¿Quieres acceso a todo?</h3>
-            <p className="text-[#b8a888] text-sm mb-5 max-w-md mx-auto">
-              Con la Escuela de Profetas obtienes acceso completo a más de 25 enseñanzas por $555.
-            </p>
-            <a href="/#programas" className="btn-gold px-7 py-3 rounded-full font-bold text-sm inline-block">
-              Ver plan completo · $555
-            </a>
-          </div>
-        )}
 
         {/* Upgrade CTA for meditaciones users */}
         {session.plan === "meditaciones" && (
