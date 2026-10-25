@@ -10,5 +10,8 @@ export async function GET(req: NextRequest) {
     .select("video_id")
     .eq("user_email", email.toLowerCase());
 
-  return Response.json({ purchasedIds: (data ?? []).map((r) => r.video_id) });
+  return Response.json(
+    { purchasedIds: (data ?? []).map((r) => r.video_id) },
+    { headers: { "Cache-Control": "no-store" } }
+  );
 }
