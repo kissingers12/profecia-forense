@@ -989,13 +989,21 @@ Servicio al Estudiante
                 </div>
                 <div className="bg-[#050510] rounded-xl p-3 flex items-start justify-between gap-2 border border-white/5">
                   <code className="text-green-400 text-xs leading-relaxed whitespace-pre-wrap font-mono flex-1">
-{`ALTER TABLE users DROP CONSTRAINT IF EXISTS users_plan_check;
+{`CREATE TABLE IF NOT EXISTS class_purchases (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_email text NOT NULL,
+  video_id integer NOT NULL,
+  created_at timestamptz DEFAULT now(),
+  UNIQUE(user_email, video_id)
+);
+
+ALTER TABLE users DROP CONSTRAINT IF EXISTS users_plan_check;
 ALTER TABLE users ADD CONSTRAINT users_plan_check
   CHECK (plan IN ('meditaciones','escuela','clases','clase_individual','mentoria'));`}
                   </code>
                   <button
                     onClick={() => {
-                      navigator.clipboard.writeText(`ALTER TABLE users DROP CONSTRAINT IF EXISTS users_plan_check;\nALTER TABLE users ADD CONSTRAINT users_plan_check\n  CHECK (plan IN ('meditaciones','escuela','clases','clase_individual','mentoria'));`).then(() => showToast("SQL copiado ✓"));
+                      navigator.clipboard.writeText(`CREATE TABLE IF NOT EXISTS class_purchases (\n  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),\n  user_email text NOT NULL,\n  video_id integer NOT NULL,\n  created_at timestamptz DEFAULT now(),\n  UNIQUE(user_email, video_id)\n);\n\nALTER TABLE users DROP CONSTRAINT IF EXISTS users_plan_check;\nALTER TABLE users ADD CONSTRAINT users_plan_check\n  CHECK (plan IN ('meditaciones','escuela','clases','clase_individual','mentoria'));`).then(() => showToast("SQL copiado ✓"));
                     }}
                     className="shrink-0 p-1.5 text-[#6a5a4a] hover:text-[#c9a84c] transition-colors"
                     title="Copiar SQL"

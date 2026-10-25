@@ -16,6 +16,14 @@ const CREATE_TABLE_SQL = `
     used_at timestamptz,
     created_at timestamptz DEFAULT now()
   );
+
+  CREATE TABLE IF NOT EXISTS class_purchases (
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_email text NOT NULL,
+    video_id integer NOT NULL,
+    created_at timestamptz DEFAULT now(),
+    UNIQUE(user_email, video_id)
+  );
 `;
 
 // La tabla users tiene un CHECK que limita los planes aceptados
