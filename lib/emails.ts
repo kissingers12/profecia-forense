@@ -2,18 +2,7 @@ import nodemailer from "nodemailer";
 import { supabaseAdmin } from "./supabase";
 import { nombreDeSaludo } from "./nombre";
 import { generoPorNombre } from "./genero";
-
-const CLASS_NAMES: Record<number, string> = {
-  100: "Bundle 8 clases básicas",
-  101: "Clase básica 1", 102: "Clase básica 2", 103: "Clase básica 3", 104: "Clase básica 4",
-  105: "Clase básica 5", 106: "Clase básica 6", 107: "Clase básica 7", 108: "Clase básica 8",
-  201: "El Secreto de la Meditación 1", 202: "El Secreto de la Meditación 2",
-  203: "El Secreto de la Meditación 3", 204: "Profecía en el Espíritu 1",
-  205: "Profecía en el Espíritu 2", 206: "Profecía en el Espíritu 3",
-  207: "Activando lo Sobrenatural 1", 208: "Activando lo Sobrenatural 2",
-  209: "Activando lo Sobrenatural 2b", 210: "Activando lo Sobrenatural 3",
-  301: "El Fluir Profético", 401: "Meditación Imaginaria 1", 402: "Meditación Imaginaria 2",
-};
+import { CLASS_NAMES } from "./clases";
 
 function escapeHtml(str: string): string {
   return str
