@@ -164,6 +164,8 @@ export default function AdminPage() {
   const [grantVideoId, setGrantVideoId] = useState("");
   const [grantLoading, setGrantLoading] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
+  const [activateClaseEmail, setActivateClaseEmail] = useState<string | null>(null);
+  const [activateClaseVideoId, setActivateClaseVideoId] = useState("");
   const [paymentCheck, setPaymentCheck] = useState<Record<string, string> | null>(null);
   const [paymentCheckLoading, setPaymentCheckLoading] = useState(false);
   const [paymentsList, setPaymentsList] = useState<PaymentEntry[]>([]);
@@ -246,6 +248,39 @@ export default function AdminPage() {
       showToast("Error de conexión.");
     }
     setGrantLoading(false);
+  };
+
+  const handleActivateWithClass = async (email: string) => {
+    if (!activateClaseVideoId) return;
+    setActionLoading(email);
+    try {
+      const res = await fetch("/api/admin/grant-class", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-admin-password": password },
+        body: JSON.stringify({ email, videoId: parseInt(activateClaseVideoId) }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        showToast(`Activado ✓ · clase(s) ${data.videos?.join(", ")} desbloqueada(s) 📧`);
+        const newRows = (data.videos as number[]).map((v) => ({
+          user_email: email,
+          video_id: v,
+          created_at: new Date().toISOString(),
+        }));
+        setClassPurchases((prev) => [
+          ...prev.filter((p) => !(p.user_email === email && (data.videos as number[]).includes(p.video_id))),
+          ...newRows,
+        ]);
+        setUsers((prev) => prev.map((u) => u.email === email ? { ...u, activated: true } : u));
+        setActivateClaseEmail(null);
+        setActivateClaseVideoId("");
+      } else {
+        showToast(data.error ?? "Error al activar.");
+      }
+    } catch {
+      showToast("Error de conexión.");
+    }
+    setActionLoading(null);
   };
 
   const handleResetPassword = async () => {
@@ -1080,19 +1115,59 @@ ALTER TABLE users ADD CONSTRAINT users_plan_check
                       </p>
                     </div>
                     <div className="flex flex-col gap-2 shrink-0">
-                      <button
-                        onClick={() => handleToggle(user)}
-                        disabled={actionLoading === user.email}
-                        className={`px-5 py-2 rounded-xl text-sm font-bold transition-all ${
-                          user.activated
-                            ? "bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20"
-                            : "btn-gold"
-                        }`}
-                      >
-                        {actionLoading === user.email ? (
-                          <span className="w-4 h-4 border-2 border-current/40 border-t-current rounded-full animate-spin inline-block" />
-                        ) : user.activated ? "Desactivar" : "Activar acceso"}
-                      </button>
+                      {user.plan === "clase_individual" && !user.activated ? (
+                        activateClaseEmail === user.email ? (
+                          <div className="flex flex-col gap-2">
+                            <select
+                              value={activateClaseVideoId}
+                              onChange={(e) => setActivateClaseVideoId(e.target.value)}
+                              className="px-3 py-2 rounded-xl text-xs bg-[#0a0a20] border border-[#c9a84c]/30 text-white focus:outline-none focus:border-[#c9a84c]/60"
+                            >
+                              <option value="">Seleccionar clase...</option>
+                              {Object.entries(CLASS_NAMES).map(([id, name]) => (
+                                <option key={id} value={id}>{name}</option>
+                              ))}
+                            </select>
+                            <button
+                              onClick={() => handleActivateWithClass(user.email)}
+                              disabled={!activateClaseVideoId || actionLoading === user.email}
+                              className="btn-gold px-4 py-2 rounded-xl text-xs font-bold disabled:opacity-50"
+                            >
+                              {actionLoading === user.email ? (
+                                <span className="w-3 h-3 border-2 border-current/40 border-t-current rounded-full animate-spin inline-block" />
+                              ) : "Activar y dar acceso"}
+                            </button>
+                            <button
+                              onClick={() => { setActivateClaseEmail(null); setActivateClaseVideoId(""); }}
+                              className="text-xs text-[#6a5a4a] hover:text-white px-2"
+                            >
+                              Cancelar
+                            </button>
+                          </div>
+                        ) : (
+                          <button
+                            onClick={() => setActivateClaseEmail(user.email)}
+                            disabled={actionLoading === user.email}
+                            className="btn-gold px-5 py-2 rounded-xl text-sm font-bold transition-all"
+                          >
+                            Activar y asignar clase
+                          </button>
+                        )
+                      ) : (
+                        <button
+                          onClick={() => handleToggle(user)}
+                          disabled={actionLoading === user.email}
+                          className={`px-5 py-2 rounded-xl text-sm font-bold transition-all ${
+                            user.activated
+                              ? "bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20"
+                              : "btn-gold"
+                          }`}
+                        >
+                          {actionLoading === user.email ? (
+                            <span className="w-4 h-4 border-2 border-current/40 border-t-current rounded-full animate-spin inline-block" />
+                          ) : user.activated ? "Desactivar" : "Activar acceso"}
+                        </button>
+                      )}
                       <select
                         value={user.plan}
                         onChange={(e) => handleCambiarPlan(user, e.target.value)}
