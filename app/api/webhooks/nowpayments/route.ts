@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import crypto from "crypto";
 import { supabaseAdmin } from "@/lib/supabase";
-import { sendWelcomeEmail } from "@/lib/emails";
+import { sendWelcomeEmail, sendClaseIndividualWelcomeEmail } from "@/lib/emails";
 
 const PRICE_TO_PLAN: Record<number, string> = {
   333: "meditaciones",
@@ -156,6 +156,20 @@ export async function POST(req: NextRequest) {
       await log("WEBHOOK_CLASE_DB_ERROR", cpError.message);
     } else {
       await log("WEBHOOK_CLASE_ACTIVATED", `email=${emailPart} videos=${idsToInsert.join(",")}`);
+
+      // Correo de clase solo la primera vez (activated pasó de false a true)
+      const { data: claseUser } = await supabaseAdmin
+        .from("users")
+        .select("name, activated")
+        .eq("email", emailPart.toLowerCase())
+        .maybeSingle();
+      if (claseUser && !claseUser.activated) {
+        try {
+          await sendClaseIndividualWelcomeEmail(emailPart.toLowerCase(), claseUser.name ?? "", idsToInsert);
+        } catch (err) {
+          await log("WEBHOOK_EMAIL_ERROR", err instanceof Error ? err.message : String(err));
+        }
+      }
     }
 
     return Response.json({ ok: true });
