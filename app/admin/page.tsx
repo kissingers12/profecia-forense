@@ -1127,9 +1127,7 @@ Servicio al Estudiante
                         ) : (
                           <button
                             onClick={() => {
-                              const logEntry = logs.find((l) => (l.user_email ?? "").toLowerCase().startsWith(user.email.toLowerCase() + ":clase:"));
-                              const vid = logEntry ? (logEntry.user_email ?? "").split(":clase:")[1] ?? "" : "";
-                              setActivateClaseVideoId(vid);
+                              setActivateClaseVideoId("");
                               setActivateClaseEmail(user.email);
                             }}
                             disabled={actionLoading === user.email}
