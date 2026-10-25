@@ -24,7 +24,7 @@ const FALLBACK_URLS: Record<string, string> = {
 };
 
 const BUNDLE_PRICES: Record<number, number> = { 100: 120 };
-const INDIVIDUAL_PRICES: Record<number, number> = { 201: 40, 206: 40, 301: 40, 401: 40 };
+const INDIVIDUAL_PRICES: Record<number, number> = { 201: 40, 202: 40, 203: 40, 204: 40, 205: 40, 206: 40, 207: 40, 208: 40, 209: 40, 210: 40, 301: 40, 401: 40, 402: 40 };
 
 async function createNowPaymentsInvoice(email: string, plan: string, videoId?: number): Promise<{ url: string | null; price: number }> {
   const apiKey = process.env.NOWPAYMENTS_API_KEY;
@@ -124,6 +124,12 @@ export async function POST(req: NextRequest) {
     .single();
 
   if (error || !user) {
+    // Log the real Supabase error so we can diagnose it
+    supabaseAdmin.from("activity_logs").insert({
+      user_email: email.toLowerCase(),
+      user_name: "REGISTER_ERROR",
+      action: error?.message ?? "no user returned",
+    }).then(() => {});
     return Response.json({ error: "Error al crear la cuenta." }, { status: 500 });
   }
 

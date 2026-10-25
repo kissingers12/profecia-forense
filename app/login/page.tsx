@@ -13,7 +13,7 @@ const PLANS = [
 ];
 
 const BUNDLE_PRICES: Record<number, number> = { 100: 120 };
-const INDIVIDUAL_PRICES_40 = new Set([201, 206, 301, 401]);
+const INDIVIDUAL_PRICES_40 = new Set([201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 301, 401, 402]);
 function clasePrecio(videoId: number | null): number {
   if (videoId === null) return 30;
   if (BUNDLE_PRICES[videoId]) return BUNDLE_PRICES[videoId];

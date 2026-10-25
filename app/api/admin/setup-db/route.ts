@@ -18,12 +18,11 @@ const CREATE_TABLE_SQL = `
   );
 `;
 
-// La tabla users tiene un CHECK que solo aceptaba meditaciones/escuela;
-// sin esto, el registro del plan "clases" ($555) falla
+// La tabla users tiene un CHECK que limita los planes aceptados
 const FIX_PLAN_CONSTRAINT_SQL = `
   ALTER TABLE users DROP CONSTRAINT IF EXISTS users_plan_check;
   ALTER TABLE users ADD CONSTRAINT users_plan_check
-    CHECK (plan IN ('meditaciones', 'escuela', 'clases'));
+    CHECK (plan IN ('meditaciones', 'escuela', 'clases', 'clase_individual', 'mentoria'));
 `;
 
 export async function POST(req: NextRequest) {
@@ -48,7 +47,7 @@ export async function POST(req: NextRequest) {
     await client.query(CREATE_TABLE_SQL);
     await client.query(FIX_PLAN_CONSTRAINT_SQL);
     await client.end();
-    return Response.json({ ok: true, message: "Base de datos actualizada: plan $555 habilitado." });
+    return Response.json({ ok: true, message: "Base de datos actualizada: planes clase_individual y mentoria habilitados." });
   } catch (err: unknown) {
     await client.end().catch(() => {});
     const msg = err instanceof Error ? err.message : String(err);

@@ -58,7 +58,7 @@ export async function PATCH(req: NextRequest) {
   }
 
   const { email, plan } = await req.json();
-  const PERMITIDOS = ["meditaciones", "clases", "escuela"];
+  const PERMITIDOS = ["meditaciones", "clases", "escuela", "clase_individual", "mentoria"];
 
   if (!email || !PERMITIDOS.includes(plan)) {
     return Response.json({ error: "Datos inválidos." }, { status: 400 });

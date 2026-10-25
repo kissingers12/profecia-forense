@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { CheckCircle, XCircle, RefreshCw, Lock, Users, LogOut, LogIn, Download, Activity, Search, PlayCircle, Copy, UserPlus, DollarSign, MessageCircle, Eye, EyeOff, Trash2, Send, Pencil, KeyRound, Mail, BarChart2 } from "lucide-react";
+import { CheckCircle, XCircle, RefreshCw, Lock, Users, LogOut, LogIn, Download, Activity, Search, PlayCircle, Copy, UserPlus, DollarSign, MessageCircle, Eye, EyeOff, Trash2, Send, Pencil, KeyRound, Mail, BarChart2, BookOpen, ChevronDown, ChevronUp } from "lucide-react";
 
 type User = {
   id: string;
@@ -71,6 +71,26 @@ const PLAN_LABELS: Record<string, string> = {
   mentoria: "Mentoría $555",
   escuela: "Escuela $777",
   clases: "Clases $555",
+  clase_individual: "Clase Individual",
+};
+
+const CLASS_NAMES: Record<number, string> = {
+  100: "Bundle 8 clases básicas ($120)",
+  101: "Clase básica 1", 102: "Clase básica 2", 103: "Clase básica 3", 104: "Clase básica 4",
+  105: "Clase básica 5", 106: "Clase básica 6", 107: "Clase básica 7", 108: "Clase básica 8",
+  201: "El Secreto de la Meditación 1",
+  202: "El Secreto de la Meditación 2",
+  203: "El Secreto de la Meditación 3",
+  204: "Profecía en el Espíritu 1",
+  205: "Profecía en el Espíritu 2",
+  206: "Profecía en el Espíritu 3",
+  207: "Activando lo Sobrenatural 1",
+  208: "Activando lo Sobrenatural 2 (incluye 208+209)",
+  209: "Activando lo Sobrenatural 2b",
+  210: "Activando lo Sobrenatural 3",
+  301: "El Fluir Profético",
+  401: "Meditación Imaginaria 1",
+  402: "Meditación Imaginaria 2",
 };
 
 // Estados de NOWPayments traducidos
@@ -137,6 +157,12 @@ export default function AdminPage() {
   const [setupDbLoading, setSetupDbLoading] = useState(false);
   const [resetEmail, setResetEmail] = useState<string | null>(null);
   const [resetPwd, setResetPwd] = useState("");
+  const [classPurchases, setClassPurchases] = useState<{ user_email: string; video_id: number; created_at: string }[]>([]);
+  const [classPurchasesLoaded, setClassPurchasesLoaded] = useState(false);
+  const [expandedClaseUser, setExpandedClaseUser] = useState<string | null>(null);
+  const [grantEmail, setGrantEmail] = useState<string | null>(null);
+  const [grantVideoId, setGrantVideoId] = useState("");
+  const [grantLoading, setGrantLoading] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
   const [paymentCheck, setPaymentCheck] = useState<Record<string, string> | null>(null);
   const [paymentCheckLoading, setPaymentCheckLoading] = useState(false);
@@ -163,12 +189,14 @@ export default function AdminPage() {
       setUsers(data.users ?? []);
       setAuthed(true);
       setAuthError("");
-      const [logsRes, foroRes] = await Promise.all([
+      const [logsRes, foroRes, cpRes] = await Promise.all([
         fetch("/api/admin/logs", { headers: { "x-admin-password": pwd } }),
         fetch("/api/admin/forum", { headers: { "x-admin-password": pwd } }),
+        fetch("/api/admin/class-purchases", { headers: { "x-admin-password": pwd } }),
       ]);
       if (logsRes.ok) setLogs((await logsRes.json()).logs ?? []);
       if (foroRes.ok) setForoPosts((await foroRes.json()).posts ?? []);
+      if (cpRes.ok) { setClassPurchases((await cpRes.json()).purchases ?? []); setClassPurchasesLoaded(true); }
     } catch { setAuthError("Error de conexión."); }
     setLoading(false);
   };
@@ -176,6 +204,48 @@ export default function AdminPage() {
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     await fetchUsers(password);
+  };
+
+  const fetchClassPurchases = async () => {
+    if (classPurchasesLoaded) return;
+    try {
+      const res = await fetch("/api/admin/class-purchases", { headers: { "x-admin-password": password } });
+      if (res.ok) {
+        const data = await res.json();
+        setClassPurchases(data.purchases ?? []);
+        setClassPurchasesLoaded(true);
+      }
+    } catch { /* silent */ }
+  };
+
+  const handleGrantClass = async (email: string) => {
+    if (!grantVideoId) return;
+    setGrantLoading(true);
+    try {
+      const res = await fetch("/api/admin/grant-class", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-admin-password": password },
+        body: JSON.stringify({ email, videoId: parseInt(grantVideoId) }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        showToast(`Acceso dado: clase(s) ${data.videos?.join(", ")} ✓`);
+        const newRows = (data.videos as number[]).map((v) => ({
+          user_email: email,
+          video_id: v,
+          created_at: new Date().toISOString(),
+        }));
+        setClassPurchases((prev) => [...prev.filter((p) => !(p.user_email === email && (data.videos as number[]).includes(p.video_id))), ...newRows]);
+        setUsers((prev) => prev.map((u) => u.email === email ? { ...u, activated: true } : u));
+        setGrantEmail(null);
+        setGrantVideoId("");
+      } else {
+        showToast(data.error ?? "Error al dar acceso.");
+      }
+    } catch {
+      showToast("Error de conexión.");
+    }
+    setGrantLoading(false);
   };
 
   const handleResetPassword = async () => {
@@ -909,6 +979,30 @@ Servicio al Estudiante
             </div>
           ) : (
             <>
+              {/* Botón de reparación de base de datos */}
+              <div className="card-dark rounded-2xl p-4 mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border border-orange-500/20">
+                <div>
+                  <p className="text-orange-300 text-xs font-bold uppercase tracking-widest mb-0.5">Reparar base de datos</p>
+                  <p className="text-[#8a7a6a] text-xs">Necesario UNA VEZ para que funcionen los pagos de clases individuales. Pulsa el botón y espera la confirmación.</p>
+                </div>
+                <button
+                  onClick={async () => {
+                    setSetupDbLoading(true);
+                    try {
+                      const res = await fetch("/api/admin/setup-db", { method: "POST", headers: { "x-admin-password": password } });
+                      const data = await res.json();
+                      showToast(res.ok ? (data.message ?? "Base de datos reparada ✓") : (data.error ?? "Error al reparar."));
+                    } catch { showToast("Error de conexión."); }
+                    setSetupDbLoading(false);
+                  }}
+                  disabled={setupDbLoading}
+                  className="shrink-0 px-5 py-2.5 rounded-xl text-sm font-bold bg-orange-500/10 text-orange-300 border border-orange-500/30 hover:bg-orange-500/20 transition-all flex items-center gap-2 disabled:opacity-50"
+                >
+                  {setupDbLoading
+                    ? <span className="w-4 h-4 border-2 border-orange-300/40 border-t-orange-300 rounded-full animate-spin" />
+                    : <><RefreshCw size={13} /> Reparar ahora</>}
+                </button>
+              </div>
               <div className="relative mb-5">
                 <Search size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6a5a4a]" />
                 <input
@@ -936,81 +1030,169 @@ Servicio al Estudiante
               {filteredUsers.map((user) => (
                 <div
                   key={user.id}
-                  className="card-dark rounded-2xl p-5 flex flex-col sm:flex-row sm:items-center gap-4"
+                  className="card-dark rounded-2xl p-5 flex flex-col gap-4"
                 >
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <p className="text-white font-semibold text-sm truncate">{user.name}</p>
-                      {user.activated ? (
-                        <span className="shrink-0 inline-flex items-center gap-1 text-xs bg-green-500/10 text-green-400 border border-green-500/20 rounded-full px-2 py-0.5">
-                          <CheckCircle size={11} />
-                          Activo
-                        </span>
-                      ) : (
-                        <span className="shrink-0 inline-flex items-center gap-1 text-xs bg-red-500/10 text-red-400 border border-red-500/20 rounded-full px-2 py-0.5">
-                          <XCircle size={11} />
-                          Pendiente
-                        </span>
+                  {/* Fila principal */}
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-4">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1 flex-wrap">
+                        <p className="text-white font-semibold text-sm truncate">{user.name}</p>
+                        {user.activated ? (
+                          <span className="shrink-0 inline-flex items-center gap-1 text-xs bg-green-500/10 text-green-400 border border-green-500/20 rounded-full px-2 py-0.5">
+                            <CheckCircle size={11} />
+                            Activo
+                          </span>
+                        ) : (
+                          <span className="shrink-0 inline-flex items-center gap-1 text-xs bg-red-500/10 text-red-400 border border-red-500/20 rounded-full px-2 py-0.5">
+                            <XCircle size={11} />
+                            Pendiente
+                          </span>
+                        )}
+                        {user.plan === "clase_individual" && (
+                          <span className="shrink-0 inline-flex items-center gap-1 text-xs bg-blue-500/10 text-blue-400 border border-blue-500/20 rounded-full px-2 py-0.5">
+                            <BookOpen size={10} />
+                            Clase individual
+                          </span>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => copyEmail(user.email)}
+                        className="flex items-center gap-1 text-[#8a7a6a] text-xs hover:text-[#c9a84c] transition-colors mt-0.5 max-w-full"
+                      >
+                        <span className="truncate">{user.email}</span>
+                        <Copy size={11} className="shrink-0" />
+                      </button>
+                      <p className="text-[#6a5a4a] text-xs mt-0.5">
+                        {PLAN_LABELS[user.plan] ?? user.plan} ·{" "}
+                        {new Date(user.created_at).toLocaleDateString("es-ES", { day: "2-digit", month: "short", year: "numeric" })}
+                      </p>
+                    </div>
+                    <div className="flex flex-col gap-2 shrink-0">
+                      <button
+                        onClick={() => handleToggle(user)}
+                        disabled={actionLoading === user.email}
+                        className={`px-5 py-2 rounded-xl text-sm font-bold transition-all ${
+                          user.activated
+                            ? "bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20"
+                            : "btn-gold"
+                        }`}
+                      >
+                        {actionLoading === user.email ? (
+                          <span className="w-4 h-4 border-2 border-current/40 border-t-current rounded-full animate-spin inline-block" />
+                        ) : user.activated ? "Desactivar" : "Activar acceso"}
+                      </button>
+                      <select
+                        value={user.plan}
+                        onChange={(e) => handleCambiarPlan(user, e.target.value)}
+                        disabled={actionLoading === user.email}
+                        title="Cambiar el programa de este cliente"
+                        className="px-3 py-2 rounded-xl text-xs font-bold bg-[#0a0a20] border border-[#c9a84c]/25 text-[#c8b89a] focus:outline-none focus:border-[#c9a84c]/60 cursor-pointer"
+                      >
+                        <option value="meditaciones">Meditación $333</option>
+                        <option value="clases">Clases $555</option>
+                        <option value="escuela">Escuela $777 (agotada)</option>
+                        <option value="clase_individual">Clase Individual</option>
+                      </select>
+                      <button
+                        onClick={() => { setResetEmail(user.email); setResetPwd(""); }}
+                        className="flex items-center justify-center gap-1.5 px-5 py-2 rounded-xl text-sm font-bold bg-white/5 text-[#c9a84c] border border-[#c9a84c]/20 hover:bg-[#c9a84c]/10 transition-all"
+                      >
+                        <KeyRound size={13} />
+                        Contraseña
+                      </button>
+                      {!user.activated && (
+                        <button
+                          onClick={() => handleDeleteUser(user)}
+                          disabled={actionLoading === user.email}
+                          title="Eliminar registro (podrá registrarse de nuevo)"
+                          className="flex items-center justify-center gap-1.5 px-5 py-1.5 rounded-xl text-xs font-bold text-red-400/80 border border-red-500/20 hover:bg-red-500/10 hover:text-red-400 transition-all"
+                        >
+                          <Trash2 size={12} />
+                          Eliminar
+                        </button>
                       )}
                     </div>
-                    <button
-                      onClick={() => copyEmail(user.email)}
-                      className="flex items-center gap-1 text-[#8a7a6a] text-xs hover:text-[#c9a84c] transition-colors mt-0.5 max-w-full"
-                    >
-                      <span className="truncate">{user.email}</span>
-                      <Copy size={11} className="shrink-0" />
-                    </button>
-                    <p className="text-[#6a5a4a] text-xs mt-0.5">
-                      {PLAN_LABELS[user.plan] ?? user.plan} ·{" "}
-                      {new Date(user.created_at).toLocaleDateString("es-ES", { day: "2-digit", month: "short", year: "numeric" })}
-                    </p>
                   </div>
-                  <div className="flex flex-col gap-2 shrink-0">
-                    <button
-                      onClick={() => handleToggle(user)}
-                      disabled={actionLoading === user.email}
-                      className={`px-5 py-2 rounded-xl text-sm font-bold transition-all ${
-                        user.activated
-                          ? "bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500/20"
-                          : "btn-gold"
-                      }`}
-                    >
-                      {actionLoading === user.email ? (
-                        <span className="w-4 h-4 border-2 border-current/40 border-t-current rounded-full animate-spin inline-block" />
-                      ) : user.activated ? "Desactivar" : "Activar acceso"}
-                    </button>
-                    {/* Corregir el plan antes de dar acceso: hay clientes que se
-                        registraron en un programa y pagaron otro */}
-                    <select
-                      value={user.plan}
-                      onChange={(e) => handleCambiarPlan(user, e.target.value)}
-                      disabled={actionLoading === user.email}
-                      title="Cambiar el programa de este cliente"
-                      className="px-3 py-2 rounded-xl text-xs font-bold bg-[#0a0a20] border border-[#c9a84c]/25 text-[#c8b89a] focus:outline-none focus:border-[#c9a84c]/60 cursor-pointer"
-                    >
-                      <option value="meditaciones">Meditación $333</option>
-                      <option value="clases">Clases $555</option>
-                      <option value="escuela">Escuela $777 (agotada)</option>
-                    </select>
-                    <button
-                      onClick={() => { setResetEmail(user.email); setResetPwd(""); }}
-                      className="flex items-center justify-center gap-1.5 px-5 py-2 rounded-xl text-sm font-bold bg-white/5 text-[#c9a84c] border border-[#c9a84c]/20 hover:bg-[#c9a84c]/10 transition-all"
-                    >
-                      <KeyRound size={13} />
-                      Contraseña
-                    </button>
-                    {!user.activated && (
+
+                  {/* Sección exclusiva para clases individuales */}
+                  {user.plan === "clase_individual" && (
+                    <div className="border-t border-white/5 pt-3">
                       <button
-                        onClick={() => handleDeleteUser(user)}
-                        disabled={actionLoading === user.email}
-                        title="Eliminar registro (podrá registrarse de nuevo)"
-                        className="flex items-center justify-center gap-1.5 px-5 py-1.5 rounded-xl text-xs font-bold text-red-400/80 border border-red-500/20 hover:bg-red-500/10 hover:text-red-400 transition-all"
+                        onClick={() => {
+                          if (expandedClaseUser !== user.email) {
+                            fetchClassPurchases();
+                            setExpandedClaseUser(user.email);
+                          } else {
+                            setExpandedClaseUser(null);
+                          }
+                          setGrantEmail(null);
+                          setGrantVideoId("");
+                        }}
+                        className="flex items-center gap-1.5 text-xs text-[#c9a84c] hover:text-white transition-colors"
                       >
-                        <Trash2 size={12} />
-                        Eliminar
+                        <BookOpen size={13} />
+                        Ver clases desbloqueadas
+                        {expandedClaseUser === user.email ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
                       </button>
-                    )}
-                  </div>
+
+                      {expandedClaseUser === user.email && (
+                        <div className="mt-3 space-y-3">
+                          {/* Clases ya desbloqueadas */}
+                          {(() => {
+                            const mias = classPurchases.filter((p) => p.user_email === user.email);
+                            return mias.length === 0 ? (
+                              <p className="text-[#6a5a4a] text-xs">Sin clases desbloqueadas aún.</p>
+                            ) : (
+                              <div className="flex flex-wrap gap-1.5">
+                                {mias.map((p) => (
+                                  <span key={p.video_id} className="text-xs bg-blue-500/10 text-blue-300 border border-blue-500/20 rounded-lg px-2 py-1">
+                                    #{p.video_id} {CLASS_NAMES[p.video_id] ? `— ${CLASS_NAMES[p.video_id]}` : ""}
+                                  </span>
+                                ))}
+                              </div>
+                            );
+                          })()}
+
+                          {/* Dar acceso manual a una clase */}
+                          {grantEmail === user.email ? (
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <select
+                                value={grantVideoId}
+                                onChange={(e) => setGrantVideoId(e.target.value)}
+                                className="flex-1 min-w-0 px-3 py-2 rounded-xl text-xs bg-[#0a0a20] border border-[#c9a84c]/30 text-white focus:outline-none focus:border-[#c9a84c]/60"
+                              >
+                                <option value="">Seleccionar clase...</option>
+                                {Object.entries(CLASS_NAMES).map(([id, name]) => (
+                                  <option key={id} value={id}>{name}</option>
+                                ))}
+                              </select>
+                              <button
+                                onClick={() => handleGrantClass(user.email)}
+                                disabled={!grantVideoId || grantLoading}
+                                className="btn-gold px-4 py-2 rounded-xl text-xs font-bold shrink-0 disabled:opacity-50"
+                              >
+                                {grantLoading ? <span className="w-3 h-3 border-2 border-current/40 border-t-current rounded-full animate-spin inline-block" /> : "Dar acceso"}
+                              </button>
+                              <button
+                                onClick={() => { setGrantEmail(null); setGrantVideoId(""); }}
+                                className="text-xs text-[#6a5a4a] hover:text-white px-2"
+                              >
+                                Cancelar
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => setGrantEmail(user.email)}
+                              className="flex items-center gap-1.5 text-xs bg-[#c9a84c]/10 text-[#c9a84c] border border-[#c9a84c]/20 hover:bg-[#c9a84c]/20 rounded-xl px-3 py-2 transition-all"
+                            >
+                              <PlayCircle size={13} />
+                              Dar acceso a una clase manualmente
+                            </button>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
