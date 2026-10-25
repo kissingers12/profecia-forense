@@ -140,6 +140,15 @@ export async function POST(req: NextRequest) {
     action: "register",
   }).then(() => {});
 
+  // Guardar la clase elegida: si no llega a pagar con cripto, NOWPayments nunca avisa y no quedaría en ningún sitio
+  if (plan === "clase_individual" && videoId) {
+    await supabaseAdmin.from("activity_logs").insert({
+      user_email: user.email,
+      user_name: "CLASE_ELEGIDA",
+      action: String(videoId),
+    });
+  }
+
   // Create unique payment per user so webhook knows who paid
   const { url: invoiceUrl, price: invoicePrice } = await createNowPaymentsInvoice(email.toLowerCase(), plan, plan === "clase_individual" ? videoId : undefined);
 

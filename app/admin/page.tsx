@@ -10,6 +10,7 @@ type User = {
   plan: string;
   activated: boolean;
   created_at: string;
+  claseElegida?: number | null;
 };
 
 type Log = {
@@ -1082,20 +1083,13 @@ Servicio al Estudiante
                         {PLAN_LABELS[user.plan] ?? user.plan} ·{" "}
                         {new Date(user.created_at).toLocaleDateString("es-ES", { day: "2-digit", month: "short", year: "numeric" })}
                       </p>
-                      {user.plan === "clase_individual" && (() => {
-                        const logEntry = logs.find((l) => {
-                          const em = l.user_email ?? "";
-                          return em.toLowerCase().startsWith(user.email.toLowerCase() + ":clase:");
-                        });
-                        if (!logEntry) return null;
-                        const videoId = parseInt((logEntry.user_email ?? "").split(":clase:")[1] ?? "");
-                        if (isNaN(videoId)) return null;
-                        return (
-                          <p className="text-blue-400 text-xs mt-0.5 font-medium">
-                            Pagó: {CLASS_NAMES[videoId] ?? `clase #${videoId}`}
-                          </p>
-                        );
-                      })()}
+                      {user.plan === "clase_individual" && (
+                        <p className={`text-xs mt-0.5 font-medium ${user.claseElegida ? "text-blue-400" : "text-[#6a5a4a]"}`}>
+                          {user.claseElegida
+                            ? `Eligió: ${CLASS_NAMES[user.claseElegida] ?? `clase #${user.claseElegida}`}`
+                            : "Clase elegida: no registrada (se registró antes de este cambio)"}
+                        </p>
+                      )}
                     </div>
                     <div className="flex flex-col gap-2 shrink-0">
                       {user.plan === "clase_individual" && !user.activated ? (
