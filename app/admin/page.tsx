@@ -261,7 +261,9 @@ export default function AdminPage() {
       });
       const data = await res.json();
       if (res.ok) {
-        showToast(`Activado ✓ · clase(s) ${data.videos?.join(", ")} desbloqueada(s) 📧`);
+        showToast(data.emailSent
+          ? `Activado ✓ · clase(s) ${data.videos?.join(", ")} desbloqueada(s) · correo enviado 📧`
+          : `Activado ✓ · clase(s) ${data.videos?.join(", ")} desbloqueada(s)`);
         const newRows = (data.videos as number[]).map((v) => ({
           user_email: email,
           video_id: v,
