@@ -134,6 +134,13 @@ export async function POST(req: NextRequest) {
       return Response.json({ ok: true });
     }
 
+    // Consultar ANTES de actualizar para saber si es la primera activación
+    const { data: claseUser } = await supabaseAdmin
+      .from("users")
+      .select("name, activated")
+      .eq("email", emailPart.toLowerCase())
+      .maybeSingle();
+
     await supabaseAdmin
       .from("users")
       .update({ activated: true })
@@ -157,15 +164,11 @@ export async function POST(req: NextRequest) {
     } else {
       await log("WEBHOOK_CLASE_ACTIVATED", `email=${emailPart} videos=${idsToInsert.join(",")}`);
 
-      // Correo de clase solo la primera vez (activated pasó de false a true)
-      const { data: claseUser } = await supabaseAdmin
-        .from("users")
-        .select("name, activated")
-        .eq("email", emailPart.toLowerCase())
-        .maybeSingle();
+      // Solo enviar en la primera activación (claseUser.activated era false antes del pago)
       if (claseUser && !claseUser.activated) {
         try {
           await sendClaseIndividualWelcomeEmail(emailPart.toLowerCase(), claseUser.name ?? "", idsToInsert);
+          await log("WEBHOOK_BIENVENIDA_CLASE", `email=${emailPart} videos=${idsToInsert.join(",")}`);
         } catch (err) {
           await log("WEBHOOK_EMAIL_ERROR", err instanceof Error ? err.message : String(err));
         }
