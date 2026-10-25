@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import { checkAdmin } from "@/lib/admin-auth";
+import { clasesElegidas } from "@/lib/clase-elegida";
 
 function checkAuth(req: NextRequest): boolean {
   return checkAdmin(req);
@@ -77,6 +78,8 @@ export async function GET(req: NextRequest) {
       bienvenidas.set(key, c.created_at);
   }
 
+  const elegidas = await clasesElegidas();
+
   const payments: PaymentRow[] = (logs ?? []).map((l) => {
     let parsed: Record<string, unknown> = {};
     try {
@@ -105,7 +108,7 @@ export async function GET(req: NextRequest) {
       activado: u?.activated ?? null,
       avisoEnviado: avisos.get(realEmail) ?? null,
       bienvenidaEnviada: bienvenidas.get(realEmail) ?? null,
-      claseId,
+      claseId: claseId ?? (u?.plan === "clase_individual" ? elegidas.get(realEmail) ?? null : null),
     };
   });
 

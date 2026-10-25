@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import { checkAdmin } from "@/lib/admin-auth";
+import { clasesElegidas } from "@/lib/clase-elegida";
 
 function checkAuth(req: NextRequest): boolean {
   return checkAdmin(req);
@@ -20,7 +21,13 @@ export async function GET(req: NextRequest) {
     return Response.json({ error: "Error al obtener usuarios.", detail: error.message }, { status: 500 });
   }
 
-  return Response.json({ users });
+  const elegidas = await clasesElegidas();
+  return Response.json({
+    users: (users ?? []).map((u) => ({
+      ...u,
+      claseElegida: u.plan === "clase_individual" ? elegidas.get(u.email.toLowerCase()) ?? null : null,
+    })),
+  });
 }
 
 // Eliminar un usuario NO activado (registros que nunca pagaron).

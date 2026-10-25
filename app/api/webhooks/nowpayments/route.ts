@@ -134,10 +134,9 @@ export async function POST(req: NextRequest) {
       return Response.json({ ok: true });
     }
 
-    // Consultar ANTES de actualizar para saber si es la primera activación
     const { data: claseUser } = await supabaseAdmin
       .from("users")
-      .select("name, activated")
+      .select("name")
       .eq("email", emailPart.toLowerCase())
       .maybeSingle();
 
@@ -154,6 +153,15 @@ export async function POST(req: NextRequest) {
     };
     const idsToInsert = BUNDLE_IDS[videoId] ?? [videoId];
 
+    // NOWPayments avisa varias veces del mismo pago: solo correo por clases nuevas
+    const { data: yaTenia } = await supabaseAdmin
+      .from("class_purchases")
+      .select("video_id")
+      .eq("user_email", emailPart.toLowerCase())
+      .in("video_id", idsToInsert);
+    const yaTeniaIds = new Set((yaTenia ?? []).map((r: { video_id: number }) => r.video_id));
+    const nuevas = idsToInsert.filter((v) => !yaTeniaIds.has(v));
+
     const rows = idsToInsert.map((vid) => ({ user_email: emailPart.toLowerCase(), video_id: vid }));
     const { error: cpError } = await supabaseAdmin
       .from("class_purchases")
@@ -164,11 +172,10 @@ export async function POST(req: NextRequest) {
     } else {
       await log("WEBHOOK_CLASE_ACTIVATED", `email=${emailPart} videos=${idsToInsert.join(",")}`);
 
-      // Solo enviar en la primera activación (claseUser.activated era false antes del pago)
-      if (claseUser && !claseUser.activated) {
+      if (claseUser && nuevas.length > 0) {
         try {
-          await sendClaseIndividualWelcomeEmail(emailPart.toLowerCase(), claseUser.name ?? "", idsToInsert);
-          await log("WEBHOOK_BIENVENIDA_CLASE", `email=${emailPart} videos=${idsToInsert.join(",")}`);
+          await sendClaseIndividualWelcomeEmail(emailPart.toLowerCase(), claseUser.name ?? "", nuevas);
+          await log("WEBHOOK_BIENVENIDA_CLASE", `email=${emailPart} videos=${nuevas.join(",")}`);
         } catch (err) {
           await log("WEBHOOK_EMAIL_ERROR", err instanceof Error ? err.message : String(err));
         }

@@ -10,6 +10,7 @@ type User = {
   plan: string;
   activated: boolean;
   created_at: string;
+  claseElegida?: number | null;
 };
 
 type Log = {
@@ -251,20 +252,20 @@ export default function AdminPage() {
     setGrantLoading(false);
   };
 
-  const handleActivateWithClass = async (email: string) => {
-    if (!activateClaseVideoId) return;
+  const handleActivateWithClass = async (email: string, videoId: string = activateClaseVideoId) => {
+    if (!videoId) return;
     setActionLoading(email);
     try {
       const res = await fetch("/api/admin/grant-class", {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-admin-password": password },
-        body: JSON.stringify({ email, videoId: parseInt(activateClaseVideoId) }),
+        body: JSON.stringify({ email, videoId: parseInt(videoId) }),
       });
       const data = await res.json();
       if (res.ok) {
         showToast(data.emailSent
           ? `Activado ✓ · clase(s) ${data.videos?.join(", ")} desbloqueada(s) · correo enviado 📧`
-          : `Activado ✓ · clase(s) ${data.videos?.join(", ")} desbloqueada(s)`);
+          : `Activado ✓ · clase(s) ${data.videos?.join(", ")} desbloqueada(s) · ya la tenía, correo no reenviado`);
         const newRows = (data.videos as number[]).map((v) => ({
           user_email: email,
           video_id: v,
@@ -327,6 +328,8 @@ export default function AdminPage() {
         );
         if (user.activated) {
           showToast(`${user.name} desactivado`);
+        } else if (data.yaEnviada) {
+          showToast(`${user.name} activado ✓ · ya tenía el correo de bienvenida, no se reenvió`);
         } else if (data.emailSent) {
           showToast(`${user.name} activado ✓ · correo de bienvenida enviado 📧`);
         } else {
@@ -1080,20 +1083,13 @@ Servicio al Estudiante
                         {PLAN_LABELS[user.plan] ?? user.plan} ·{" "}
                         {new Date(user.created_at).toLocaleDateString("es-ES", { day: "2-digit", month: "short", year: "numeric" })}
                       </p>
-                      {user.plan === "clase_individual" && (() => {
-                        const logEntry = logs.find((l) => {
-                          const em = l.user_email ?? "";
-                          return em.toLowerCase().startsWith(user.email.toLowerCase() + ":clase:");
-                        });
-                        if (!logEntry) return null;
-                        const videoId = parseInt((logEntry.user_email ?? "").split(":clase:")[1] ?? "");
-                        if (isNaN(videoId)) return null;
-                        return (
-                          <p className="text-blue-400 text-xs mt-0.5 font-medium">
-                            Pagó: {CLASS_NAMES[videoId] ?? `clase #${videoId}`}
-                          </p>
-                        );
-                      })()}
+                      {user.plan === "clase_individual" && (
+                        <p className={`text-xs mt-0.5 font-medium ${user.claseElegida ? "text-blue-400" : "text-[#6a5a4a]"}`}>
+                          {user.claseElegida
+                            ? `Eligió: ${CLASS_NAMES[user.claseElegida] ?? `clase #${user.claseElegida}`}`
+                            : "Clase elegida: no registrada (se registró antes de este cambio)"}
+                        </p>
+                      )}
                     </div>
                     <div className="flex flex-col gap-2 shrink-0">
                       {user.plan === "clase_individual" && !user.activated ? (
@@ -1409,8 +1405,21 @@ Servicio al Estudiante
                           <button
                             onClick={() => {
                               const u = users.find((x) => x.email.toLowerCase() === p.email.toLowerCase());
-                              if (u) handleToggle(u).then(() => fetchPayments());
-                              else showToast("Ese correo no tiene cuenta en la web.");
+                              if (!u) { showToast("Ese correo no tiene cuenta en la web."); return; }
+                              if (u.plan === "clase_individual") {
+                                // Sin clase asignada la cuenta quedaría activa pero vacía
+                                if (p.claseId && window.confirm(`¿Dar acceso a ${u.name} a la clase "${CLASS_NAMES[p.claseId] ?? `#${p.claseId}`}"?`)) {
+                                  handleActivateWithClass(u.email, String(p.claseId)).then(() => fetchPayments());
+                                } else if (!p.claseId) {
+                                  setActiveTab("clientes");
+                                  setSearch(u.email);
+                                  setActivateClaseVideoId("");
+                                  setActivateClaseEmail(u.email);
+                                  showToast("Elige la clase para darle acceso");
+                                }
+                                return;
+                              }
+                              handleToggle(u).then(() => fetchPayments());
                             }}
                             disabled={actionLoading === p.email}
                             className="btn-gold px-5 py-2 rounded-xl text-sm font-bold"

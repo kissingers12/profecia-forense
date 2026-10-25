@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { supabaseAdmin } from "@/lib/supabase";
 
 const BUNDLE_PRICES: Record<number, number> = { 100: 120 };
 const INDIVIDUAL_PRICES: Record<number, number> = { 201: 40, 202: 40, 203: 40, 204: 40, 205: 40, 206: 40, 207: 40, 208: 40, 209: 40, 210: 40, 301: 40, 401: 40, 402: 40 };
@@ -14,6 +15,12 @@ export async function POST(req: NextRequest) {
 
   const orderId = `${email.toLowerCase()}:clase:${videoId}`;
   const price = BUNDLE_PRICES[videoId] ?? INDIVIDUAL_PRICES[videoId] ?? 30;
+
+  await supabaseAdmin.from("activity_logs").insert({
+    user_email: email.toLowerCase(),
+    user_name: "CLASE_ELEGIDA",
+    action: String(videoId),
+  });
 
   try {
     const res = await fetch("https://api.nowpayments.io/v1/invoice", {
