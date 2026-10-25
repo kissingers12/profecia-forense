@@ -270,6 +270,25 @@ export default function AdminPage() {
     setActionLoading(null);
   };
 
+  const handleRevokeClass = async (email: string, videoId: number) => {
+    if (!window.confirm(`¿Quitar el acceso a "${CLASS_NAMES[videoId] ?? `#${videoId}`}"?`)) return;
+    try {
+      const res = await fetch("/api/admin/grant-class", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json", "x-admin-password": password },
+        body: JSON.stringify({ email, videoId }),
+      });
+      if (res.ok) {
+        setClassPurchases((prev) => prev.filter((p) => !(p.user_email === email && p.video_id === videoId)));
+        showToast("Clase quitada ✓");
+      } else {
+        showToast((await res.json()).error ?? "No se pudo quitar.");
+      }
+    } catch {
+      showToast("Error de conexión.");
+    }
+  };
+
   const handleResetPassword = async () => {
     if (!resetEmail || !resetPwd) return;
     setResetLoading(true);
@@ -400,6 +419,7 @@ export default function AdminPage() {
       const data = await res.json();
       if (res.ok) {
         setUsers((prev) => prev.filter((u) => u.email !== user.email));
+        setClassPurchases((prev) => prev.filter((p) => p.user_email !== user.email));
         showToast("Registro eliminado ✓");
       } else {
         showToast(data.error ?? "Error al eliminar.");
@@ -1195,8 +1215,15 @@ Servicio al Estudiante
                             ) : (
                               <div className="flex flex-wrap gap-1.5">
                                 {mias.map((p) => (
-                                  <span key={p.video_id} className="text-xs bg-blue-500/10 text-blue-300 border border-blue-500/20 rounded-lg px-2 py-1">
+                                  <span key={p.video_id} className="inline-flex items-center gap-1.5 text-xs bg-blue-500/10 text-blue-300 border border-blue-500/20 rounded-lg pl-2 pr-1 py-1">
                                     {CLASS_NAMES[p.video_id] ?? `Clase desconocida (#${p.video_id})`}
+                                    <button
+                                      onClick={() => handleRevokeClass(user.email, p.video_id)}
+                                      title="Quitar esta clase"
+                                      className="px-1 text-blue-300/60 hover:text-red-400 transition-colors"
+                                    >
+                                      ✕
+                                    </button>
                                   </span>
                                 ))}
                               </div>

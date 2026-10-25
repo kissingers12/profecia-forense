@@ -3,6 +3,31 @@ import { supabaseAdmin } from "@/lib/supabase";
 import { checkAdmin } from "@/lib/admin-auth";
 import { sendClaseIndividualWelcomeEmail } from "@/lib/emails";
 
+export async function DELETE(req: NextRequest) {
+  if (!checkAdmin(req)) return Response.json({ error: "No autorizado." }, { status: 401 });
+
+  const { email, videoId } = await req.json();
+  const vid = Number(videoId);
+  if (!email || isNaN(vid)) {
+    return Response.json({ error: "Email y videoId son requeridos." }, { status: 400 });
+  }
+
+  const { error } = await supabaseAdmin
+    .from("class_purchases")
+    .delete()
+    .eq("user_email", email.toLowerCase())
+    .eq("video_id", vid);
+  if (error) return Response.json({ error: error.message }, { status: 500 });
+
+  await supabaseAdmin.from("activity_logs").insert({
+    user_email: email.toLowerCase(),
+    user_name: "ADMIN",
+    action: `quitó acceso a clase ${vid}`,
+  });
+
+  return Response.json({ ok: true });
+}
+
 export async function POST(req: NextRequest) {
   if (!checkAdmin(req)) return Response.json({ error: "No autorizado." }, { status: 401 });
 
