@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import { LogOut, PlayCircle, BookOpen, Lock, CheckCircle, ChevronRight, Eye, KeyRound, MessageCircle, Video, Download, Gift, Bitcoin } from "lucide-react";
+import { LogOut, PlayCircle, BookOpen, Lock, CheckCircle, ChevronRight, Eye, KeyRound, MessageCircle, Video, Download, Gift, Bitcoin, RefreshCw } from "lucide-react";
 import { getSession, clearSession, saveSession, PLAN_LABELS, type UserSession } from "@/lib/auth";
 import { generoPorNombre } from "@/lib/genero";
 import { nombreDeSaludo } from "@/lib/nombre";
@@ -268,6 +268,14 @@ export default function Dashboard() {
   };
 
   const INDIVIDUAL_PRICES_40 = new Set([201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 301, 401, 402]);
+
+  const reloadClases = () => {
+    if (!session) return;
+    fetch(`/api/classes?email=${encodeURIComponent(session.email)}&t=${Date.now()}`)
+      .then((r) => r.json())
+      .then((cd) => { setPurchasedIds(new Set(cd.purchasedIds ?? [])); })
+      .catch(() => {});
+  };
 
   const handleBuyClass = async (videoId: number, videoTitle: string) => {
     setBuyingClassId(videoId);
@@ -1137,10 +1145,20 @@ export default function Dashboard() {
           <div className="space-y-10">
             {/* ── SECCIÓN 1: Tus clases ── */}
             <div>
-              <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                <PlayCircle size={18} className="text-[#c9a84c]" />
-                Tus clases
-              </h3>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                  <PlayCircle size={18} className="text-[#c9a84c]" />
+                  Tus clases
+                </h3>
+                <button
+                  onClick={reloadClases}
+                  className="text-xs text-[#6a5a4a] hover:text-[#c9a84c] transition-colors flex items-center gap-1"
+                  title="Actualizar lista de clases"
+                >
+                  <RefreshCw size={13} />
+                  Actualizar
+                </button>
+              </div>
               {unlockedLessons.length === 0 ? (
                 <div className="rounded-2xl border border-white/10 p-8 text-center">
                   <Lock size={32} className="text-[#4a3a2a] mx-auto mb-3" />
