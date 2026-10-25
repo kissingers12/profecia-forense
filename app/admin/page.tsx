@@ -50,6 +50,7 @@ type PaymentRow = {
   activado: boolean | null;
   avisoEnviado: string | null;
   bienvenidaEnviada: string | null;
+  claseId: number | null;
 };
 
 const fechaCorta = (iso: string) =>
@@ -261,7 +262,9 @@ export default function AdminPage() {
       });
       const data = await res.json();
       if (res.ok) {
-        showToast(`Activado ✓ · clase(s) ${data.videos?.join(", ")} desbloqueada(s) 📧`);
+        showToast(data.emailSent
+          ? `Activado ✓ · clase(s) ${data.videos?.join(", ")} desbloqueada(s) · correo enviado 📧`
+          : `Activado ✓ · clase(s) ${data.videos?.join(", ")} desbloqueada(s)`);
         const newRows = (data.videos as number[]).map((v) => ({
           user_email: email,
           video_id: v,
@@ -1125,9 +1128,7 @@ Servicio al Estudiante
                         ) : (
                           <button
                             onClick={() => {
-                              const logEntry = logs.find((l) => (l.user_email ?? "").toLowerCase().startsWith(user.email.toLowerCase() + ":clase:"));
-                              const vid = logEntry ? (logEntry.user_email ?? "").split(":clase:")[1] ?? "" : "";
-                              setActivateClaseVideoId(vid);
+                              setActivateClaseVideoId("");
                               setActivateClaseEmail(user.email);
                             }}
                             disabled={actionLoading === user.email}
@@ -1372,6 +1373,11 @@ Servicio al Estudiante
                           <span className="truncate">{p.email}</span>
                           <Copy size={11} className="shrink-0" />
                         </button>
+                        {p.claseId && (
+                          <p className="text-blue-400 text-xs mt-1 font-medium">
+                            Clase: {CLASS_NAMES[p.claseId] ?? `#${p.claseId}`}
+                          </p>
+                        )}
                         {p.tipo === "paypal" ? (
                           <p className="text-[#6a5a4a] text-xs mt-1">
                             Pulsó pagar con PayPal · queda esperar su comprobante ·{" "}

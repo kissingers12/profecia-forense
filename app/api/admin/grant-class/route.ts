@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import { checkAdmin } from "@/lib/admin-auth";
+import { sendClaseIndividualWelcomeEmail } from "@/lib/emails";
 
 export async function POST(req: NextRequest) {
   if (!checkAdmin(req)) return Response.json({ error: "No autorizado." }, { status: 401 });
@@ -31,7 +32,13 @@ export async function POST(req: NextRequest) {
     return Response.json({ error: cpError.message }, { status: 500 });
   }
 
-  // Activar la cuenta si no estaba activada
+  // Consultar ANTES de activar para saber si es la primera vez
+  const { data: existingUser } = await supabaseAdmin
+    .from("users")
+    .select("name, activated")
+    .eq("email", email.toLowerCase())
+    .maybeSingle();
+
   await supabaseAdmin
     .from("users")
     .update({ activated: true })
@@ -43,5 +50,17 @@ export async function POST(req: NextRequest) {
     action: `acceso manual a clase(s) ${idsToInsert.join(",")}`,
   }).then(() => {});
 
-  return Response.json({ ok: true, videos: idsToInsert });
+  // Enviar correo solo si es la primera activación
+  let emailSent = false;
+  if (existingUser && !existingUser.activated) {
+    try {
+      emailSent = await sendClaseIndividualWelcomeEmail(
+        email.toLowerCase(),
+        existingUser.name ?? "",
+        idsToInsert,
+      );
+    } catch { /* no bloquear si falla el correo */ }
+  }
+
+  return Response.json({ ok: true, videos: idsToInsert, emailSent });
 }
