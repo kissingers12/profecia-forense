@@ -50,6 +50,7 @@ type PaymentRow = {
   activado: boolean | null;
   avisoEnviado: string | null;
   bienvenidaEnviada: string | null;
+  claseId: number | null;
 };
 
 const fechaCorta = (iso: string) =>
@@ -1372,6 +1373,11 @@ Servicio al Estudiante
                           <span className="truncate">{p.email}</span>
                           <Copy size={11} className="shrink-0" />
                         </button>
+                        {p.claseId && (
+                          <p className="text-blue-400 text-xs mt-1 font-medium">
+                            Clase: {CLASS_NAMES[p.claseId] ?? `#${p.claseId}`}
+                          </p>
+                        )}
                         {p.tipo === "paypal" ? (
                           <p className="text-[#6a5a4a] text-xs mt-1">
                             Pulsó pagar con PayPal · queda esperar su comprobante ·{" "}

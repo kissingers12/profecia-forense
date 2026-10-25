@@ -12,18 +12,19 @@ type PaymentRow = {
   fecha: string;
   status: string;
   tipo: "cripto" | "paypal";
-  precio: number;          // USD que debía pagar
-  pagado: number;          // cripto que envió
-  requerido: number;       // cripto que se le pidió
-  moneda: string;          // moneda enviada (btc, usdt…)
-  recibido: number;        // lo que llegó a la cartera
-  monedaRecibida: string;  // moneda en que llegó
+  precio: number;
+  pagado: number;
+  requerido: number;
+  moneda: string;
+  recibido: number;
+  monedaRecibida: string;
   paymentId: string;
   nombre: string | null;
   plan: string | null;
   activado: boolean | null;
-  avisoEnviado: string | null;      // fecha del correo "no completaste el pago"
-  bienvenidaEnviada: string | null; // fecha del correo de bienvenida
+  avisoEnviado: string | null;
+  bienvenidaEnviada: string | null;
+  claseId: number | null;  // para pagos de clase_individual
 };
 
 // Avisos de pago recibidos de NOWPayments, cruzados con los datos del cliente.
@@ -40,14 +41,24 @@ export async function GET(req: NextRequest) {
 
   if (error) return Response.json({ error: "Error al cargar los pagos." }, { status: 500 });
 
-  const emails = [...new Set((logs ?? []).map((l) => l.user_email.toLowerCase()))];
+  // Para clase_individual, user_email es "email:clase:videoId" — extraer email real
+  const parseOrderEmail = (raw: string): { email: string; claseId: number | null } => {
+    const lower = raw.toLowerCase();
+    if (lower.includes(":clase:")) {
+      const [emailPart, idPart] = lower.split(":clase:");
+      const claseId = parseInt(idPart ?? "");
+      return { email: emailPart, claseId: isNaN(claseId) ? null : claseId };
+    }
+    return { email: lower, claseId: null };
+  };
+
+  const emails = [...new Set((logs ?? []).map((l) => parseOrderEmail(l.user_email).email))];
   const { data: users } = emails.length
     ? await supabaseAdmin.from("users").select("email, name, plan, activated").in("email", emails)
     : { data: [] };
 
   const byEmail = new Map((users ?? []).map((u) => [u.email.toLowerCase(), u]));
 
-  // Correos ya enviados a estas personas, para no repetirlos
   const { data: correos } = emails.length
     ? await supabaseAdmin
         .from("activity_logs")
@@ -62,7 +73,8 @@ export async function GET(req: NextRequest) {
   for (const c of correos ?? []) {
     const key = c.user_email.toLowerCase();
     if (c.action === "aviso-pago" && !avisos.has(key)) avisos.set(key, c.created_at);
-    if (c.action === "bienvenida" && !bienvenidas.has(key)) bienvenidas.set(key, c.created_at);
+    if ((c.action === "bienvenida" || c.action === "bienvenida_clase") && !bienvenidas.has(key))
+      bienvenidas.set(key, c.created_at);
   }
 
   const payments: PaymentRow[] = (logs ?? []).map((l) => {
@@ -70,14 +82,15 @@ export async function GET(req: NextRequest) {
     try {
       parsed = JSON.parse(l.action);
     } catch {
-      // registro antiguo o texto suelto — se muestra igualmente
+      // registro antiguo o texto suelto
     }
-    const u = byEmail.get(l.user_email.toLowerCase());
+    const { email: realEmail, claseId } = parseOrderEmail(l.user_email);
+    const u = byEmail.get(realEmail);
     const esPayPal = l.user_name === "PAYPAL";
     return {
       tipo: (esPayPal ? "paypal" : "cripto") as "cripto" | "paypal",
       id: l.id,
-      email: l.user_email,
+      email: realEmail,
       fecha: l.created_at,
       status: String(parsed.status ?? "desconocido"),
       precio: Number(parsed.precio ?? 0),
@@ -90,8 +103,9 @@ export async function GET(req: NextRequest) {
       nombre: u?.name ?? null,
       plan: u?.plan ?? null,
       activado: u?.activated ?? null,
-      avisoEnviado: avisos.get(l.user_email.toLowerCase()) ?? null,
-      bienvenidaEnviada: bienvenidas.get(l.user_email.toLowerCase()) ?? null,
+      avisoEnviado: avisos.get(realEmail) ?? null,
+      bienvenidaEnviada: bienvenidas.get(realEmail) ?? null,
+      claseId,
     };
   });
 
