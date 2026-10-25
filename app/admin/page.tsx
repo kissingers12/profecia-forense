@@ -979,6 +979,30 @@ Servicio al Estudiante
             </div>
           ) : (
             <>
+              {/* Botón de reparación de base de datos */}
+              <div className="card-dark rounded-2xl p-4 mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border border-orange-500/20">
+                <div>
+                  <p className="text-orange-300 text-xs font-bold uppercase tracking-widest mb-0.5">Reparar base de datos</p>
+                  <p className="text-[#8a7a6a] text-xs">Necesario UNA VEZ para que funcionen los pagos de clases individuales. Pulsa el botón y espera la confirmación.</p>
+                </div>
+                <button
+                  onClick={async () => {
+                    setSetupDbLoading(true);
+                    try {
+                      const res = await fetch("/api/admin/setup-db", { method: "POST", headers: { "x-admin-password": password } });
+                      const data = await res.json();
+                      showToast(res.ok ? (data.message ?? "Base de datos reparada ✓") : (data.error ?? "Error al reparar."));
+                    } catch { showToast("Error de conexión."); }
+                    setSetupDbLoading(false);
+                  }}
+                  disabled={setupDbLoading}
+                  className="shrink-0 px-5 py-2.5 rounded-xl text-sm font-bold bg-orange-500/10 text-orange-300 border border-orange-500/30 hover:bg-orange-500/20 transition-all flex items-center gap-2 disabled:opacity-50"
+                >
+                  {setupDbLoading
+                    ? <span className="w-4 h-4 border-2 border-orange-300/40 border-t-orange-300 rounded-full animate-spin" />
+                    : <><RefreshCw size={13} /> Reparar ahora</>}
+                </button>
+              </div>
               <div className="relative mb-5">
                 <Search size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6a5a4a]" />
                 <input
