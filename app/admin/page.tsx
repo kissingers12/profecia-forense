@@ -1,5 +1,6 @@
 "use client";
 
+import { CLASS_NAMES } from "@/lib/clases";
 import { useState, useEffect } from "react";
 import { CheckCircle, XCircle, RefreshCw, Lock, Users, LogOut, LogIn, Download, Activity, Search, PlayCircle, Copy, UserPlus, DollarSign, MessageCircle, Eye, EyeOff, Trash2, Send, Pencil, KeyRound, Mail, BarChart2, BookOpen, ChevronDown, ChevronUp } from "lucide-react";
 
@@ -76,24 +77,6 @@ const PLAN_LABELS: Record<string, string> = {
   clase_individual: "Clase Individual",
 };
 
-const CLASS_NAMES: Record<number, string> = {
-  100: "Bundle 8 clases básicas ($120)",
-  101: "Clase básica 1", 102: "Clase básica 2", 103: "Clase básica 3", 104: "Clase básica 4",
-  105: "Clase básica 5", 106: "Clase básica 6", 107: "Clase básica 7", 108: "Clase básica 8",
-  201: "El Secreto de la Meditación 1",
-  202: "El Secreto de la Meditación 2",
-  203: "El Secreto de la Meditación 3",
-  204: "Profecía en el Espíritu 1",
-  205: "Profecía en el Espíritu 2",
-  206: "Profecía en el Espíritu 3",
-  207: "Activando lo Sobrenatural 1",
-  208: "Activando lo Sobrenatural 2 (incluye 208+209)",
-  209: "Activando lo Sobrenatural 2b",
-  210: "Activando lo Sobrenatural 3",
-  301: "El Fluir Profético",
-  401: "Meditación Imaginaria 1",
-  402: "Meditación Imaginaria 2",
-};
 
 // Estados de NOWPayments traducidos
 const PAYMENT_STATUS: Record<string, { label: string; color: string }> = {
@@ -1086,7 +1069,7 @@ Servicio al Estudiante
                       {user.plan === "clase_individual" && (
                         <p className={`text-xs mt-0.5 font-medium ${user.claseElegida ? "text-blue-400" : "text-[#6a5a4a]"}`}>
                           {user.claseElegida
-                            ? `Eligió: ${CLASS_NAMES[user.claseElegida] ?? `clase #${user.claseElegida}`}`
+                            ? `Eligió: ${CLASS_NAMES[user.claseElegida] ?? `clase desconocida (#${user.claseElegida})`}`
                             : "Clase elegida: no registrada (se registró antes de este cambio)"}
                         </p>
                       )}
@@ -1213,7 +1196,7 @@ Servicio al Estudiante
                               <div className="flex flex-wrap gap-1.5">
                                 {mias.map((p) => (
                                   <span key={p.video_id} className="text-xs bg-blue-500/10 text-blue-300 border border-blue-500/20 rounded-lg px-2 py-1">
-                                    #{p.video_id} {CLASS_NAMES[p.video_id] ? `— ${CLASS_NAMES[p.video_id]}` : ""}
+                                    {CLASS_NAMES[p.video_id] ?? `Clase desconocida (#${p.video_id})`}
                                   </span>
                                 ))}
                               </div>
