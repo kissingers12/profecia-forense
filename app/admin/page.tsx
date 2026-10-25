@@ -252,14 +252,14 @@ export default function AdminPage() {
     setGrantLoading(false);
   };
 
-  const handleActivateWithClass = async (email: string) => {
-    if (!activateClaseVideoId) return;
+  const handleActivateWithClass = async (email: string, videoId: string = activateClaseVideoId) => {
+    if (!videoId) return;
     setActionLoading(email);
     try {
       const res = await fetch("/api/admin/grant-class", {
         method: "POST",
         headers: { "Content-Type": "application/json", "x-admin-password": password },
-        body: JSON.stringify({ email, videoId: parseInt(activateClaseVideoId) }),
+        body: JSON.stringify({ email, videoId: parseInt(videoId) }),
       });
       const data = await res.json();
       if (res.ok) {
@@ -1405,8 +1405,21 @@ Servicio al Estudiante
                           <button
                             onClick={() => {
                               const u = users.find((x) => x.email.toLowerCase() === p.email.toLowerCase());
-                              if (u) handleToggle(u).then(() => fetchPayments());
-                              else showToast("Ese correo no tiene cuenta en la web.");
+                              if (!u) { showToast("Ese correo no tiene cuenta en la web."); return; }
+                              if (u.plan === "clase_individual") {
+                                // Sin clase asignada la cuenta quedaría activa pero vacía
+                                if (p.claseId && window.confirm(`¿Dar acceso a ${u.name} a la clase "${CLASS_NAMES[p.claseId] ?? `#${p.claseId}`}"?`)) {
+                                  handleActivateWithClass(u.email, String(p.claseId)).then(() => fetchPayments());
+                                } else if (!p.claseId) {
+                                  setActiveTab("clientes");
+                                  setSearch(u.email);
+                                  setActivateClaseVideoId("");
+                                  setActivateClaseEmail(u.email);
+                                  showToast("Elige la clase para darle acceso");
+                                }
+                                return;
+                              }
+                              handleToggle(u).then(() => fetchPayments());
                             }}
                             disabled={actionLoading === p.email}
                             className="btn-gold px-5 py-2 rounded-xl text-sm font-bold"
