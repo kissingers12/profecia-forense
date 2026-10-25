@@ -979,29 +979,33 @@ Servicio al Estudiante
             </div>
           ) : (
             <>
-              {/* Botón de reparación de base de datos */}
-              <div className="card-dark rounded-2xl p-4 mb-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 border border-orange-500/20">
+              {/* Reparación de base de datos — via SQL en Supabase */}
+              <div className="card-dark rounded-2xl p-4 mb-5 flex flex-col gap-3 border border-orange-500/20">
                 <div>
-                  <p className="text-orange-300 text-xs font-bold uppercase tracking-widest mb-0.5">Reparar base de datos</p>
-                  <p className="text-[#8a7a6a] text-xs">Necesario UNA VEZ para que funcionen los pagos de clases individuales. Pulsa el botón y espera la confirmación.</p>
+                  <p className="text-orange-300 text-xs font-bold uppercase tracking-widest mb-0.5">Reparar base de datos — necesario UNA VEZ</p>
+                  <p className="text-[#8a7a6a] text-xs leading-relaxed">
+                    Para que funcionen los pagos de clases individuales hay que ejecutar este SQL en <strong className="text-white">supabase.com → tu proyecto → SQL Editor</strong>. Copia el código, pégalo y pulsa Run.
+                  </p>
                 </div>
-                <button
-                  onClick={async () => {
-                    setSetupDbLoading(true);
-                    try {
-                      const res = await fetch("/api/admin/setup-db", { method: "POST", headers: { "x-admin-password": password } });
-                      const data = await res.json();
-                      showToast(res.ok ? (data.message ?? "Base de datos reparada ✓") : (data.error ?? "Error al reparar."));
-                    } catch { showToast("Error de conexión."); }
-                    setSetupDbLoading(false);
-                  }}
-                  disabled={setupDbLoading}
-                  className="shrink-0 px-5 py-2.5 rounded-xl text-sm font-bold bg-orange-500/10 text-orange-300 border border-orange-500/30 hover:bg-orange-500/20 transition-all flex items-center gap-2 disabled:opacity-50"
-                >
-                  {setupDbLoading
-                    ? <span className="w-4 h-4 border-2 border-orange-300/40 border-t-orange-300 rounded-full animate-spin" />
-                    : <><RefreshCw size={13} /> Reparar ahora</>}
-                </button>
+                <div className="bg-[#050510] rounded-xl p-3 flex items-start justify-between gap-2 border border-white/5">
+                  <code className="text-green-400 text-xs leading-relaxed whitespace-pre-wrap font-mono flex-1">
+{`ALTER TABLE users DROP CONSTRAINT IF EXISTS users_plan_check;
+ALTER TABLE users ADD CONSTRAINT users_plan_check
+  CHECK (plan IN ('meditaciones','escuela','clases','clase_individual','mentoria'));`}
+                  </code>
+                  <button
+                    onClick={() => {
+                      navigator.clipboard.writeText(`ALTER TABLE users DROP CONSTRAINT IF EXISTS users_plan_check;\nALTER TABLE users ADD CONSTRAINT users_plan_check\n  CHECK (plan IN ('meditaciones','escuela','clases','clase_individual','mentoria'));`).then(() => showToast("SQL copiado ✓"));
+                    }}
+                    className="shrink-0 p-1.5 text-[#6a5a4a] hover:text-[#c9a84c] transition-colors"
+                    title="Copiar SQL"
+                  >
+                    <Copy size={14} />
+                  </button>
+                </div>
+                <p className="text-[#6a5a4a] text-xs">
+                  Pasos: entra en <span className="text-white">supabase.com</span> → tu proyecto → menú izquierdo <strong className="text-white">SQL Editor</strong> → pega el código → pulsa <strong className="text-white">Run</strong>.
+                </p>
               </div>
               <div className="relative mb-5">
                 <Search size={15} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#6a5a4a]" />
