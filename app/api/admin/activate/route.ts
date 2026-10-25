@@ -34,7 +34,19 @@ export async function POST(req: NextRequest) {
   // Avisar al alumno solo cuando se le DA acceso (nunca al desactivar)
   let emailSent = false;
   let emailError: string | null = null;
-  if (willActivate && notify !== false && user) {
+  let yaEnviada = false;
+  if (willActivate && user) {
+    const { data: previa } = await supabaseAdmin
+      .from("activity_logs")
+      .select("id")
+      .eq("user_name", "CORREO")
+      .eq("user_email", user.email.toLowerCase())
+      .in("action", ["bienvenida", "bienvenida_clase"])
+      .limit(1);
+    yaEnviada = (previa ?? []).length > 0;
+  }
+
+  if (willActivate && notify !== false && user && !yaEnviada) {
     try {
       if (user.plan === "clase_individual") {
         const { data: purchases } = await supabaseAdmin
@@ -53,5 +65,5 @@ export async function POST(req: NextRequest) {
     }
   }
 
-  return Response.json({ ok: true, emailSent, emailError });
+  return Response.json({ ok: true, emailSent, emailError, yaEnviada });
 }

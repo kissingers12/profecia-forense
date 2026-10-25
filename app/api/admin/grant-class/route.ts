@@ -23,6 +23,15 @@ export async function POST(req: NextRequest) {
   };
   const idsToInsert = BUNDLE_IDS[vid] ?? [vid];
 
+  // Desactivar no borra las clases, así que esto distingue una clase nueva de una reactivación
+  const { data: yaTenia } = await supabaseAdmin
+    .from("class_purchases")
+    .select("video_id")
+    .eq("user_email", email.toLowerCase())
+    .in("video_id", idsToInsert);
+  const yaTeniaIds = new Set((yaTenia ?? []).map((r: { video_id: number }) => r.video_id));
+  const nuevas = idsToInsert.filter((v) => !yaTeniaIds.has(v));
+
   const rows = idsToInsert.map((v) => ({ user_email: email.toLowerCase(), video_id: v }));
   const { error: cpError } = await supabaseAdmin
     .from("class_purchases")
@@ -32,10 +41,9 @@ export async function POST(req: NextRequest) {
     return Response.json({ error: cpError.message }, { status: 500 });
   }
 
-  // Consultar ANTES de activar para saber si es la primera vez
   const { data: existingUser } = await supabaseAdmin
     .from("users")
-    .select("name, activated")
+    .select("name")
     .eq("email", email.toLowerCase())
     .maybeSingle();
 
@@ -50,14 +58,13 @@ export async function POST(req: NextRequest) {
     action: `acceso manual a clase(s) ${idsToInsert.join(",")}`,
   }).then(() => {});
 
-  // Enviar correo solo si es la primera activación
   let emailSent = false;
-  if (existingUser && !existingUser.activated) {
+  if (existingUser && nuevas.length > 0) {
     try {
       emailSent = await sendClaseIndividualWelcomeEmail(
         email.toLowerCase(),
         existingUser.name ?? "",
-        idsToInsert,
+        nuevas,
       );
     } catch { /* no bloquear si falla el correo */ }
   }

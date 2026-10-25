@@ -264,7 +264,7 @@ export default function AdminPage() {
       if (res.ok) {
         showToast(data.emailSent
           ? `Activado ✓ · clase(s) ${data.videos?.join(", ")} desbloqueada(s) · correo enviado 📧`
-          : `Activado ✓ · clase(s) ${data.videos?.join(", ")} desbloqueada(s)`);
+          : `Activado ✓ · clase(s) ${data.videos?.join(", ")} desbloqueada(s) · ya la tenía, correo no reenviado`);
         const newRows = (data.videos as number[]).map((v) => ({
           user_email: email,
           video_id: v,
@@ -327,6 +327,8 @@ export default function AdminPage() {
         );
         if (user.activated) {
           showToast(`${user.name} desactivado`);
+        } else if (data.yaEnviada) {
+          showToast(`${user.name} activado ✓ · ya tenía el correo de bienvenida, no se reenvió`);
         } else if (data.emailSent) {
           showToast(`${user.name} activado ✓ · correo de bienvenida enviado 📧`);
         } else {
