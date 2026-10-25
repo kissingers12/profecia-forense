@@ -1,7 +1,7 @@
 import { NextRequest } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import { checkAdmin } from "@/lib/admin-auth";
-import { sendWelcomeEmail } from "@/lib/emails";
+import { sendWelcomeEmail, sendClaseIndividualWelcomeEmail } from "@/lib/emails";
 
 function checkAuth(req: NextRequest): boolean {
   return checkAdmin(req);
@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
     .from("users")
     .update({ activated: willActivate })
     .eq("email", email.toLowerCase())
-    .select("email, name")
+    .select("email, name, plan")
     .maybeSingle();
 
   if (error) {
@@ -36,7 +36,16 @@ export async function POST(req: NextRequest) {
   let emailError: string | null = null;
   if (willActivate && notify !== false && user) {
     try {
-      emailSent = await sendWelcomeEmail(user.email, user.name ?? "");
+      if (user.plan === "clase_individual") {
+        const { data: purchases } = await supabaseAdmin
+          .from("class_purchases")
+          .select("video_id")
+          .eq("user_email", user.email.toLowerCase());
+        const videoIds = (purchases ?? []).map((p: { video_id: number }) => p.video_id);
+        emailSent = await sendClaseIndividualWelcomeEmail(user.email, user.name ?? "", videoIds);
+      } else {
+        emailSent = await sendWelcomeEmail(user.email, user.name ?? "");
+      }
       if (!emailSent) emailError = "Faltan las credenciales de correo (EMAIL_USER / EMAIL_PASS).";
     } catch (err) {
       emailError = err instanceof Error ? err.message : "No se pudo enviar el correo.";
