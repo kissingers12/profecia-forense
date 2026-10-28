@@ -204,3 +204,102 @@ export async function sendClaseIndividualWelcomeEmail(
 
   return true;
 }
+
+export async function sendInvitationEmail(
+  email: string,
+  name: string,
+  videoIds: number[],
+  link: string,
+  necesitaClave: boolean,
+): Promise<boolean> {
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) return false;
+
+  const nombre = nombreDeSaludo(name);
+  const safeName = escapeHtml(nombre);
+  const safeEmail = escapeHtml(email);
+  const safeLink = escapeHtml(link);
+  const clases = videoIds.map((id) => CLASS_NAMES[id] ?? `Clase #${id}`);
+  const clasesHtml = clases.map((c) => `<li style="margin:0 0 6px">${escapeHtml(c)}</li>`).join("");
+
+  const pasosTexto = necesitaClave
+    ? `1. Abre este enlace: ${link}\n2. Escribe tu correo (${email}) y crea tu contraseña.\n3. Pulsa «Entrar a mis clases».\n\nEl enlace es personal y solo sirve una vez. Después entrarás siempre desde https://www.kissingersaraque.com/login con tu correo y tu contraseña.`
+    : `Entra con tu correo (${email}) y tu contraseña de siempre: ${link}`;
+
+  const pasosHtml = necesitaClave
+    ? `<ol style="font-size:15px;line-height:1.8;color:#e8dcc8;margin:0 0 18px;padding-left:20px">
+          <li>Pulsa el botón de abajo.</li>
+          <li>Escribe tu correo (<strong style="color:#c9a84c">${safeEmail}</strong>) y crea tu contraseña.</li>
+          <li>Pulsa «Entrar a mis clases».</li>
+        </ol>
+        <p style="font-size:13px;line-height:1.6;color:#8a7a6a;margin:0 0 24px">
+          El enlace es personal y solo sirve una vez. Después entrarás siempre desde
+          <a href="https://www.kissingersaraque.com/login" style="color:#c9a84c">kissingersaraque.com/login</a> con tu correo y tu contraseña.
+        </p>`
+    : `<p style="font-size:15px;line-height:1.7;color:#e8dcc8;margin:0 0 24px">
+          Entra con tu correo (<strong style="color:#c9a84c">${safeEmail}</strong>) y tu contraseña de siempre.
+        </p>`;
+
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
+  });
+
+  await transporter.sendMail({
+    from: `"Servicio al Estudiante · 100x100Cristianos" <${process.env.EMAIL_USER}>`,
+    to: email,
+    subject: "Te han invitado a ver clases 🙏",
+    text:
+      `¡Bendiciones${nombre ? ", " + nombre : ""}! 🙏\n\n` +
+      `Has recibido una invitación para ver ${clases.length === 1 ? "esta clase" : "estas clases"} de 100x100Cristianos:\n\n` +
+      clases.map((c) => `• ${c}`).join("\n") + `\n\n` +
+      `CÓMO ENTRAR:\n${pasosTexto}\n\n` +
+      `Oramos para que este tiempo de formación sea de mucha edificación.\n\n` +
+      `Si tienes alguna dificultad, responde a este correo y con gusto te ayudaremos.\n\n` +
+      `Servicio al Estudiante · 100x100Cristianos`,
+    html: `
+      <div style="font-family:Arial,Helvetica,sans-serif;max-width:600px;margin:0 auto;background:#050510;color:#f0e6d3;padding:36px 32px;border-radius:14px;border:1px solid #c9a84c33">
+        <p style="color:#c9a84c;font-size:12px;letter-spacing:3px;text-transform:uppercase;margin:0 0 14px">100×100 Cristianos</p>
+        <h1 style="color:#ffffff;font-size:24px;margin:0 0 22px;line-height:1.3">¡Bendiciones${safeName ? `, ${safeName}` : ""}! 🙏</h1>
+
+        <p style="font-size:15px;line-height:1.7;color:#e8dcc8;margin:0 0 18px">
+          Has recibido una <strong style="color:#c9a84c">invitación</strong> para ver ${clases.length === 1 ? "esta clase" : "estas clases"}:
+        </p>
+
+        <div style="background:#0a0a20;border:1px solid #c9a84c33;border-radius:10px;padding:16px 16px 10px;margin:0 0 22px">
+          <ul style="color:#c9a84c;font-size:15px;font-weight:bold;margin:0;padding-left:20px">${clasesHtml}</ul>
+        </div>
+
+        <p style="color:#c9a84c;font-size:12px;letter-spacing:2px;text-transform:uppercase;margin:0 0 10px">Cómo entrar</p>
+        ${pasosHtml}
+
+        <div style="text-align:center;margin:0 0 26px">
+          <a href="${safeLink}"
+             style="display:inline-block;background:#c9a84c;color:#050510;font-weight:bold;font-size:15px;text-decoration:none;padding:14px 34px;border-radius:10px">
+            ${necesitaClave ? "Aceptar invitación →" : "Entrar a mis clases →"}
+          </a>
+        </div>
+
+        <p style="font-size:15px;line-height:1.7;color:#e8dcc8;margin:0 0 18px">
+          Oramos para que este tiempo de formación sea de mucha edificación.
+        </p>
+
+        <hr style="border:none;border-top:1px solid #c9a84c22;margin:24px 0"/>
+
+        <p style="font-size:13px;line-height:1.6;color:#8a7a6a;margin:0 0 6px">
+          Si tienes alguna dificultad, responde a este correo y con gusto te ayudaremos.
+        </p>
+        <p style="font-size:13px;color:#6a5a4a;margin:0">
+          <strong style="color:#8a7a6a">Servicio al Estudiante</strong> · <a href="https://www.kissingersaraque.com" style="color:#c9a84c;text-decoration:none">kissingersaraque.com</a>
+        </p>
+      </div>
+    `,
+  });
+
+  await supabaseAdmin.from("activity_logs").insert({
+    user_email: email,
+    user_name: "CORREO",
+    action: "invitacion",
+  });
+
+  return true;
+}
