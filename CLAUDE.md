@@ -34,6 +34,11 @@
 - `POST /api/auth/invitacion {token, email, password}`: comprueba token+email, guarda la contraseña y devuelve el usuario para iniciar sesión → `/dashboard`.
 - Si la persona ya tenía cuenta (y no tiene invitación pendiente) solo se añaden clases y el enlace es `/login`.
 
+## Progreso (pestaña "Progreso" del admin)
+- `/api/admin/progress` lista TODOS los usuarios activos (aunque no hayan visto nada) + quien tenga `video_progress`. Para clase_individual devuelve `unlocked` (clases de `class_purchases` con fecha en que la abrió o null).
+- `video_progress` se marca al ABRIR una lección en el dashboard (`markWatched`), no al terminar el vídeo.
+- Entradas: `/api/auth/me` (lo llama el dashboard al cargar) registra `user_name="VISITA"` como mucho cada 30 min por usuario; también cuentan los logs de login (`action` login/course_access). Las VISITA se excluyen de la pestaña Actividad (`/api/admin/logs`). Solo hay visitas registradas desde el PR que añadió esto; antes solo inicios de sesión con contraseña.
+
 ## Pendiente / a tener en cuenta
 - Usuarios registrados antes del PR #37 no tienen CLASE_ELEGIDA.
 - Correos de clase enviados antes del PR #38 pudieron llevar el nombre de clase equivocado (el vídeo desbloqueado sí era correcto).

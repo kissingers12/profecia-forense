@@ -50,6 +50,8 @@ export async function POST(req: NextRequest) {
     .update({ action: `usada:${hashToken(token)}` })
     .eq("id", invitacion.id);
 
+  await supabaseAdmin.from("activity_logs").insert({ user_email: user.email, user_name: "VISITA", action: "invitacion_aceptada" });
+
   return Response.json({
     success: true,
     user: { id: user.id, email: user.email, name: user.name, plan: user.plan, activated: user.activated },

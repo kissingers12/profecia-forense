@@ -124,7 +124,7 @@ export default function AdminPage() {
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [toast, setToast] = useState("");
   const [activeTab, setActiveTab] = useState<"clientes" | "pagos" | "actividad" | "ingresos" | "foro" | "hotmart" | "email" | "progreso" | "invitar">("clientes");
-  const [progressData, setProgressData] = useState<{ email: string; name: string; plan: string; activated: boolean; videos: { id: number; title: string; watchedAt: string }[] }[]>([]);
+  const [progressData, setProgressData] = useState<{ email: string; name: string; plan: string; activated: boolean; videos: { id: number; title: string; watchedAt: string }[]; unlocked: { id: number; title: string; watchedAt: string | null }[] | null; lastSeen: string | null; firstSeen: string | null; daysActive: number }[]>([]);
   const [progressLoading, setProgressLoading] = useState(false);
   const [progressSearch, setProgressSearch] = useState("");
   const [progressExpanded, setProgressExpanded] = useState<string | null>(null);
@@ -2382,10 +2382,13 @@ Servicio al Estudiante
                     u.email.toLowerCase().includes(progressSearch.toLowerCase()) ||
                     u.name.toLowerCase().includes(progressSearch.toLowerCase())
                   )
-                  .sort((a, b) => b.videos.length - a.videos.length)
+                  .sort((a, b) => (b.lastSeen ?? "").localeCompare(a.lastSeen ?? ""))
                   .map((u) => {
                     const isExpanded = progressExpanded === u.email;
                     const planLabel = PLAN_LABELS[u.plan] ?? u.plan;
+                    const fecha = (iso: string) =>
+                      new Date(iso).toLocaleString("es-ES", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+                    const vistas = u.unlocked ? u.unlocked.filter((c) => c.watchedAt).length : u.videos.length;
                     return (
                       <div key={u.email} className="card-dark rounded-2xl overflow-hidden border border-white/5">
                         <button
@@ -2396,31 +2399,71 @@ Servicio al Estudiante
                             <p className="text-white font-semibold text-sm truncate">{u.name}</p>
                             <p className="text-[#6a5a4a] text-xs truncate">{u.email}</p>
                             <p className="text-[#8a7a6a] text-xs mt-0.5">{planLabel}</p>
+                            <p className={`text-xs mt-0.5 ${u.lastSeen ? "text-blue-300" : "text-red-400/80"}`}>
+                              {u.lastSeen ? `Última entrada: ${fecha(u.lastSeen)}` : "Nunca ha entrado"}
+                            </p>
                           </div>
                           <div className="text-right shrink-0">
-                            <p className="text-[#c9a84c] font-bold text-lg">{u.videos.length}</p>
-                            <p className="text-[#6a5a4a] text-xs">vídeos abiertos</p>
+                            <p className={`font-bold text-lg ${vistas > 0 ? "text-[#c9a84c]" : "text-red-400/80"}`}>
+                              {u.unlocked ? `${vistas}/${u.unlocked.length}` : vistas}
+                            </p>
+                            <p className="text-[#6a5a4a] text-xs">{u.unlocked ? "clases abiertas" : "vídeos abiertos"}</p>
                           </div>
                           <span className="text-[#6a5a4a] text-xs ml-1">{isExpanded ? "▲" : "▼"}</span>
                         </button>
 
                         {isExpanded && (
-                          <div className="border-t border-white/5 px-5 py-4 space-y-2">
-                            {u.videos.length === 0 ? (
+                          <div className="border-t border-white/5 px-5 py-4 space-y-4">
+                            <div className="grid grid-cols-3 gap-2 text-center">
+                              <div className="bg-white/5 rounded-xl p-2">
+                                <p className="text-[#6a5a4a] text-[10px] uppercase tracking-wider">Primera entrada</p>
+                                <p className="text-white text-xs mt-1">{u.firstSeen ? fecha(u.firstSeen) : "—"}</p>
+                              </div>
+                              <div className="bg-white/5 rounded-xl p-2">
+                                <p className="text-[#6a5a4a] text-[10px] uppercase tracking-wider">Última entrada</p>
+                                <p className="text-white text-xs mt-1">{u.lastSeen ? fecha(u.lastSeen) : "—"}</p>
+                              </div>
+                              <div className="bg-white/5 rounded-xl p-2">
+                                <p className="text-[#6a5a4a] text-[10px] uppercase tracking-wider">Días que entró</p>
+                                <p className="text-white text-xs mt-1">{u.daysActive}</p>
+                              </div>
+                            </div>
+
+                            {u.unlocked ? (
+                              u.unlocked.length === 0 ? (
+                                <p className="text-[#6a5a4a] text-sm">No tiene clases desbloqueadas.</p>
+                              ) : (
+                                <div className="space-y-2">
+                                  {u.unlocked.map((c) => (
+                                    <div key={c.id} className="flex items-start gap-3 text-sm">
+                                      {c.watchedAt
+                                        ? <CheckCircle size={14} className="text-green-500 mt-0.5 shrink-0" />
+                                        : <XCircle size={14} className="text-[#4a3a2a] mt-0.5 shrink-0" />}
+                                      <div className="flex-1">
+                                        <p className={c.watchedAt ? "text-[#d8c8b8]" : "text-[#6a5a4a]"}>{c.title}</p>
+                                        <p className="text-[#4a3a2a] text-xs">
+                                          {c.watchedAt ? `Abierta el ${fecha(c.watchedAt)}` : "Todavía no la ha abierto"}
+                                        </p>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              )
+                            ) : u.videos.length === 0 ? (
                               <p className="text-[#6a5a4a] text-sm">No ha abierto ningún vídeo todavía.</p>
                             ) : (
-                              u.videos.map((v, i) => (
-                                <div key={v.id} className="flex items-start gap-3 text-sm">
-                                  <span className="text-[#c9a84c] font-mono text-xs w-5 shrink-0 mt-0.5">{i + 1}</span>
-                                  <div className="flex-1">
-                                    <p className="text-[#d8c8b8]">{v.title}</p>
-                                    {v.watchedAt && (
-                                      <p className="text-[#4a3a2a] text-xs">{new Date(v.watchedAt).toLocaleString("es-ES", { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" })}</p>
-                                    )}
+                              <div className="space-y-2">
+                                {u.videos.map((v, i) => (
+                                  <div key={v.id} className="flex items-start gap-3 text-sm">
+                                    <span className="text-[#c9a84c] font-mono text-xs w-5 shrink-0 mt-0.5">{i + 1}</span>
+                                    <div className="flex-1">
+                                      <p className="text-[#d8c8b8]">{v.title}</p>
+                                      {v.watchedAt && <p className="text-[#4a3a2a] text-xs">{fecha(v.watchedAt)}</p>}
+                                    </div>
+                                    <CheckCircle size={13} className="text-green-500 mt-0.5 shrink-0" />
                                   </div>
-                                  <CheckCircle size={13} className="text-green-500 mt-0.5 shrink-0" />
-                                </div>
-                              ))
+                                ))}
+                              </div>
                             )}
                           </div>
                         )}
@@ -2434,7 +2477,7 @@ Servicio al Estudiante
                   u.name.toLowerCase().includes(progressSearch.toLowerCase())
                 ).length === 0 && (
                   <p className="text-center text-[#6a5a4a] py-12 text-sm">
-                    {progressSearch ? "No se encontró ningún alumno." : "Ningún alumno ha abierto vídeos todavía."}
+                    {progressSearch ? "No se encontró ningún alumno." : "Todavía no hay alumnos con acceso."}
                   </p>
                 )}
               </div>

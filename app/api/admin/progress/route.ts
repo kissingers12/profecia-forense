@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
 import { checkAdmin } from "@/lib/admin-auth";
+import { CLASS_NAMES } from "@/lib/clases";
 
 const VIDEO_TITLES: Record<number, string> = {
   1: "El Secreto de la Meditación 1",
@@ -34,42 +35,81 @@ const VIDEO_TITLES: Record<number, string> = {
 export async function GET(req: NextRequest) {
   if (!checkAdmin(req)) return Response.json({ error: "No autorizado." }, { status: 401 });
 
-  const { data: rows } = await supabaseAdmin
-    .from("video_progress")
-    .select("user_email, video_id, plan, created_at")
-    .order("user_email");
+  const [{ data: rows }, { data: users }, { data: compras }, { data: entradas }] = await Promise.all([
+    supabaseAdmin.from("video_progress").select("user_email, video_id, plan, created_at"),
+    supabaseAdmin.from("users").select("email, name, plan, activated"),
+    supabaseAdmin.from("class_purchases").select("user_email, video_id"),
+    // Visitas al panel (VISITA) e inicios de sesión con contraseña (login / course_access)
+    supabaseAdmin
+      .from("activity_logs")
+      .select("user_email, created_at")
+      .or("user_name.eq.VISITA,action.eq.login,action.eq.course_access")
+      .order("created_at", { ascending: false })
+      .limit(10000),
+  ]);
 
-  const { data: users } = await supabaseAdmin
-    .from("users")
-    .select("email, name, plan, activated");
+  const userMap = new Map((users ?? []).map((u) => [u.email.toLowerCase(), u]));
 
-  const userMap = new Map((users ?? []).map((u) => [u.email, u]));
-
-  const grouped: Record<string, {
-    email: string;
-    name: string;
-    plan: string;
-    activated: boolean;
-    videos: { id: number; title: string; watchedAt: string }[];
-  }> = {};
-
-  for (const row of rows ?? []) {
-    if (!grouped[row.user_email]) {
-      const u = userMap.get(row.user_email);
-      grouped[row.user_email] = {
-        email: row.user_email,
-        name: u?.name ?? row.user_email,
-        plan: u?.plan ?? row.plan ?? "",
-        activated: u?.activated ?? false,
-        videos: [],
-      };
-    }
-    grouped[row.user_email].videos.push({
-      id: row.video_id,
-      title: VIDEO_TITLES[row.video_id] ?? `Vídeo ${row.video_id}`,
-      watchedAt: row.created_at ?? "",
-    });
+  const vistos = new Map<string, { id: number; watchedAt: string }[]>();
+  for (const r of rows ?? []) {
+    const k = r.user_email.toLowerCase();
+    if (!vistos.has(k)) vistos.set(k, []);
+    vistos.get(k)!.push({ id: r.video_id, watchedAt: r.created_at ?? "" });
   }
 
-  return Response.json({ progress: Object.values(grouped) });
+  const desbloqueadas = new Map<string, number[]>();
+  for (const c of compras ?? []) {
+    const k = c.user_email.toLowerCase();
+    if (!desbloqueadas.has(k)) desbloqueadas.set(k, []);
+    desbloqueadas.get(k)!.push(c.video_id);
+  }
+
+  const visitas = new Map<string, string[]>();
+  for (const e of entradas ?? []) {
+    const k = (e.user_email ?? "").toLowerCase();
+    if (!visitas.has(k)) visitas.set(k, []);
+    visitas.get(k)!.push(e.created_at);
+  }
+
+  // Todos los activos (aunque no hayan visto nada) y cualquiera con progreso
+  const emails = new Set<string>([
+    ...(users ?? []).filter((u) => u.activated).map((u) => u.email.toLowerCase()),
+    ...vistos.keys(),
+  ]);
+
+  const progress = [...emails].map((email) => {
+    const u = userMap.get(email);
+    const plan = u?.plan ?? "";
+    const esClase = plan === "clase_individual";
+    const titulo = (id: number) =>
+      (esClase ? CLASS_NAMES[id] : VIDEO_TITLES[id]) ?? CLASS_NAMES[id] ?? `Vídeo ${id}`;
+
+    const videos = (vistos.get(email) ?? [])
+      .sort((a, b) => a.watchedAt.localeCompare(b.watchedAt))
+      .map((v) => ({ id: v.id, title: titulo(v.id), watchedAt: v.watchedAt }));
+    const vistoEn = new Map(videos.map((v) => [v.id, v.watchedAt]));
+
+    const fechas = visitas.get(email) ?? [];
+    const dias = new Set(fechas.map((f) => f.slice(0, 10)));
+
+    return {
+      email,
+      name: u?.name ?? email,
+      plan,
+      activated: u?.activated ?? false,
+      videos,
+      unlocked: esClase
+        ? (desbloqueadas.get(email) ?? []).map((id) => ({
+            id,
+            title: titulo(id),
+            watchedAt: vistoEn.get(id) ?? null,
+          }))
+        : null,
+      lastSeen: fechas[0] ?? null,
+      firstSeen: fechas[fechas.length - 1] ?? null,
+      daysActive: dias.size,
+    };
+  });
+
+  return Response.json({ progress });
 }
