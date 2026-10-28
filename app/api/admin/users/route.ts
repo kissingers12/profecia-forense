@@ -54,6 +54,9 @@ export async function DELETE(req: NextRequest) {
   const { error } = await supabaseAdmin.from("users").delete().eq("id", user.id);
   if (error) return Response.json({ error: "Error al eliminar." }, { status: 500 });
 
+  // Si no, quien se registre después con este correo heredaría estas clases
+  await supabaseAdmin.from("class_purchases").delete().eq("user_email", email.toLowerCase());
+
   return Response.json({ success: true });
 }
 

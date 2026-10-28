@@ -9,7 +9,7 @@
 - IDs reales: 101–108 (Básico), 1–4 y 7 (Intermedio), 201–210, 301, 401, 402 (Avanzado). Bundles: 100 → 101–108; 208 → 208+209 (`BUNDLE_IDS` en webhook y grant-class).
 
 ## Datos (Supabase)
-- `class_purchases(user_email, video_id, UNIQUE(user_email, video_id))`: clases desbloqueadas. Desactivar un usuario NO borra sus filas.
+- `class_purchases(user_email, video_id, UNIQUE(user_email, video_id))`: clases desbloqueadas. Desactivar un usuario NO borra sus filas; ELIMINAR al usuario sí (antes no, y un nuevo registro con el mismo correo heredaba clases viejas). `DELETE /api/admin/grant-class` quita una clase concreta (✕ en el admin).
 - `activity_logs` sirve de registro de eventos:
   - `user_name="CLASE_ELEGIDA"`, `action=<videoId>`: clase elegida al registrarse (`/api/auth/register`) o al comprar desde el panel (`/api/payment/class`). Antes no se guardaba si el alumno no pagaba con cripto (p. ej. PayPal).
   - `user_name="PAGO"`, `user_email=<order_id>`: avisos de NOWPayments. En clase individual el order_id es `email:clase:videoId`.
@@ -32,4 +32,4 @@
 - Usuarios registrados antes del PR #37 no tienen CLASE_ELEGIDA.
 - Correos de clase enviados antes del PR #38 pudieron llevar el nombre de clase equivocado (el vídeo desbloqueado sí era correcto).
 - No se ha probado de punta a punta en producción desde el entorno de Claude (la red bloquea kissingersaraque.com); el usuario prueba manualmente.
-- Cuenta de prueba del dueño: pskissingers@gmail.com (aparece como "Hugo boss"/"Kissingers 12"), tiene la 201 desbloqueada de pruebas.
+- Cuenta de prueba del dueño: pskissingers@gmail.com ("Hugo boss"/"Kissingers 12"/"Kissingers Araque"); tenía la 201 heredada de pruebas anteriores.
