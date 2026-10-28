@@ -1,8 +1,8 @@
 "use client";
 
-import { CLASS_NAMES } from "@/lib/clases";
+import { CLASS_NAMES, CLASES_INDIVIDUALES } from "@/lib/clases";
 import { useState, useEffect } from "react";
-import { CheckCircle, XCircle, RefreshCw, Lock, Users, LogOut, LogIn, Download, Activity, Search, PlayCircle, Copy, UserPlus, DollarSign, MessageCircle, Eye, EyeOff, Trash2, Send, Pencil, KeyRound, Mail, BarChart2, BookOpen, ChevronDown, ChevronUp } from "lucide-react";
+import { CheckCircle, XCircle, RefreshCw, Lock, Users, LogOut, LogIn, Download, Activity, Search, PlayCircle, Copy, UserPlus, DollarSign, MessageCircle, Eye, EyeOff, Trash2, Send, Pencil, KeyRound, Mail, BarChart2, BookOpen, ChevronDown, ChevronUp, Gift } from "lucide-react";
 
 type User = {
   id: string;
@@ -123,7 +123,7 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [toast, setToast] = useState("");
-  const [activeTab, setActiveTab] = useState<"clientes" | "pagos" | "actividad" | "ingresos" | "foro" | "hotmart" | "email" | "progreso">("clientes");
+  const [activeTab, setActiveTab] = useState<"clientes" | "pagos" | "actividad" | "ingresos" | "foro" | "hotmart" | "email" | "progreso" | "invitar">("clientes");
   const [progressData, setProgressData] = useState<{ email: string; name: string; plan: string; activated: boolean; videos: { id: number; title: string; watchedAt: string }[] }[]>([]);
   const [progressLoading, setProgressLoading] = useState(false);
   const [progressSearch, setProgressSearch] = useState("");
@@ -161,6 +161,11 @@ export default function AdminPage() {
   const [emailBody, setEmailBody] = useState("");
   const [emailSending, setEmailSending] = useState(false);
   const [selectedTemplate, setSelectedTemplate] = useState("");
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviteName, setInviteName] = useState("");
+  const [inviteIds, setInviteIds] = useState<Set<number>>(new Set());
+  const [inviteLoading, setInviteLoading] = useState(false);
+  const [inviteResult, setInviteResult] = useState<{ email: string; link: string; necesitaClave: boolean; emailSent: boolean; emailError: string | null } | null>(null);
 
   const showToast = (msg: string) => {
     setToast(msg);
@@ -268,6 +273,34 @@ export default function AdminPage() {
       showToast("Error de conexión.");
     }
     setActionLoading(null);
+  };
+
+  const handleInvite = async () => {
+    if (!inviteEmail.trim() || inviteIds.size === 0) return;
+    setInviteLoading(true);
+    setInviteResult(null);
+    try {
+      const res = await fetch("/api/admin/invite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-admin-password": password },
+        body: JSON.stringify({ email: inviteEmail, name: inviteName, videoIds: [...inviteIds] }),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setInviteResult({ email: inviteEmail.trim().toLowerCase(), link: data.link, necesitaClave: data.necesitaClave, emailSent: data.emailSent, emailError: data.emailError });
+        showToast(data.emailSent ? "Invitación enviada 📧" : "Acceso dado ✓ · el correo no salió");
+        setInviteEmail("");
+        setInviteName("");
+        setInviteIds(new Set());
+        setClassPurchasesLoaded(false);
+        fetchUsers(password);
+      } else {
+        showToast(data.error ?? "No se pudo invitar.");
+      }
+    } catch {
+      showToast("Error de conexión.");
+    }
+    setInviteLoading(false);
   };
 
   const handleRevokeClass = async (email: string, videoId: number) => {
@@ -960,6 +993,17 @@ Servicio al Estudiante
           >
             <Users size={15} />
             Clientes
+          </button>
+          <button
+            onClick={() => setActiveTab("invitar")}
+            className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-4 py-2.5 text-xs sm:text-sm font-bold rounded-t-xl transition-all shrink-0 ${
+              activeTab === "invitar"
+                ? "text-[#c9a84c] border-b-2 border-[#c9a84c]"
+                : "text-[#6a5a4a] hover:text-white"
+            }`}
+          >
+            <Gift size={15} />
+            Invitar
           </button>
           <button
             onClick={() => { setActiveTab("pagos"); fetchPayments(); }}
@@ -2187,6 +2231,124 @@ Servicio al Estudiante
         )}
 
         {/* Tab: Progreso */}
+        {activeTab === "invitar" && (
+          <div className="space-y-4">
+            <div className="card-dark rounded-2xl p-5 border border-[#c9a84c]/15">
+              <p className="text-[#c9a84c] text-xs font-bold uppercase tracking-widest mb-1">Invitar a ver clases</p>
+              <p className="text-[#8a7a6a] text-xs leading-relaxed">
+                Escribe el correo de la persona y marca las clases que podrá ver. Le llegará un correo con un enlace personal
+                (de un solo uso) donde pone su correo y crea su contraseña. Si ya tiene cuenta, solo se le añaden las clases.
+              </p>
+            </div>
+
+            <div className="card-dark rounded-2xl p-5 space-y-4">
+              <div className="grid sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-[#c9a84c] uppercase tracking-widest mb-2">Correo *</label>
+                  <input
+                    type="email"
+                    value={inviteEmail}
+                    onChange={(e) => setInviteEmail(e.target.value)}
+                    placeholder="persona@correo.com"
+                    className="w-full bg-white/5 border border-[#c9a84c]/20 rounded-xl px-4 py-3 text-white placeholder-[#4a3a2a] text-sm focus:outline-none focus:border-[#c9a84c]/60"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-[#c9a84c] uppercase tracking-widest mb-2">Nombre (opcional)</label>
+                  <input
+                    type="text"
+                    value={inviteName}
+                    onChange={(e) => setInviteName(e.target.value)}
+                    placeholder="Para saludarle en el correo"
+                    className="w-full bg-white/5 border border-[#c9a84c]/20 rounded-xl px-4 py-3 text-white placeholder-[#4a3a2a] text-sm focus:outline-none focus:border-[#c9a84c]/60"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <p className="text-xs font-semibold text-[#c9a84c] uppercase tracking-widest">Clases ({inviteIds.size} marcadas) *</p>
+                  {inviteIds.size > 0 && (
+                    <button onClick={() => setInviteIds(new Set())} className="text-xs text-[#6a5a4a] hover:text-white">Quitar todas</button>
+                  )}
+                </div>
+                {(["Basico", "Intermedio", "Avanzado"] as const).map((nivel) => {
+                  const delNivel = CLASES_INDIVIDUALES.filter((c) => c.nivel === nivel);
+                  const todas = delNivel.every((c) => inviteIds.has(c.id));
+                  return (
+                    <div key={nivel} className="rounded-xl border border-[#c9a84c]/15 overflow-hidden">
+                      <div className="flex items-center justify-between px-4 py-2 bg-white/5">
+                        <p className="text-white text-xs font-bold">Nivel {nivel === "Basico" ? "Básico" : nivel}</p>
+                        <button
+                          onClick={() => setInviteIds((prev) => {
+                            const n = new Set(prev);
+                            delNivel.forEach((c) => (todas ? n.delete(c.id) : n.add(c.id)));
+                            return n;
+                          })}
+                          className="text-[11px] text-[#c9a84c] hover:text-white"
+                        >
+                          {todas ? "Desmarcar nivel" : "Marcar todo el nivel"}
+                        </button>
+                      </div>
+                      <div className="divide-y divide-white/5">
+                        {delNivel.map((c) => (
+                          <label key={c.id} className="flex items-center gap-3 px-4 py-2.5 cursor-pointer hover:bg-white/5">
+                            <input
+                              type="checkbox"
+                              checked={inviteIds.has(c.id)}
+                              onChange={() => setInviteIds((prev) => {
+                                const n = new Set(prev);
+                                if (n.has(c.id)) n.delete(c.id); else n.add(c.id);
+                                return n;
+                              })}
+                              className="accent-[#c9a84c] w-4 h-4 shrink-0"
+                            />
+                            <span className="text-[#c8b89a] text-xs leading-snug">{c.title}</span>
+                          </label>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <button
+                onClick={handleInvite}
+                disabled={inviteLoading || !inviteEmail.trim() || inviteIds.size === 0}
+                className="btn-gold w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 disabled:opacity-50"
+              >
+                {inviteLoading
+                  ? <span className="w-4 h-4 border-2 border-[#050510]/40 border-t-[#050510] rounded-full animate-spin" />
+                  : <><Gift size={15} /> Invitar y dar acceso</>}
+              </button>
+            </div>
+
+            {inviteResult && (
+              <div className="card-dark rounded-2xl p-5 border border-green-500/20 space-y-3">
+                <p className="text-green-400 text-sm font-bold">✓ {inviteResult.email} ya tiene acceso a las clases</p>
+                <p className="text-[#8a7a6a] text-xs">
+                  {inviteResult.emailSent
+                    ? "Le enviamos el correo de invitación."
+                    : `El correo NO salió (${inviteResult.emailError ?? "error desconocido"}). Envíale el enlace tú mismo.`}
+                  {inviteResult.necesitaClave
+                    ? " También puedes copiar el enlace y mandárselo por WhatsApp. Solo sirve una vez."
+                    : " Ya tenía cuenta: entra con su contraseña de siempre desde este enlace."}
+                </p>
+                <div className="bg-[#050510] rounded-xl p-3 flex items-center justify-between gap-2 border border-white/5">
+                  <code className="text-[#c9a84c] text-xs break-all flex-1">{inviteResult.link}</code>
+                  <button
+                    onClick={() => navigator.clipboard.writeText(inviteResult.link).then(() => showToast("Enlace copiado ✓"))}
+                    className="shrink-0 p-1.5 text-[#6a5a4a] hover:text-[#c9a84c] transition-colors"
+                    title="Copiar enlace"
+                  >
+                    <Copy size={14} />
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
         {activeTab === "progreso" && (
           <div className="space-y-4">
             <div className="flex items-center justify-between gap-3">

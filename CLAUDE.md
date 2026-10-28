@@ -28,6 +28,12 @@
 - Pagos: muestra "Clase: <nombre>". "Dar acceso" para clase individual confirma y asigna la clase conocida; si no se conoce, abre el selector en Clientes.
 - Se eliminó el bloque SQL "Reparar base de datos" (la tabla class_purchases ya existe en producción).
 
+## Invitaciones (pestaña "Invitar" del admin)
+- `POST /api/admin/invite {email, name?, videoIds[]}`: si no existe, crea usuario `clase_individual` activado con contraseña aleatoria; añade las clases a `class_purchases`; envía `sendInvitationEmail`. Devuelve `link` para copiarlo (WhatsApp).
+- Enlace `/invitacion?token=...`: token aleatorio; en `activity_logs` (`user_name="INVITACION"`) se guarda solo su sha256 (`lib/invitacion.ts`). Al usarlo, `action` pasa a `usada:<hash>`; al reinvitar, los anteriores pasan a `anulada:<hash>`.
+- `POST /api/auth/invitacion {token, email, password}`: comprueba token+email, guarda la contraseña y devuelve el usuario para iniciar sesión → `/dashboard`.
+- Si la persona ya tenía cuenta (y no tiene invitación pendiente) solo se añaden clases y el enlace es `/login`.
+
 ## Pendiente / a tener en cuenta
 - Usuarios registrados antes del PR #37 no tienen CLASE_ELEGIDA.
 - Correos de clase enviados antes del PR #38 pudieron llevar el nombre de clase equivocado (el vídeo desbloqueado sí era correcto).
