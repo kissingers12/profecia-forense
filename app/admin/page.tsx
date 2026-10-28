@@ -676,6 +676,39 @@ Servicio al Estudiante
 100x100Cristianos · kissingersaraque.com`,
     },
     {
+      // Solo hay que cambiar [CODIGO] por el código creado en la pestaña Hotmart
+      id: "codigo-libro",
+      nombre: "📖 Código para descargar el libro (Hotmart)",
+      asunto: "Tu código para descargar el libro 📖",
+      body: `¡Bendiciones!
+
+Sabemos que tuviste dificultades para descargar el libro desde Hotmart, así que te preparamos un acceso directo desde nuestra página.
+
+TU CÓDIGO DE DESCARGA:
+[CODIGO]
+
+CÓMO CANJEARLO:
+
+1. Entra en este enlace:
+https://www.kissingersaraque.com/libro
+
+2. Escribe el código tal como aparece arriba (puedes copiarlo y pegarlo).
+
+3. Pulsa el botón «Acceder a mi descarga».
+
+4. Te aparecerán los botones para descargar tu libro. Descárgalo en ese mismo momento y guarda el archivo en tu teléfono o computadora.
+
+IMPORTANTE:
+• El código es de UN SOLO USO. En cuanto lo canjeas queda desactivado y no se puede volver a usar.
+• Después de canjearlo, los botones de descarga funcionan durante 15 minutos. Te recomendamos hacerlo desde un dispositivo con buena conexión y descargar el libro enseguida.
+• Una vez descargado, el libro es tuyo: guárdalo bien para poder leerlo cuando quieras.
+
+Si tienes cualquier problema al canjearlo, responde a este correo y con gusto te ayudamos.
+
+Servicio al Estudiante
+100x100Cristianos · kissingersaraque.com`,
+    },
+    {
       // Para quien dice haber pagado pero no encontramos el pago
       id: "pedir-comprobante",
       nombre: "🔎 Pedir comprobante del pago",
@@ -1974,6 +2007,20 @@ Servicio al Estudiante
                     <p className="text-[#c9a84c] text-xs font-bold uppercase tracking-widest mb-1">Código generado</p>
                     <p className="text-white font-bold text-lg tracking-widest">{generatedCode}</p>
                     <p className="text-[#8a7a6a] text-xs mt-1">Envía este código al cliente. Solo se puede usar una vez.</p>
+                    <button
+                      onClick={() => {
+                        const t = EMAIL_TEMPLATES.find((x) => x.id === "codigo-libro");
+                        if (!t) return;
+                        setSelectedTemplate(t.id);
+                        setEmailSubject(t.asunto);
+                        setEmailBody(t.body.replace("[CODIGO]", generatedCode));
+                        setActiveTab("email");
+                      }}
+                      className="mt-3 inline-flex items-center gap-1.5 btn-gold px-4 py-2 rounded-xl text-xs font-bold"
+                    >
+                      <Mail size={13} />
+                      Preparar correo con este código
+                    </button>
                   </div>
                   <button
                     onClick={() => { navigator.clipboard.writeText(generatedCode); showToast("Código copiado ✓"); }}
@@ -2115,7 +2162,7 @@ Servicio al Estudiante
                   placeholder="Escribe o selecciona una plantilla arriba..."
                   className="w-full bg-white/5 border border-[#c9a84c]/20 rounded-xl px-4 py-3 text-white placeholder-[#4a3a2a] text-sm focus:outline-none focus:border-[#c9a84c]/60 resize-none font-mono leading-relaxed"
                 />
-                <p className="text-[#6a5a4a] text-xs mt-1.5">Edita el texto antes de enviar. Cambia [NOMBRE], [EMAIL], [ENLACE_PAYPAL] por los datos reales.</p>
+                <p className="text-[#6a5a4a] text-xs mt-1.5">Edita el texto antes de enviar. Cambia [NOMBRE], [EMAIL], [CODIGO], [ENLACE_PAYPAL] por los datos reales.</p>
               </div>
 
               <div className="flex gap-3 pt-1">
