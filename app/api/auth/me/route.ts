@@ -20,6 +20,22 @@ export async function POST(req: NextRequest) {
 
   if (!user) return Response.json({ error: "Usuario no encontrado." }, { status: 404 });
 
+  // Registro de visitas al panel para la pestaña Progreso del admin (máx. una cada 30 min)
+  if (user.activated) {
+    const cuenta = email.toLowerCase();
+    const desde = new Date(Date.now() - 30 * 60_000).toISOString();
+    const { data: reciente } = await supabaseAdmin
+      .from("activity_logs")
+      .select("id")
+      .eq("user_name", "VISITA")
+      .eq("user_email", cuenta)
+      .gte("created_at", desde)
+      .limit(1);
+    if (!reciente?.length) {
+      await supabaseAdmin.from("activity_logs").insert({ user_email: cuenta, user_name: "VISITA", action: "panel" });
+    }
+  }
+
   // Solo se devuelve lo imprescindible para refrescar la sesión
   return Response.json({ user: { plan: user.plan, activated: user.activated } });
 }
