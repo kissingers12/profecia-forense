@@ -44,6 +44,7 @@
 - Contacto (`/api/contact`): "Oración" 1 por correo cada 7 días → 429 con `limite:true` y el mensaje "Para evitar colapsar el buzón de entrada, solo se puede enviar una petición de oración por cuenta y por semana." (lo muestra `components/Contact.tsx`). Otros motivos: 2 cada 7 días; al pasarse responde ok SIN enviar (decisión del dueño: que no diga nada). Además 6/día por IP (memoria).
 - Pagos/soporte (`/api/support`): 2 cada 7 días y 4 cada 30 días por cuenta → 429 `limite:true`; el dashboard muestra "Ya recibimos tu solicitud" en vez de "problema técnico".
 - Los FORM_* no se muestran en la pestaña Actividad.
+- Destinos: formulario de contacto (oración, invitaciones ministeriales, otros) → pskissingers@gmail.com; Pagos/soporte → 100x100cristianos@gmail.com.
 
 ## Pendiente / a tener en cuenta
 - Usuarios registrados antes del PR #37 no tienen CLASE_ELEGIDA.

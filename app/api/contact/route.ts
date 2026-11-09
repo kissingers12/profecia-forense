@@ -68,7 +68,8 @@ export async function POST(req: NextRequest) {
 
     await transporter.sendMail({
       from: `"100x100Cristianos" <${process.env.EMAIL_USER}>`,
-      to: "100x100cristianos@gmail.com",
+      // Oración, invitaciones y otros van a este buzón; Pagos (/api/support) sigue en 100x100cristianos
+      to: "pskissingers@gmail.com",
       replyTo: email,
       subject: esInvitacion
         ? `⛪ INVITACIÓN MINISTERIAL — ${safeIglesia} | ${safeName}`
