@@ -3,6 +3,7 @@ import nodemailer from "nodemailer";
 import { supabaseAdmin } from "@/lib/supabase";
 import { allow, clientIp } from "@/lib/rate-limit";
 import { limpiarMensaje, limpiarCabecera } from "@/lib/sanitizar";
+import { enviosRecientes, registrarEnvio, DIA } from "@/lib/limite-envios";
 
 const PLAN_LABELS: Record<string, string> = {
   meditaciones: "Meditación Profética — $333",
@@ -30,15 +31,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: false, error: "Email requerido." }, { status: 400 });
     }
 
-    // Evita que un bot llene el buzón de soporte de mensajes:
-    // 3 por persona y 10 por dispositivo cada 24 h
-    const DIA = 24 * 60 * 60_000;
-    if (
-      !allow("soporte-cuenta", String(email).toLowerCase(), 3, DIA) ||
-      !allow("soporte-ip", clientIp(req), 10, DIA)
-    ) {
+    // Para no llenar el buzón: 2 por cuenta cada 7 días y 4 cada 30 días (en base de datos),
+    // más un freno por dispositivo en memoria
+    const [semana, mes] = await Promise.all([
+      enviosRecientes("FORM_SOPORTE", String(email), 7 * DIA),
+      enviosRecientes("FORM_SOPORTE", String(email), 30 * DIA),
+    ]);
+    if (semana >= 2 || mes >= 4 || !allow("soporte-ip", clientIp(req), 10, DIA)) {
       return NextResponse.json(
-        { ok: false, error: "Ya recibimos tu solicitud. Te responderemos pronto." },
+        { ok: false, limite: true, error: "Ya recibimos tu solicitud. Te responderemos pronto." },
         { status: 429 }
       );
     }
@@ -162,6 +163,8 @@ export async function POST(req: NextRequest) {
         </div>
       `,
     });
+
+    await registrarEnvio("FORM_SOPORTE", String(email), adjunto ? "con comprobante" : "sin comprobante");
 
     return NextResponse.json({ ok: true });
   } catch (err) {

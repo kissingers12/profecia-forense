@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
   const { data: logs, error } = await supabaseAdmin
     .from("activity_logs")
     .select("id, user_email, user_name, action, created_at")
-    .neq("user_name", "VISITA")
+    .not("user_name", "in", "(VISITA,FORM_ORACION,FORM_CONTACTO,FORM_SOPORTE)")
     .order("created_at", { ascending: false })
     .limit(100);
 

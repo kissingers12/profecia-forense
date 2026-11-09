@@ -39,6 +39,12 @@
 - `video_progress` se marca al ABRIR una lección en el dashboard (`markWatched`), no al terminar el vídeo.
 - Entradas: `/api/auth/me` (lo llama el dashboard al cargar) registra `user_name="VISITA"` como mucho cada 30 min por usuario; también cuentan los logs de login (`action` login/course_access). Las VISITA se excluyen de la pestaña Actividad (`/api/admin/logs`). Solo hay visitas registradas desde el PR que añadió esto; antes solo inicios de sesión con contraseña.
 
+## Límites de formularios (anti-spam del buzón)
+- `lib/limite-envios.ts`: cuenta envíos en `activity_logs` (`user_name` FORM_ORACION / FORM_CONTACTO / FORM_SOPORTE, `user_email`=correo) en ventanas móviles; sobrevive a reinicios (lib/rate-limit es solo memoria).
+- Contacto (`/api/contact`): "Oración" 1 por correo cada 7 días → 429 con `limite:true` y el mensaje "Para evitar colapsar el buzón de entrada, solo se puede enviar una petición de oración por cuenta y por semana." (lo muestra `components/Contact.tsx`). Otros motivos: 2 cada 7 días; al pasarse responde ok SIN enviar (decisión del dueño: que no diga nada). Además 6/día por IP (memoria).
+- Pagos/soporte (`/api/support`): 2 cada 7 días y 4 cada 30 días por cuenta → 429 `limite:true`; el dashboard muestra "Ya recibimos tu solicitud" en vez de "problema técnico".
+- Los FORM_* no se muestran en la pestaña Actividad.
+
 ## Pendiente / a tener en cuenta
 - Usuarios registrados antes del PR #37 no tienen CLASE_ELEGIDA.
 - Correos de clase enviados antes del PR #38 pudieron llevar el nombre de clase equivocado (el vídeo desbloqueado sí era correcto).
