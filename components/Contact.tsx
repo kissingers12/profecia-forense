@@ -55,10 +55,11 @@ export default function Contact() {
           rol: form.rol,
         }),
       });
+      const data = await res.json().catch(() => ({}));
       if (res.ok) {
         setSubmitted(true);
       } else {
-        setError("No se pudo enviar el mensaje. Intenta de nuevo.");
+        setError(data.limite ? data.error : "No se pudo enviar el mensaje. Intenta de nuevo.");
       }
     } catch {
       setError("Error de conexión. Intenta de nuevo.");

@@ -125,6 +125,7 @@ export default function Dashboard() {
   const [supportLoading, setSupportLoading] = useState(false);
   const [supportSent, setSupportSent] = useState(false);
   const [supportFailed, setSupportFailed] = useState(false);
+  const [supportAlreadySent, setSupportAlreadySent] = useState(false);
   const [paymentUrl, setPaymentUrl] = useState("");
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [upgradeLoading, setUpgradeLoading] = useState(false);
@@ -349,7 +350,9 @@ export default function Dashboard() {
           comprobante,
         }),
       });
-      if (res.ok) {
+      const data = await res.json().catch(() => ({}));
+      if (res.ok || data.limite) {
+        setSupportAlreadySent(!!data.limite);
         setSupportSent(true);
       } else {
         setSupportFailed(true);
@@ -405,12 +408,16 @@ export default function Dashboard() {
                   <div className="w-14 h-14 rounded-full bg-[#c9a84c]/10 border border-[#c9a84c]/30 flex items-center justify-center mx-auto">
                     <CheckCircle size={28} className="text-[#c9a84c]" />
                   </div>
-                  <h3 className="text-white font-bold text-lg">Mensaje enviado</h3>
+                  <h3 className="text-white font-bold text-lg">{supportAlreadySent ? "Ya recibimos tu solicitud" : "Mensaje enviado"}</h3>
                   <p className="text-[#8a7a6a] text-sm">
-                    Recibimos tu solicitud. Te contactaremos a <span className="text-[#c9a84c]">{session.email}</span> en las próximas horas para verificar tu pago y darte acceso.
+                    {supportAlreadySent
+                      ? "Ya tenemos tus mensajes de esta semana y los estamos revisando. No hace falta que lo vuelvas a enviar: te escribiremos a "
+                      : "Recibimos tu solicitud. Te contactaremos a "}
+                    <span className="text-[#c9a84c]">{session.email}</span>
+                    {supportAlreadySent ? "." : " en las próximas horas para verificar tu pago y darte acceso."}
                   </p>
                   <button
-                    onClick={() => { setShowSupport(false); setSupportSent(false); setSupportMessage(""); }}
+                    onClick={() => { setShowSupport(false); setSupportSent(false); setSupportAlreadySent(false); setSupportMessage(""); }}
                     className="btn-gold w-full py-3 rounded-xl font-bold mt-2"
                   >
                     Cerrar
@@ -796,12 +803,16 @@ export default function Dashboard() {
                 <div className="w-14 h-14 rounded-full bg-[#c9a84c]/10 border border-[#c9a84c]/30 flex items-center justify-center mx-auto">
                   <CheckCircle size={28} className="text-[#c9a84c]" />
                 </div>
-                <h3 className="text-white font-bold text-lg">Mensaje enviado</h3>
+                <h3 className="text-white font-bold text-lg">{supportAlreadySent ? "Ya recibimos tu solicitud" : "Mensaje enviado"}</h3>
                 <p className="text-[#8a7a6a] text-sm">
-                  Recibimos tu solicitud. Te contactaremos a <span className="text-[#c9a84c]">{session.email}</span> en las próximas horas para verificar tu pago y darte acceso.
+                  {supportAlreadySent
+                    ? "Ya tenemos tus mensajes de esta semana y los estamos revisando. No hace falta que lo vuelvas a enviar: te escribiremos a "
+                    : "Recibimos tu solicitud. Te contactaremos a "}
+                  <span className="text-[#c9a84c]">{session.email}</span>
+                  {supportAlreadySent ? "." : " en las próximas horas para verificar tu pago y darte acceso."}
                 </p>
                 <button
-                  onClick={() => { setShowSupport(false); setSupportSent(false); setSupportMessage(""); }}
+                  onClick={() => { setShowSupport(false); setSupportSent(false); setSupportAlreadySent(false); setSupportMessage(""); }}
                   className="btn-gold w-full py-3 rounded-xl font-bold mt-2"
                 >
                   Cerrar
