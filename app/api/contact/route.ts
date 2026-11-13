@@ -28,15 +28,22 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: false, error: "El correo no es válido." }, { status: 400 });
     }
 
-    // Límite por correo, todos los motivos juntos: 1 cada 15 días y 2 como máximo en 30 días
-    const tipo = programa === "Oración" ? "FORM_ORACION" : "FORM_CONTACTO";
-    const TODOS = ["FORM_ORACION", "FORM_CONTACTO"] as const;
-    const [quincena, mes] = await Promise.all([
-      enviosRecientes([...TODOS], email, 15 * DIA),
-      enviosRecientes([...TODOS], email, 30 * DIA),
-    ]);
-    // Freno extra por dispositivo, por si cambian de correo en cada envío
-    if (quincena >= 1 || mes >= 2 || !allow("contacto-ip", clientIp(req), 3, DIA)) {
+    // Solo "Oración" y "Otro" tienen límite (juntos): 1 por correo cada 15 días y máx. 2 en 30 días.
+    // Invitaciones, preguntas e inscripciones no tienen límite por correo.
+    const conLimite = programa === "Oración" || programa === "Otro";
+    const tipo = programa === "Oración" ? "FORM_ORACION" : programa === "Otro" ? "FORM_OTRO" : "FORM_CONTACTO";
+    if (conLimite) {
+      const LIMITADOS = ["FORM_ORACION", "FORM_OTRO"] as const;
+      const [quincena, mes] = await Promise.all([
+        enviosRecientes([...LIMITADOS], email, 15 * DIA),
+        enviosRecientes([...LIMITADOS], email, 30 * DIA),
+      ]);
+      // Freno extra por dispositivo, por si cambian de correo en cada envío
+      if (quincena >= 1 || mes >= 2 || !allow("contacto-ip", clientIp(req), 3, DIA)) {
+        return NextResponse.json({ ok: false, limite: true, error: MENSAJE_BUZON_LLENO }, { status: 429 });
+      }
+    } else if (!allow("contacto-ip-otros", clientIp(req), 10, DIA)) {
+      // Solo contra bots: un uso normal nunca llega a 10 al día
       return NextResponse.json({ ok: false, limite: true, error: MENSAJE_BUZON_LLENO }, { status: 429 });
     }
 
