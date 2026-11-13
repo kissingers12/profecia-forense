@@ -41,7 +41,7 @@
 
 ## Límites de formularios (anti-spam del buzón)
 - `lib/limite-envios.ts`: cuenta envíos en `activity_logs` (`user_name` FORM_ORACION / FORM_CONTACTO / FORM_SOPORTE, `user_email`=correo) en ventanas móviles; sobrevive a reinicios (lib/rate-limit es solo memoria).
-- Contacto (`/api/contact`): "Oración" 1 por correo cada 7 días → 429 con `limite:true` y el mensaje "Para evitar colapsar el buzón de entrada, solo se puede enviar una petición de oración por cuenta y por semana." (lo muestra `components/Contact.tsx`). Otros motivos: 2 cada 7 días; al pasarse responde ok SIN enviar (decisión del dueño: que no diga nada). Además 6/día por IP (memoria).
+- Contacto (`/api/contact`), todos los motivos juntos (FORM_ORACION + FORM_CONTACTO): 1 por correo cada 15 días y máx. 2 en 30 días, más 3/día por IP (memoria). Al pasarse NO se envía y responde 429 `limite:true` con "El buzón de entrada del destinatario está lleno. No se pueden enviar más mensajes. Inténtalo más tarde." (lo muestra `components/Contact.tsx`). Pedido por el dueño el 13-nov-2026 por exceso de correos; sustituye los límites anteriores (oración 1/semana, otros 2/semana silencioso).
 - Pagos/soporte (`/api/support`): 2 cada 7 días y 4 cada 30 días por cuenta → 429 `limite:true`; el dashboard muestra "Ya recibimos tu solicitud" en vez de "problema técnico".
 - Los FORM_* no se muestran en la pestaña Actividad.
 - Destinos: formulario de contacto (oración, invitaciones ministeriales, otros) → pskissingers@gmail.com; Pagos/soporte → 100x100cristianos@gmail.com.

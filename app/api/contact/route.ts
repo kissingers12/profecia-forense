@@ -4,8 +4,8 @@ import { limpiarMensaje, limpiarCabecera } from "@/lib/sanitizar";
 import { allow, clientIp } from "@/lib/rate-limit";
 import { enviosRecientes, registrarEnvio, DIA } from "@/lib/limite-envios";
 
-const MENSAJE_LIMITE_ORACION =
-  "Para evitar colapsar el buzón de entrada, solo se puede enviar una petición de oración por cuenta y por semana.";
+const MENSAJE_BUZON_LLENO =
+  "El buzón de entrada del destinatario está lleno. No se pueden enviar más mensajes. Inténtalo más tarde.";
 
 function escapeHtml(str: string): string {
   return str
@@ -28,20 +28,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ ok: false, error: "El correo no es válido." }, { status: 400 });
     }
 
-    // Límites por correo y por 7 días para no saturar el buzón
-    const esOracion = programa === "Oración";
-    const tipo = esOracion ? "FORM_ORACION" : "FORM_CONTACTO";
-    const enviados = await enviosRecientes(tipo, email, 7 * DIA);
-    if (esOracion && enviados >= 1) {
-      return NextResponse.json({ ok: false, limite: true, error: MENSAJE_LIMITE_ORACION }, { status: 429 });
-    }
-    // Resto de motivos: 2 por semana; al pasarse se responde "enviado" sin enviar nada
-    if (!esOracion && enviados >= 2) {
-      return NextResponse.json({ ok: true });
-    }
+    // Límite por correo, todos los motivos juntos: 1 cada 15 días y 2 como máximo en 30 días
+    const tipo = programa === "Oración" ? "FORM_ORACION" : "FORM_CONTACTO";
+    const TODOS = ["FORM_ORACION", "FORM_CONTACTO"] as const;
+    const [quincena, mes] = await Promise.all([
+      enviosRecientes([...TODOS], email, 15 * DIA),
+      enviosRecientes([...TODOS], email, 30 * DIA),
+    ]);
     // Freno extra por dispositivo, por si cambian de correo en cada envío
-    if (!allow("contacto-ip", clientIp(req), 6, DIA)) {
-      return NextResponse.json({ ok: true });
+    if (quincena >= 1 || mes >= 2 || !allow("contacto-ip", clientIp(req), 3, DIA)) {
+      return NextResponse.json({ ok: false, limite: true, error: MENSAJE_BUZON_LLENO }, { status: 429 });
     }
 
     const safeName = escapeHtml(limpiarCabecera(nombre));
