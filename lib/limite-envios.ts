@@ -2,7 +2,7 @@ import { supabaseAdmin } from "./supabase";
 
 // Envíos de formularios guardados en activity_logs: a diferencia de lib/rate-limit
 // (en memoria), sobreviven a los reinicios de Vercel y permiten ventanas de días.
-export type TipoEnvio = "FORM_ORACION" | "FORM_CONTACTO" | "FORM_SOPORTE";
+export type TipoEnvio = "FORM_ORACION" | "FORM_OTRO" | "FORM_CONTACTO" | "FORM_SOPORTE";
 
 export const DIA = 24 * 60 * 60_000;
 
